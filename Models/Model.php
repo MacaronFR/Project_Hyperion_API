@@ -12,11 +12,12 @@ abstract class Model{
 	 * Models constructor.
 	 */
 	public function __construct(){
-		$dbname = "HYPERION";
-		$host = "";
-		$user = "";
-		$passwd = "";
-		$port = "";
+		include_once "conf.php";
+		$dbname = $db["dbname"];
+		$host = $db["host"];
+		$user = $db["user"];
+		$passwd = $db["passwd"];
+		$port = $db["port"];
 		$this->bdd = new PDO("mysql:dbname=${dbname};host=${host}:${port}", $user, $passwd);
 	}
 	/**
