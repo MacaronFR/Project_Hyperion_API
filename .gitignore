@@ -1,2 +1,4 @@
 .idea/
 Models/conf.php
+.phpunit.result.cache
+APICoverage/

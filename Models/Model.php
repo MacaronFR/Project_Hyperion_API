@@ -11,8 +11,8 @@ abstract class Model{
 	/**
 	 * Models constructor.
 	 */
-	protected function __construct(){
-		include_once "conf.php";
+	public function __construct(){
+		require "conf.php";
 		$dbname = $db["dbname"];
 		$host = $db["host"];
 		$user = $db["user"];
@@ -32,9 +32,9 @@ abstract class Model{
 	 * @param string $statement Statement to prepare and query
 	 * @param array $param Array of param of form $param["param_name"] = $param_value
 	 * @param bool $unique If the query return only one row
-	 * @return PDOStatement|array
+	 * @return array|false
 	 */
-	protected function prepared_query(string $statement, array $param, bool $unique = false): PDOStatement|array{
+	protected function prepared_query(string $statement, array $param, bool $unique = false): array|false{
 		$req = $this->bdd->prepare($statement);
 		foreach($param as $name => $value){
 			$req->bindParam($name, $value);

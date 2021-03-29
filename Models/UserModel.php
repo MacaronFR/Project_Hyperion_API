@@ -3,14 +3,15 @@
 
 namespace Hyperion\API;
 use \PDOStatement;
+require_once "Model.php";
 
 class UserModel extends Model{
 	/**
 	 * Retrieve user designated by $id or false if error occurs
 	 * @param int $id User ID to retrieve
-	 * @return PDOStatement|false
+	 * @return array|false
 	 */
-	function select(int $id): PDOStatement|false
+	function select(int $id): array|false
 	{
 		return $this->prepared_query("SELECT * FROM USERS WHERE id_user=:id", ['id' => $id], true);
 	}
