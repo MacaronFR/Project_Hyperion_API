@@ -10,6 +10,7 @@
 			<directory  suffix =".php">test</directory>
 			<directory  suffix =".php">cov</directory>
 			<file>autoload.php</file>
+			<file>Models/conf.php</file>
 		</exclude>
 		<report>
 			<html outputDirectory="APICoverage"/>
