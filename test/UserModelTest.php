@@ -143,10 +143,10 @@ final class UserModelTest extends TestCase{
 		];
 		$this->assertFalse($this->md->insert($value));
 	}
-	public function testDeleteValidID(){
-		$this->assertTrue($this->md->delete(11));
-	}
-	public function testDeleteInvalidID(){
-		$this->assertFalse($this->md->delete(12));
-	}
+	//public function testDeleteValidID(){
+		//$this->assertTrue($this->md->delete(11));
+	//}
+//	public function testDeleteInvalidID(){
+//		$this->assertFalse($this->md->delete(12));
+//	}
 }
