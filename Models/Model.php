@@ -11,7 +11,7 @@ abstract class Model{
 	/**
 	 * Models constructor.
 	 */
-	public function __construct(){
+	protected function __construct(){
 		include_once "conf.php";
 		$dbname = $db["dbname"];
 		$host = $db["host"];
@@ -44,4 +44,9 @@ abstract class Model{
 			return $req->fetch(PDO::FETCH_ASSOC);
 		return $req->fetchAll(PDO::FETCH_ASSOC);
 	}
+	abstract public function selectAll();
+	abstract public function select(int $id);
+	abstract public function update(int $id, array $value);
+	abstract public function insert(array $value);
+	abstract public function delete(int $id);
 }
