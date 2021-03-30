@@ -1,8 +1,10 @@
 <?php
 
-require_once "Models/Model.php";
+require_once "Controllers/OAuthController.php";
+require_once "Routers.php";
 
-use Hyperion\API\Model;
-phpinfo();
-//$model = new Model();
-//$model->prepared_query("SELECT * FROM PRODUCTS WHERE id_product=:id", ['id'=>2],true);
+use Hyperion\API\Router;
+use Hyperion\API\OAuthController;
+$rt = new Router();
+$rt->get("/token/*/*/*/*", new OAuthController());
+$rt->get("/token/*/*", new OAuthController());

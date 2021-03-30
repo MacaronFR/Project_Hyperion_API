@@ -63,7 +63,8 @@ final class UserModelTest extends TestCase{
 			'mail' => "denisft77@gmail.com",
 			'last_login' => $date->format("Y-m-d h:m:s"),
 			'account_creation' => "2021-02-12",
-			'address' => 1
+			'address' => 1,
+			'password' => '6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b'
 		];
 		$this->assertTrue($this->md->update("1", $value));
 	}
@@ -99,7 +100,8 @@ final class UserModelTest extends TestCase{
 			'mail' => "denisft77@gmail.com",
 			'last_login' => "2021-03-29 11:12:13",
 			'account_creation' => "2021-02-12",
-			'address' => 1
+			'address' => 1,
+			'password' => '6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b'
 		];
 		$prepare = $this->getMethod("prepare_fields");
 		$this->assertIsArray($prepare->invokeArgs($this->md, [$value]));
@@ -124,10 +126,11 @@ final class UserModelTest extends TestCase{
 			'firstname' => "Denis",
 			'green_coins' => 0,
 			'type' => 0,
-			'mail' => "denisft77@gmail.com",
+			'mail' => "denisft77@gmail.com".bin2hex(random_bytes(3)),
 			'last_login' => $date->format("Y-m-d h:m:s"),
 			'account_creation' => "2021-02-12",
-			'address' => 1
+			'address' => 1,
+			'password' => '6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b'
 		];
 		$this->assertTrue($this->md->insert($value));
 	}

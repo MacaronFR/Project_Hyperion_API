@@ -2,3 +2,5 @@
 Models/conf.php
 .phpunit.result.cache
 APICoverage/
+OAuth2/
+key/

@@ -17,6 +17,7 @@ class UserModel extends Model{
 				'llog' => $value['last_login'],
 				'ac_creation' => $value['account_creation'],
 				'addr' => $value['address'],
+				'passwd' => $value['password']
 			];
 		}catch(Exception){
 			return false;
@@ -45,7 +46,7 @@ class UserModel extends Model{
 		$fields['id'] = $id;
 		return $this->prepared_query(
 			'UPDATE USERS SET firstname=:firstname, name=:name, green_coins=:gc, type=:type, mail=:mail,
-			 last_login=:llog, account_creation=:ac_creation, address=:addr WHERE id_user=:id;',
+			 last_login=:llog, account_creation=:ac_creation, address=:addr, password=:passwd WHERE id_user=:id;',
 			$fields, fetch: false);
 	}
 	/**
@@ -58,8 +59,8 @@ class UserModel extends Model{
 		if($fields === false)
 			return false;
 		return $this->prepared_query("INSERT INTO USERS 
-    (name, firstname, green_coins, type, mail, last_login, account_creation, address)
-    VALUE (:name, :firstname, :gc, :type, :mail, :llog, :ac_creation, :addr);", $fields, fetch: false);
+    (name, firstname, green_coins, type, mail, last_login, account_creation, address, password)
+    VALUE (:name, :firstname, :gc, :type, :mail, :llog, :ac_creation, :addr, :passwd);", $fields, fetch: false);
 	}
 	/**
 	 * Delete user designated by $id. Return true on success false on error
@@ -79,5 +80,9 @@ class UserModel extends Model{
 		$start = 500 * $iteration;
 		$end = 500 * ($iteration + 1);
 		return $this->query("SELECT * FROM USERS LIMIT ${start},${end}");
+	}
+
+	public function selectFromMail(string $mail): array|false{
+		return $this->prepared_query("SELECT id_user, password, type FROM USERS WHERE mail=:mail", ['mail' => $mail], true);
 	}
 }

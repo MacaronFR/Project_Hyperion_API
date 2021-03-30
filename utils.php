@@ -1,5 +1,8 @@
 <?php
 $_PUT = [];
+/**
+ * Used to parse put request parameters
+ */
 function parse_put(){
 	global $_PUT;
 	$_PUT = [];
@@ -9,4 +12,24 @@ function parse_put(){
 		$tmp2 = explode("=", $field);
 		$_PUT[$tmp2[0]] = $tmp2[1];
 	}
+}
+
+/**
+ * Create a JSON format response with HTTP Code, message and eventually content
+ * @param int $status HTTP Code to return
+ * @param string $message Message to join with status code
+ * @param array|null $return Content to return
+ */
+function response(int $status, string $message, array|null $return = null){
+	$response = [
+		'status' => [
+			'code' => $status,
+			'message' => $message
+		]
+	];
+	if($return !== null){
+		$response['content'] = $return;
+	}
+	http_response_code($status);
+	echo json_encode($response);
 }

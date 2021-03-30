@@ -8,7 +8,7 @@ use PDOException;
 
 abstract class Model{
 	/** @var PDO $bdd PDO object to database */
-	private PDO $bdd;
+	protected PDO $bdd;
 	/**
 	 * Models constructor.
 	 */
@@ -63,6 +63,6 @@ abstract class Model{
 	abstract public function selectAll(int $iteration): array|false;
 	abstract public function select(int $id): array|false;
 	abstract public function update(int $id, array $value): bool;
-	abstract public function insert(array $value);
-	abstract public function delete(int $id);
+	abstract public function insert(array $value): bool;
+	abstract public function delete(int $id): bool;
 }
