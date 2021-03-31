@@ -40,7 +40,7 @@ class OAuthController extends Controller
 			$clientInfo = $clientM->selectFromClientID($args['uri_args'][0]);
 			if($clientInfo !== false && $clientInfo['client_secret'] === $args['uri_args'][1]){
 				$userInfo = $userM->selectFromMail($args['uri_args'][2]);
-				if($userInfo !== false && $userInfo['password'] === hash('sha256', $args['uri_args'][3])){
+				if($userInfo !== false && $userInfo['password'] === $args['uri_args'][3]){
 					$token = $tokenM->selectByUser((int)$userInfo['id_user']);
 					if($token !== false){
 						$now = new DateTime();
@@ -49,12 +49,11 @@ class OAuthController extends Controller
 							$tokenM->delete($token['id_token']);
 							$this->newToken($userInfo['type'], $clientInfo['id_client'], $userInfo['id_user']);
 						}else{
-							$new_end = $tokenM->refreshToken($token['id_token']);
-							if($new_end === false){
-								sleep(1);
-								$new_end = $tokenM->refreshToken($token['id_token']);
-							}
-							response(200, "Token refreshed", [$token['value'], $new_end]);
+							do{
+								$end = $now->add(new DateInterval("PT2H"));
+								$refreshed = $tokenM->update($token['id_token'], ["end" => $end->format("Y-m-d H:i:s")]);
+							}while(!$refreshed);
+							response(200, "Token refreshed", ['token' => $token['value'], 'expire' => $end->format("Y-m-d H:i:s")]);
 						}
 					}else{
 						$this->newToken($userInfo['type'], $clientInfo['id_client'], $userInfo['id_user']);

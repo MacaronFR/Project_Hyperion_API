@@ -5,17 +5,27 @@ use PHPUnit\Framework\TestCase;
 use \Hyperion\API\UserModel;
 
 final class UserModelTest extends TestCase{
-	private $md;
-	protected function getMethod($name){
-		$class = new ReflectionClass($this->md);
-		$method = $class->getMethod($name);
-		$method->setAccessible(true);
-		return $method;
-	}
-	public function __construct(?string $name = null, array $data = [], $dataName = '')
-	{
+	private UserModel $md;
+	public function __construct(?string $name = null, array $data = [], $dataName = ''){
 		$this->md = new UserModel();
 		parent::__construct($name, $data, $dataName);
+	}
+
+	/**
+	 * Get private and protected method
+	 * @param string $name Method name
+	 * @return ReflectionMethod|false
+	 */
+	protected function getMethod(string $name): ReflectionMethod|false {
+		$class = new ReflectionClass($this->md);
+		try {
+			$method = $class->getMethod($name);
+		} catch (ReflectionException $e) {
+			echo "Error : " . $e->getMessage();
+			return false;
+		}
+		$method->setAccessible(true);
+		return $method;
 	}
 	public function testCanBeCreated(){
 		$this->assertInstanceOf(UserModel::class, $this->md);
@@ -91,34 +101,6 @@ final class UserModelTest extends TestCase{
 		$this->assertFalse($this->md->update("1234", $value));
 		$this->assertFalse($this->md->update("1234", $value2));
 	}
-	public function testPrepareFields(){
-		$value = [
-			'name' => "TURBIEZ",
-			'firstname' => "Denis",
-			'green_coins' => 0,
-			'type' => 0,
-			'mail' => "denisft77@gmail.com",
-			'last_login' => "2021-03-29 11:12:13",
-			'account_creation' => "2021-02-12",
-			'address' => 1,
-			'password' => '6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b'
-		];
-		$prepare = $this->getMethod("prepare_fields");
-		$this->assertIsArray($prepare->invokeArgs($this->md, [$value]));
-	}
-	public function testPrepareFieldsMissing(){
-		$value = [
-			'name' => "TURBIEZ",
-			'firstname' => "Denis",
-			'type' => 0,
-			'mail' => "denisft77@gmail.com",
-			'last_login' => "2021-03-29 11:12:13",
-			'account_creation' => "2021-02-12",
-			'address' => 1
-		];
-		$prepare = $this->getMethod("prepare_fields");
-		$this->assertFalse($prepare->invokeArgs($this->md, [$value]));
-	}
 	public function testValidInsert(){
 		$date = new DateTime();
 		$value = [
@@ -148,7 +130,7 @@ final class UserModelTest extends TestCase{
 	}
 
 	public function testParamColum(){
-		$function = $this->getMethod("prepareColumnAndParameter");
+		$function = $this->getMethod("prepare_column_and_parameter");
 		$this->assertIsArray($function->invokeArgs($this->md, ['fname']));
 		$this->assertFalse($function->invokeArgs($this->md, ['nikk']));
 	}
@@ -156,6 +138,10 @@ final class UserModelTest extends TestCase{
 	public function testPrepareUpdateQuery(){
 		$function = $this->getMethod("prepare_update_query");
 		$this->assertNotFalse($function->invokeArgs($this->md, [['addr' => 1, 'gc' => 1] ]));
+	}
+	public function testSelectFromMail(){
+		$this->assertIsArray($this->md->selectFromMail("denisft77@gmail.com"));
+		$this->assertFalse($this->md->selectFromMail("NIK TOI"));
 	}
 	//public function testDeleteValidID(){
 		//$this->assertTrue($this->md->delete(11));

@@ -2,25 +2,23 @@
 
 
 namespace Hyperion\API;
-use DateTime;
-use DateInterval;
 
 class TokenModel extends Model
 {
-	private function prepareFields(array $value): array|false{
-		try {
-			return [
-				'value' => $value['token'],
-				'scope' => $value['scope'],
-				'expire' => $value['end'],
-				'idc' => $value['client'],
-				'idu' => $value['user']
-			];
-		}catch (\Exception){
-			return false;
-		}
+	protected string $table_name = "TOKEN";
+	protected string $id_name = "id_token";
+	protected function prepare_column_and_parameter(string $name): array|false{
+		return match($name){
+			"token" => ["value", "token"],
+			"scope" => ["scope", "scope"],
+			"end" => ["expire", "end"],
+			"client" => ["id_client", "client"],
+			"user" => ["id_user", "user"],
+			default => false
+		};
 	}
-	public function selectAll(int $iteration): array|false{return false;}
+
+	public function selectAll(int $iteration = 0): array|false{return false;}
 	/**
 	 * Select Token by is DataBase ID
 	 * @param int $id
@@ -54,23 +52,15 @@ class TokenModel extends Model
 	 * @return array|false
 	 */
 	public function selectByClient(int $client): array|false{
-		return $this->prepared_query("SELECT id_token, id_user, id_client, scope, expire FROM TOKEN WHERE id_client=:client", ['client' => $client]);
+		return $this->prepared_query("SELECT id_token, id_user, id_client, scope, expire FROM TOKEN WHERE id_client=:client", ['client' => $client], true);
 	}
 
-	public function update(int $id, array $value): bool{}
-
-	/**
-	 * Refresh the token instead of recreate it. Return false if no changes
-	 * @param int $id Token ID in Database
-	 * @return string|false
-	 */
-	public function refreshToken(int $id):string|false{
-		$now = new DateTime();
-		$now->add(new DateInterval("PT2H"));
-		if($this->prepared_query("UPDATE TOKEN SET expire=:expire WHERE id_token=:id", ['expire' => $now->format("Y-m-d H:i:s"), 'id' => $id], fetch: false)){
-			return $now->format("Y-m-d H:i:s");
-		}
-		return false;
+	public function update(int $id, array $value): bool{
+		$query = $this->prepare_query_string($value, self::UPDATE);
+		if($query === false)
+			return false;
+		$value['id'] = $id;
+		return $this->prepared_query($query, $value, fetch: false);
 	}
 
 	/**
@@ -79,11 +69,10 @@ class TokenModel extends Model
 	 * @return bool
 	 */
 	public function insert(array $value): bool{
-		$formattedValue = $this->prepareFields($value);
-		if($formattedValue !== false){
-			return $this->prepared_query("INSERT INTO TOKEN (value, scope, expire, id_client, id_user) VALUE (:value, :scope, :expire, :idc, :idu)", $formattedValue, fetch: false);
-		}
-		return false;
+		$query = $this->prepare_query_string($value, self::INSERT);
+		if($query === false)
+			return false;
+		return $this->prepared_query($query, $value, fetch: false);
 	}
 
 	/**

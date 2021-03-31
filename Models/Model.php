@@ -9,8 +9,13 @@ use PDOException;
 abstract class Model{
 	/** @var PDO $bdd PDO object to database */
 	protected PDO $bdd;
+	protected const INSERT = 1;
+	protected const UPDATE = 2;
+	protected string $table_name;
+	protected string $id_name;
 	/**
 	 * Models constructor.
+	 * @codeCoverageIgnore
 	 */
 	public function __construct(){
 		require "conf.php";
@@ -60,9 +65,51 @@ abstract class Model{
 			return false;
 		}
 	}
+
+	protected function prepare_query_string(array $fields, int $type): string|false{
+		return match($type){
+			self::INSERT => $this->prepare_insert_query($fields),
+			self::UPDATE => $this->prepare_update_query($fields),
+			default => false
+		};
+	}
+
+	protected function prepare_insert_query(array $fields): string|false{
+		$query = "INSERT INTO " . $this->table_name . " ";
+		$column = "(";
+		$param = "(";
+		foreach($fields as $name => $value){
+			$tmp = $this->prepare_column_and_parameter($name);
+			if($tmp === false){
+				return false;
+			}
+			$column .= $tmp[0] . ", ";
+			$param .= ":" . $tmp[1] . ", ";
+		}
+		$column = substr($column, 0, -2);
+		$param = substr($param, 0, -2);
+		$query .= $column . ") VALUES " . "$param" . ");";
+		return $query;
+	}
+	protected function prepare_update_query(array $fields): string|false{
+		$query = "UPDATE " . $this->table_name . " SET ";
+		$arg = "";
+		foreach($fields as $name => $value){
+			$tmp = $this->prepare_column_and_parameter($name);
+			if($tmp === false){
+				return false;
+			}
+			$arg .= $tmp[0] . "=:" . $tmp[1] . ", ";
+		}
+		$arg = substr($arg, 0, -2);
+		$query .= "$arg" . " WHERE " . $this->id_name . "=:id;";
+		return $query;
+	}
+
 	abstract public function selectAll(int $iteration): array|false;
 	abstract public function select(int $id): array|false;
 	abstract public function update(int $id, array $value): bool;
 	abstract public function insert(array $value): bool;
 	abstract public function delete(int $id): bool;
+	abstract protected function prepare_column_and_parameter(string $name): array|false;
 }
