@@ -1,7 +1,7 @@
 <?php
 namespace Hyperion\API;
 use JetBrains\PhpStorm\ArrayShape;
-require "utils.php";
+require_once "autoload.php";
 /**
  * Class Router used to route all request on project hyperion website
  * @package Router
@@ -62,13 +62,14 @@ class Router{
 		}
 		return false;
 	}
+
 	/**
 	 * Prepare an args array with the uri args and if it exist, POST and FILES value
 	 * @param array $uri_arg argument of uri
+	 * @param mixed $additional_param additional param
 	 * @return array[]
 	 */
-	#[ArrayShape(['uri_args' => "array", 'file_args' => "array", 'post_args' => "array"])]
-	private function prepareArgs(array $uri_arg): array{
+	private function prepareArgs(array $uri_arg, mixed $additional_param = null): array{
 		global $_PUT;
 		$args = [
 			'uri_args' => $uri_arg
@@ -83,6 +84,9 @@ class Router{
 			parse_put();
 			$args['put_args'] = $_PUT;
 		}
+		if($additional_param !== null){
+			$args['additional'] = $additional_param;
+		}
 		return $args;
 	}
 	/**
@@ -90,11 +94,11 @@ class Router{
 	 * @param string $pattern Pattern to match with
 	 * @param Controller|null $controller Controller to use if pattern match
 	 */
-	public function get(string $pattern = "/", Controller|null $controller = null){
+	public function get(string $pattern = "/", Controller|null $controller = null, mixed $additional_param = null){
 		if($this->method == Router::GET){
 			if(($matches = $this->match($pattern)) !== false){
 				$this->routed = true;
-				$args = $this->prepareArgs($matches);
+				$args = $this->prepareArgs($matches, $additional_param);
 				if($controller !== null)
 					$controller->get($args);
 				else
@@ -107,11 +111,11 @@ class Router{
 	 * @param string $pattern Pattern to match with
 	 * @param Controller|null $controller Controller used if pattern match
 	 */
-	public function post(string $pattern = "/", Controller|null $controller = null){
+	public function post(string $pattern = "/", Controller|null $controller = null, mixed $additional_param = null){
 		if($this->method == Router::POST){
 			if(($matches = $this->match($pattern)) !== false){
 				$this->routed = true;
-				$args = $this->prepareArgs($matches);
+				$args = $this->prepareArgs($matches, $additional_param);
 				if($controller !== null)
 					$controller->post($args);
 				else
@@ -124,11 +128,11 @@ class Router{
 	 * @param string $pattern Pattern to match with
 	 * @param Controller|null $controller Controller used if pattern match
 	 */
-	public function put(string $pattern = "/", Controller|null $controller = null){
+	public function put(string $pattern = "/", Controller|null $controller = null, mixed $additional_param = null){
 		if($this->method == Router::PUT){
 			if(($matches = $this->match($pattern)) !== false){
 				$this->routed = true;
-				$args = $this->prepareArgs($matches);
+				$args = $this->prepareArgs($matches, $additional_param);
 				if($controller !== null)
 					$controller->put($args);
 				else
@@ -141,11 +145,11 @@ class Router{
 	 * @param string $pattern Pattern to match with
 	 * @param Controller|null $controller Controller to use if pattern match
 	 */
-	public function delete(string $pattern = "/", Controller|null $controller = null){
+	public function delete(string $pattern = "/", Controller|null $controller = null, mixed $additional_param = null){
 		if($this->method == Router::DELETE){
 			if(($matches = $this->match($pattern)) !== false){
 				$this->routed = true;
-				$args = $this->prepareArgs($matches);
+				$args = $this->prepareArgs($matches, $additional_param);
 				if($controller !== null)
 					$controller->delete($args);
 				else

@@ -1,10 +1,11 @@
 <?php
 
-require_once "Controllers/OAuthController.php";
-require_once "Routers.php";
+use \Hyperion\API\{OAuthController,ConnectionController};
+use \Hyperion\API\Router;
 
-use Hyperion\API\Router;
-use Hyperion\API\OAuthController;
+require_once "autoload.php";
+
 $rt = new Router();
 $rt->get("/token/*/*/*/*", new OAuthController());
 $rt->get("/token/*/*", new OAuthController());
+$rt->put("/connect/*/*", new ConnectionController());

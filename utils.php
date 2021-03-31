@@ -21,6 +21,7 @@ function parse_put(){
  * @param array|null $return Content to return
  */
 function response(int $status, string $message, array|null $return = null){
+	header("Content-Type: application/json");
 	$response = [
 		'status' => [
 			'code' => $status,
