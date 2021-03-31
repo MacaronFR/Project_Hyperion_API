@@ -4,10 +4,7 @@
 namespace Hyperion\API;
 use DateTime;
 use DateInterval;
-require_once "Controller.php";
-require_once "Models/ClientModel.php";
-require_once "Models/UserModel.php";
-require_once "Models/TokenModel.php";
+require_once "autoload.php";
 
 class OAuthController extends Controller
 {

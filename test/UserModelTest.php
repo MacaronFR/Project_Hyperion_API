@@ -57,14 +57,14 @@ final class UserModelTest extends TestCase{
 		$date = new DateTime();
 		$value = [
 			'name' => "TURBIEZ",
-			'firstname' => "Denis",
-			'green_coins' => 0,
+			'fname' => "Denis",
+			'gc' => 0,
 			'type' => 0,
 			'mail' => "denisft77@gmail.com",
-			'last_login' => $date->format("Y-m-d h:m:s"),
-			'account_creation' => "2021-02-12",
-			'address' => 1,
-			'password' => '6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b'
+			'llog' => $date->format("Y-m-d h:m:s"),
+			'ac_creation' => "2021-02-12",
+			'addr' => 1,
+			'passwd' => '6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b'
 		];
 		$this->assertTrue($this->md->update("1", $value));
 	}
@@ -123,14 +123,14 @@ final class UserModelTest extends TestCase{
 		$date = new DateTime();
 		$value = [
 			'name' => "TURBIEZ",
-			'firstname' => "Denis",
-			'green_coins' => 0,
+			'fname' => "Denis",
+			'gc' => 0,
 			'type' => 0,
 			'mail' => "denisft77@gmail.com".bin2hex(random_bytes(3)),
-			'last_login' => $date->format("Y-m-d h:m:s"),
-			'account_creation' => "2021-02-12",
-			'address' => 1,
-			'password' => '6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b'
+			'llog' => $date->format("Y-m-d h:m:s"),
+			'ac_creation' => "2021-02-12",
+			'addr' => 1,
+			'passwd' => '6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b'
 		];
 		$this->assertTrue($this->md->insert($value));
 	}
@@ -145,6 +145,17 @@ final class UserModelTest extends TestCase{
 			'address' => 1
 		];
 		$this->assertFalse($this->md->insert($value));
+	}
+
+	public function testParamColum(){
+		$function = $this->getMethod("prepareColumnAndParameter");
+		$this->assertIsArray($function->invokeArgs($this->md, ['fname']));
+		$this->assertFalse($function->invokeArgs($this->md, ['nikk']));
+	}
+
+	public function testPrepareUpdateQuery(){
+		$function = $this->getMethod("prepare_update_query");
+		$this->assertNotFalse($function->invokeArgs($this->md, [['addr' => 1, 'gc' => 1] ]));
 	}
 	//public function testDeleteValidID(){
 		//$this->assertTrue($this->md->delete(11));

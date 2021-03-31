@@ -3,7 +3,10 @@
 
 namespace Hyperion\API;
 use \Exception;
-require_once "Model.php";
+use JetBrains\PhpStorm\Language;
+use function PHPUnit\Framework\isFalse;
+
+require_once "autoload.php";
 
 class UserModel extends Model{
 	private function prepare_fields($value): array|false{
@@ -23,6 +26,62 @@ class UserModel extends Model{
 			return false;
 		}
 	}
+	private const INSERT = 1;
+	private const UPDATE = 2;
+	private function prepareColumnAndParameter(string $name): array|false{
+		return match ($name) {
+			"name" => ["name", "name"],
+			"fname" => ["firstname", "fname"],
+			"gc" => ["green_coins", "gc"],
+			"type" => ["type", "type"],
+			"mail" => ["mail", "mail"],
+			"llog" => ["last_login", "llog"],
+			"ac_creation" => ["account_creation", "ac_creation"],
+			"addr" => ["address", "addr"],
+			"passwd" => ["password", "passwd"],
+			default => false,
+		};
+	}
+
+	private function prepare_query_string(array $fields, int $type): string|false{
+		return match($type){
+			self::INSERT => $this->prepare_insert_query($fields),
+			self::UPDATE => $this->prepare_update_query($fields),
+			default => false
+		};
+	}
+
+	private function prepare_insert_query(array $fields): string|false{
+		$query = "INSERT INTO USERS ";
+		$column = "(";
+		$param = "(";
+		foreach($fields as $name => $value){
+			$tmp = $this->prepareColumnAndParameter($name);
+			if($tmp === false){
+				return false;
+			}
+			$column .= $tmp[0] . ", ";
+			$param .= ":" . $tmp[1] . ", ";
+		}
+		$column = substr($column, 0, -2);
+		$param = substr($param, 0, -2);
+		$query .= $column . ") VALUES " . "$param" . ");";
+		return $query;
+	}
+	private function prepare_update_query(array $fields): string|false{
+		$query = "UPDATE USERS SET ";
+		$arg = "";
+		foreach($fields as $name => $value){
+			$tmp = $this->prepareColumnAndParameter($name);
+			if($tmp === false){
+				return false;
+			}
+			$arg .= $tmp[0] . "=:" . $tmp[1] . ", ";
+		}
+		$arg = substr($arg, 0, -2);
+		$query .= "$arg" . " WHERE id_user=:id;";
+		return $query;
+	}
 	/**
 	 * Retrieve user designated by $id or false if error occurs
 	 * @param int $id User ID to retrieve
@@ -39,15 +98,12 @@ class UserModel extends Model{
 	 * @return bool
 	 */
 	public function update(int $id, array $value): bool{
-		$fields = $this->prepare_fields($value);
-		if($fields === false){
+		$query = $this->prepare_query_string($value, self::UPDATE);
+		if($query === false){
 			return false;
 		}
-		$fields['id'] = $id;
-		return $this->prepared_query(
-			'UPDATE USERS SET firstname=:firstname, name=:name, green_coins=:gc, type=:type, mail=:mail,
-			 last_login=:llog, account_creation=:ac_creation, address=:addr, password=:passwd WHERE id_user=:id;',
-			$fields, fetch: false);
+		$value['id'] = $id;
+		return $this->prepared_query($query, $value, fetch: false);
 	}
 	/**
 	 * By providing a full collection of user attributes, create it
@@ -55,12 +111,10 @@ class UserModel extends Model{
 	 * @return bool
 	 */
 	public function insert(array $value): bool{
-		$fields = $this->prepare_fields($value);
-		if($fields === false)
+		$query = $this->prepare_query_string($value, self::INSERT);
+		if($query === false)
 			return false;
-		return $this->prepared_query("INSERT INTO USERS 
-    (name, firstname, green_coins, type, mail, last_login, account_creation, address, password)
-    VALUE (:name, :firstname, :gc, :type, :mail, :llog, :ac_creation, :addr, :passwd);", $fields, fetch: false);
+		return $this->prepared_query($query, $value, fetch: false);
 	}
 	/**
 	 * Delete user designated by $id. Return true on success false on error
@@ -83,6 +137,6 @@ class UserModel extends Model{
 	}
 
 	public function selectFromMail(string $mail): array|false{
-		return $this->prepared_query("SELECT id_user, password, type FROM USERS WHERE mail=:mail", ['mail' => $mail], true);
+		return $this->prepared_query("SELECT id_user, password, type, CONCAT(name, ' ', firstname) as name FROM USERS WHERE mail=:mail", ['mail' => $mail], true);
 	}
 }
