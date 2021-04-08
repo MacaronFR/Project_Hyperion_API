@@ -18,30 +18,31 @@ class StoreController extends Controller
 				response(200, "Product 1 to 500", $products);
 			else
 				response(204, "No product found");
-		}
+		}elseif(count($args['uri_args']) === 1){
+		    if(is_numeric($args['uri_args'][0])){
+                $products = $pm->selectAll((int)$args['uri_args'][0]);
+                if($products) {
+                    $start = (int)$args['uri_args'][0] * 500 + 1;
+                    $end = ((int)$args['uri_args'][0] + 1 )* 500;
+                    response(200, "Product ${start} to ${end}", $products);
+                }else
+                    response(204, "No product found");
+            }
+        }
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function post(array $args)
-	{
-		// TODO: Implement post() method.
-	}
+	public function post(array $args){return false;}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function put(array $args)
-	{
-		// TODO: Implement put() method.
-	}
+	public function put(array $args){return false;}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function delete(array $args)
-	{
-		// TODO: Implement delete() method.
-	}
+	public function delete(array $args){return false;}
 }
