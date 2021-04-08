@@ -21,7 +21,7 @@ class ClientModel extends Model
 		};
 	}
 
-	public function selectAll(int $iteration): array|false
+	public function selectAll(int $iteration = 0): array|false
 	{
 		// TODO: Implement selectAll() method.
 	}

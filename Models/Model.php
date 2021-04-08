@@ -106,7 +106,7 @@ abstract class Model{
 		return $query;
 	}
 
-	abstract public function selectAll(int $iteration): array|false;
+	abstract public function selectAll(int $iteration = 0): array|false;
 	abstract public function select(int $id): array|false;
 	abstract public function update(int $id, array $value): bool;
 	abstract public function insert(array $value): bool;
