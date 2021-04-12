@@ -28,8 +28,8 @@ class StoreController extends Controller
         }
         $products = $pm->selectAll($iteration);
         if($products) {
-            $start = (int)$args['uri_args'][0] * 500 + 1;
-            $end = ((int)$args['uri_args'][0] + 1 )* 500;
+            $start = $iteration * 500 + 1;
+            $end = ($iteration + 1 )* 500;
             response(200, "Product $start to $end", $products);
         }else
             response(204, "No product found");
