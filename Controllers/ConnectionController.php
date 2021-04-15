@@ -3,6 +3,7 @@
 
 namespace Hyperion\API;
 
+use Cassandra\Date;
 use \DateTime;
 use JetBrains\PhpStorm\Pure;
 
@@ -36,10 +37,33 @@ class ConnectionController extends Controller
 	}
 
 	/**
+	 * Inscription
 	 * @inheritDoc
-	 *
 	 */
-	public function post(array $args){return false;}
+	public function post(array $args){
+		$tm = new TokenModel();
+		$token = $tm->selectByToken($args['uri_args'][0]);
+		if($token !== false){
+			$values = $args['post_args'];
+			if(isset($values['name'], $values['fname'], $values['mail'], $values['passwd']) && count($values) === 4){
+				$values['gc'] = 0;
+				$values['type'] = 0;
+				$now = new DateTime();
+				$values['llog'] = $now->format("Y-m-d H:i:s");
+				$values['ac_creation'] = $now->format("Y-m-d H:i:s");
+				$values['addr'] = null;
+				if($this->userM->insert($values)){
+					response(200, "User Created");
+				}else{
+					response(500, "Error creating user");
+				}
+			}else{
+				response(400, "Bad Request, mismatch in given argument");
+			}
+		}else{
+			response(401, "Invalid Credentials");
+		}
+	}
 
 	/**
 	 * @inheritDoc
@@ -47,6 +71,7 @@ class ConnectionController extends Controller
 	public function put(array $args){return false;}
 
 	/**
+	 * Disconnecting
 	 * @inheritDoc
 	 */
 	public function delete(array $args){

@@ -52,7 +52,7 @@ class TokenModel extends Model
 	 * @return array|false
 	 */
 	public function selectByClient(int $client): array|false{
-		return $this->prepared_query("SELECT id_token, id_user, id_client, scope, expire FROM TOKEN WHERE id_client=:client", ['client' => $client], true);
+		return $this->prepared_query("SELECT id_token, id_user, id_client, scope, expire, value FROM TOKEN WHERE id_client=:client", ['client' => $client], true);
 	}
 
 	public function update(int $id, array $value): bool{
