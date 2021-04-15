@@ -1,6 +1,6 @@
 <?php
 
-use \Hyperion\API\{OAuthController,ConnectionController,StoreController};
+use \Hyperion\API\{OAuthController,ConnectionController,StoreController,ProfileController};
 use \Hyperion\API\Router;
 
 require_once "autoload.php";
@@ -13,3 +13,4 @@ $rt->delete("/disconnect/*/*", ConnectionController::class);
 $rt->post("/inscription/*", ConnectionController::class);
 $rt->get("/store", StoreController::class);
 $rt->get("/store/*", StoreController::class);
+$rt->get("/me/*", ProfileController::class);

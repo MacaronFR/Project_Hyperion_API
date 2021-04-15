@@ -87,7 +87,7 @@ class UserModel extends Model{
 	public function selectAll(int $iteration = 0): array|false{
 		$start = 500 * $iteration;
 		$end = 500 * ($iteration + 1);
-		return $this->query("SELECT * FROM USERS LIMIT ${start},${end}");
+		return $this->query("SELECT * FROM USERS LIMIT $start,$end");
 	}
 
 	public function selectFromMail(string $mail): array|false{
