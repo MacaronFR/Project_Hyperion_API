@@ -44,7 +44,7 @@ abstract class Model{
 	 * @param string $statement Statement to prepare and query
 	 * @param array $param Array of param of form $param["param_name"] = $param_value
 	 * @param bool $unique If the query return only one row
-	 * @param bool$fetch Query have to be fetch ?
+	 * @param bool $fetch Query have to be fetch ?
 	 * @return array|bool
 	 */
 	protected function prepared_query(string $statement, array $param, bool $unique = false, bool $fetch = true): array|bool{

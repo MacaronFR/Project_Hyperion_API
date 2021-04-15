@@ -55,6 +55,12 @@ class TokenModel extends Model
 		return $this->prepared_query("SELECT id_token, id_user, id_client, scope, expire, value FROM TOKEN WHERE id_client=:client", ['client' => $client], true);
 	}
 
+	/**
+	 * Update the token designated by $id
+	 * @param int $id Token ID
+	 * @param array $value Value to update
+	 * @return bool Return true on success, false on failure or if nothing changed
+	 */
 	public function update(int $id, array $value): bool{
 		$query = $this->prepare_query_string($value, self::UPDATE);
 		if($query === false)

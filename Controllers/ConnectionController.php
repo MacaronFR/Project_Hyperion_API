@@ -3,9 +3,7 @@
 
 namespace Hyperion\API;
 
-use Cassandra\Date;
-use \DateTime;
-use JetBrains\PhpStorm\Pure;
+use DateTime;
 
 require_once "autoload.php";
 
@@ -72,7 +70,9 @@ class ConnectionController extends Controller
 	/**
 	 * @inheritDoc
 	 */
-	public function put(array $args){return false;}
+	public function put(array $args){
+		response("405", "Method PUT not allowed");
+	}
 
 	/**
 	 * Disconnecting
