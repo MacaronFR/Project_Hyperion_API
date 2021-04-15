@@ -46,6 +46,10 @@ class ConnectionController extends Controller
 		if($token !== false){
 			$values = $args['post_args'];
 			if(isset($values['name'], $values['fname'], $values['mail'], $values['passwd']) && count($values) === 4){
+				if($this->userM->selectFromMail($values['mail']) !== false){
+					response(400, "Mail already exist");
+					return;
+				}
 				$values['gc'] = 0;
 				$values['type'] = 0;
 				$now = new DateTime();
@@ -53,7 +57,7 @@ class ConnectionController extends Controller
 				$values['ac_creation'] = $now->format("Y-m-d H:i:s");
 				$values['addr'] = null;
 				if($this->userM->insert($values)){
-					response(200, "User Created");
+					response(201, "User Created");
 				}else{
 					response(500, "Error creating user");
 				}
