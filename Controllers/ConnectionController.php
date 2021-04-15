@@ -11,12 +11,11 @@ require_once "autoload.php";
 class ConnectionController extends Controller
 {
 	private UserModel $userM;
-	#[Pure]
 	public function __construct(){
 		 $this->userM = new UserModel();
 	}
 	/**
-	 * Connect user by providing client token and user credentials
+	 * Connect user by providing client credentials and user credentials
 	 * @inheritDoc
 	 */
 	public function get(array $args){
@@ -45,15 +44,22 @@ class ConnectionController extends Controller
 	/**
 	 * @inheritDoc
 	 */
-	public function put(array $args)
-	{
-
-	}
+	public function put(array $args){return false;}
 
 	/**
 	 * @inheritDoc
 	 */
 	public function delete(array $args){
-
+		$tm = new TokenModel();
+		$token_id = $tm->selectByToken($args["uri_args"][0]);
+		if($token_id !== false){
+			if($tm->delete($token_id['id_token'])){
+				response(200, "Disconnected");
+			}else{
+				response(500, "Error during disconnection");
+			}
+		}else{
+			response(404, "User token not found");
+		}
 	}
 }
