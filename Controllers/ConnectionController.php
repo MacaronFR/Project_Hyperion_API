@@ -16,12 +16,13 @@ class ConnectionController extends Controller
 		 $this->userM = new UserModel();
 	}
 	/**
+	 * Connect user by providing client token and user credentials
 	 * @inheritDoc
 	 */
 	public function get(array $args){
 		$clientM = new ClientModel();
 		$clientInfo = $clientM->selectFromClientID($args['uri_args'][0]);
-		if($clientInfo !== false && $args['uri_args'][1] === $clientInfo['client_secret']) {
+		if($clientInfo !== false && $args['uri_args'][1] === $clientInfo['client_secret']){
 			$user = $this->userM->selectFromMail($args['uri_args'][2]);
 			if ($user['password'] === $args['uri_args'][3]) {
 				$message = "Redirect to get new token";

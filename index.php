@@ -6,8 +6,8 @@ use \Hyperion\API\Router;
 require_once "autoload.php";
 
 $rt = new Router();
-$rt->get("/token/*/*/*/*", new OAuthController());
-$rt->get("/token/*/*", new OAuthController());
-$rt->get("/connect/*/*/*/*", new ConnectionController());
-$rt->get("/store", new StoreController());
-$rt->get("/store/*", new StoreController());
+$rt->get("/token/*/*/*/*", OAuthController::class);
+$rt->get("/token/*/*", OAuthController::class);
+$rt->get("/connect/*/*/*/*", ConnectionController::class);
+$rt->get("/store", StoreController::class);
+$rt->get("/store/*", StoreController::class);
