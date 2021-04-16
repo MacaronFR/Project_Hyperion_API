@@ -33,4 +33,5 @@ function response(int $status, string $message, array|null $return = null){
 	}
 	http_response_code($status);
 	echo json_encode($response);
+	exit();
 }

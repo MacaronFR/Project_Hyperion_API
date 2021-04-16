@@ -168,6 +168,11 @@ class Router{
 			}
 		}
 	}
+
+	/**
+	 * Execute a controller on a method when no previous was executed
+	 * @param string $method Method to execute default
+	 */
 	public function default(string $method = ""){
 		if(!($this->routed) && $this->default_controller !== null){
 			if(($method !== "" && $method === $this->method) || $method === ""){
@@ -182,5 +187,9 @@ class Router{
 				}
 			}
 		}
+	}
+
+	public function getRouted(): bool{
+		return $this->routed;
 	}
 }
