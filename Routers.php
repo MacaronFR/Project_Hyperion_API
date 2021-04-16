@@ -1,6 +1,8 @@
 <?php
+
 namespace Hyperion\API;
 require_once "autoload.php";
+
 /**
  * Class Router used to route all request on project hyperion website
  * @package Router
@@ -39,6 +41,7 @@ class Router{
 		$this->default_controller = $default_controller;
 		unset($headers);
 	}
+
 	/**
 	 * Take a pattern and return the correspondent regex;
 	 * @param string $pattern pattern to convert
@@ -48,6 +51,7 @@ class Router{
 		$regex = "/^" . str_replace("\*", "([^\/]*)", preg_quote($pattern, "/")) . "$/";
 		return $regex;
 	}
+
 	/**
 	 * take router pattern and test it returning the matches if it match and false in the other case
 	 * @param string $pattern
@@ -74,14 +78,21 @@ class Router{
 			'uri_args' => $uri_arg
 		];
 		if($this->method === Router::POST){
-			$args['post_args'] = $_POST;
 			if($this->have_file){
+				$args['post_args'] = $_POST;
 				$args['file_args'] = $_FILES;
+			}else{
+				$post = parse_body();
+				if($post !== false){
+					$args['post_args'] = $post;
+				}else{
+					response(400, "Bad Request");
+				}
 			}
 		}
 		if($this->method === Router::PUT){
-			parse_put();
-			$args['put_args'] = $_PUT;
+			$put = parse_body();
+			$args['put_args'] = $put;
 		}
 		if($additional_param !== null){
 			$args['additional'] = $additional_param;

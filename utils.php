@@ -14,6 +14,15 @@ function parse_put(){
 	}
 }
 
+function parse_body(): array| false{
+	$body = file_get_contents("php://input");
+	try{
+		return json_decode($body, true, flags: JSON_THROW_ON_ERROR);
+	}catch(JsonException){
+		return false;
+	}
+}
+
 /**
  * Create a JSON format response with HTTP Code, message and eventually content
  * @param int $status HTTP Code to return
