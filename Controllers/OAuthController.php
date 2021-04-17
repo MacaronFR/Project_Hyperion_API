@@ -38,7 +38,7 @@ class OAuthController extends Controller
 		if(count($args['uri_args']) === 4){
 			$userM = new UserModel();
 			$clientInfo = $clientM->selectFromClientID($args['uri_args'][0]);
-			if($clientInfo !== false && $clientInfo['client_secret'] === $args['uri_args'][1]){
+			if($clientInfo !== false && $clientInfo['secret'] === $args['uri_args'][1]){
 				$userInfo = $userM->selectFromMail($args['uri_args'][2]);
 				if($userInfo !== false && $userInfo['password'] === $args['uri_args'][3]){
 					$token = $tokenM->selectByUser((int)$userInfo['id_user']);
@@ -66,7 +66,7 @@ class OAuthController extends Controller
 			}
 		}elseif(count($args['uri_args']) === 2){
 			$clientInfo = $clientM->selectFromClientID($args['uri_args'][0]);
-			if($clientInfo !== false && $clientInfo['client_secret'] === $args['uri_args'][1]){
+			if($clientInfo !== false && $clientInfo['secret'] === $args['uri_args'][1]){
 				$token = $tokenM->selectByClient($clientInfo['id_client']);
 				if($token !== false){
 					$now = new DateTime();
