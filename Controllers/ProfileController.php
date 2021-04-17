@@ -6,7 +6,7 @@ namespace Hyperion\API;
 
 use DateTime;
 
-class ProfileController extends Controller{
+class ProfileController implements Controller{
 
 	/**
 	 * @inheritDoc

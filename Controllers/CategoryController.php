@@ -4,7 +4,7 @@
 namespace Hyperion\API;
 
 
-class CategoryController extends Controller{
+class CategoryController implements Controller{
 	private CategoryModel $cm;
 	public function __construct(){
 		$this->cm = new CategoryModel();

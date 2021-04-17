@@ -7,7 +7,7 @@ use DateTime;
 
 require_once "autoload.php";
 
-class ConnectionController extends Controller{
+class ConnectionController implements Controller{
 	private UserModel $userM;
 
 	public function __construct(){
@@ -42,7 +42,7 @@ class ConnectionController extends Controller{
 	public function post(array $args){
 		$tm = new TokenModel();
 		$token = $tm->selectByToken($args['uri_args'][0]);
-		if($token !== false){
+		if($token !== false && ((int)$token['scope']) === 0){
 			$values = $args['post_args'];
 			if(isset($values['name'], $values['fname'], $values['mail'], $values['passwd']) && count($values) === 4){
 				if($this->userM->selectFromMail($values['mail']) !== false){

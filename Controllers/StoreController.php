@@ -4,7 +4,7 @@
 namespace Hyperion\API;
 require_once "autoload.php";
 
-class StoreController extends Controller
+class StoreController implements Controller
 {
 
 	/**
