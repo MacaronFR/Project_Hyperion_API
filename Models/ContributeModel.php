@@ -1,5 +1,7 @@
 <?php
-
+/*
+ * prepare JSON post for files
+ **/
 
 namespace Hyperion\API;
 
