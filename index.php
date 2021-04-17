@@ -36,7 +36,6 @@ $rt->post("/category/*", CategoryController::class);
 // /category/{client_token}/{id_cat}
 // {"name": <new_category_name>}
 $rt->put("/category/*/*", CategoryController::class);
-$rt->put("/cat", CategoryController::class);
 //Type
 $rt->get("/category/type/*",TypeController::class);
 $rt->get("/category/type/*/*",TypeController::class);
