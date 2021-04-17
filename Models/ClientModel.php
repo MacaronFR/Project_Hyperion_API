@@ -23,6 +23,6 @@ class ClientModel extends Model{
 		'scope' => 'int'
 	])]
 	public function selectFromClientID(string $client_id): array|false{
-		return $this->prepared_query("SELECT id_client, client_secret, scope FROM CLIENT WHERE client_id=:id", ['id' => $client_id], true);
+		return $this->prepared_query("SELECT id_client, client_secret as secret, scope FROM CLIENT WHERE client_id=:id", ['id' => $client_id], true);
 	}
 }

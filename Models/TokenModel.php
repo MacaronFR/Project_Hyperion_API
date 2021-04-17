@@ -21,7 +21,7 @@ class TokenModel extends Model
 	 * @return array|false
 	 */
 	public function selectByToken(string $token): array|false{
-		return $this->prepared_query("SELECT id_token, id_user, id_client, scope, expire FROM TOKEN WHERE value=:val", ['val' => $token], true);
+		return $this->prepared_query("SELECT id_token, id_user, id_client, scope, expire as end FROM TOKEN WHERE value=:val", ['val' => $token], true);
 	}
 
 	/**

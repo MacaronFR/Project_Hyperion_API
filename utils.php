@@ -1,4 +1,8 @@
 <?php
+
+use JetBrains\PhpStorm\NoReturn;
+use Hyperion\API\TokenModel;
+
 $_PUT = [];
 /**
  * Used to parse put request parameters
@@ -29,7 +33,7 @@ function parse_body(): array| false{
  * @param string $message Message to join with status code
  * @param array|null $return Content to return
  */
-function response(int $status, string $message, array|null $return = null){
+#[NoReturn] function response(int $status, string $message, array|null $return = null){
 	header("Content-Type: application/json");
 	$response = [
 		'status' => [
@@ -43,4 +47,16 @@ function response(int $status, string $message, array|null $return = null){
 	http_response_code($status);
 	echo json_encode($response);
 	exit();
+}
+
+function checkValidity(string $datetime): bool{
+	$test = DateTime::createFromFormat("Y-m-d H:i:s", $datetime);
+	$now = new DateTime();
+	return $test->diff($now)->invert === 1;
+}
+
+function checkToken(string $token, int $level): bool{
+	$tm = new TokenModel();
+	$res = $tm->selectByToken($token);
+	return $res !== false && checkValidity($res['end']) && $res['scope'] < $level;
 }

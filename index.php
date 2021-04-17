@@ -1,7 +1,7 @@
 <?php
 
-use \Hyperion\API\{OAuthController,ConnectionController,StoreController,ProfileController,CategoryController};
-use \Hyperion\API\Router;
+use Hyperion\API\{OAuthController,ConnectionController,StoreController,ProfileController,CategoryController};
+use Hyperion\API\Router;
 
 require_once "autoload.php";
 
@@ -17,13 +17,22 @@ $rt->delete("/disconnect/*", ConnectionController::class);
 // /inscription/{client_token}
 // {}
 $rt->post("/inscription/*", ConnectionController::class);
+// /store
 $rt->get("/store", StoreController::class);
+// /store/{page}
 $rt->get("/store/*", StoreController::class);
+// /me/{user_token}
 $rt->get("/me/*", ProfileController::class);
+// /category
 $rt->get("/category", CategoryController::class);
+// /category/{id_cat}
 $rt->get("/category/*", CategoryController::class);
+// /category/{user_token}
+// {"name": <category_name>}
 $rt->post("/category/*", CategoryController::class);
-$rt->put("/cat", CategoryController::class);
+// /category/{client_token}/{id_cat}
+// {"name": <new_category_name>}
+$rt->put("/category/*/*", CategoryController::class);
 if(!$rt->getRouted()){
 	response(404, "Not Found");
 }

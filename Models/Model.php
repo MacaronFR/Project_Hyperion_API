@@ -127,7 +127,6 @@ abstract class Model{
 	}
 	public function insert(array $value): bool{
 		$sql = $this->prepare_insert_query($value);
-		var_dump($sql);
 		return $this->prepared_query($sql, $value, fetch: false);
 	}
 	public function delete(int $id): bool{
