@@ -18,6 +18,7 @@ $rt->get("/category", CategoryController::class);
 $rt->get("/category/*", CategoryController::class);
 $rt->post("/category", CategoryController::class);
 $rt->put("/cat", CategoryController::class);
+$rt->delete("/test/l", ProfileController::class);
 if(!$rt->getRouted()){
 	response(404, "Not Found");
 }

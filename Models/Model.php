@@ -13,6 +13,7 @@ abstract class Model{
 	protected const UPDATE = 2;
 	protected string $table_name;
 	protected string $id_name;
+	protected array $column;
 	/**
 	 * Models constructor.
 	 * @codeCoverageIgnore
@@ -30,7 +31,7 @@ abstract class Model{
 	/**
 	 * Query to Database
 	 * @param string $statement Statement to query
-	 * @return false|PDOStatement
+	 * @return false|array
 	 */
 	protected function query(string $statement): false|array{
 		try {
@@ -79,12 +80,9 @@ abstract class Model{
 		$column = "(";
 		$param = "(";
 		foreach($fields as $name => $value){
-			$tmp = $this->prepare_column_and_parameter($name);
-			if($tmp === false){
-				return false;
-			}
-			$column .= $tmp[0] . ", ";
-			$param .= ":" . $tmp[1] . ", ";
+			$column_name = $this->column[$name];
+			$column .= $column_name . ", ";
+			$param .= ":" . $name . ", ";
 		}
 		$column = substr($column, 0, -2);
 		$param = substr($param, 0, -2);
@@ -95,21 +93,45 @@ abstract class Model{
 		$query = "UPDATE " . $this->table_name . " SET ";
 		$arg = "";
 		foreach($fields as $name => $value){
-			$tmp = $this->prepare_column_and_parameter($name);
-			if($tmp === false){
-				return false;
-			}
-			$arg .= $tmp[0] . "=:" . $tmp[1] . ", ";
+			$column_name = $this->column[$name];
+			$arg .= $column_name . "=:" . $name . ", ";
 		}
 		$arg = substr($arg, 0, -2);
 		$query .= "$arg" . " WHERE " . $this->id_name . "=:id;";
 		return $query;
 	}
 
-	abstract public function selectAll(int $iteration = 0): array|false;
-	abstract public function select(int $id): array|false;
-	abstract public function update(int $id, array $value): bool;
-	abstract public function insert(array $value): bool;
-	abstract public function delete(int $id): bool;
-	abstract protected function prepare_column_and_parameter(string $name): array|false;
+	public function selectAll(int $iteration = 0): array|false{
+		$start = 500 * $iteration;
+		$sql = "SELECT";
+		foreach($this->column as $key => $item){
+			$sql .= " $item as $key,";
+		}
+		$sql .= " $this->id_name as id";
+		$sql .= " FROM $this->table_name LIMIT $start, 500";
+		return $this->query($sql);
+	}
+	public function select(int $id): array|false{
+		$sql = "SELECT";
+		foreach($this->column as $item){
+			$sql .= " $item,";
+		}
+		$sql .= " $this->id_name as id";
+		$sql .= " FROM $this->table_name WHERE $this->id_name=:id ";
+		return $this->prepared_query($sql, ["id" => $id], unique: true);
+	}
+	public function update(int $id, array $value): bool{
+		$sql = $this->prepare_update_query($value);
+		$value["id"] = $id;
+		return $this->prepared_query($sql, $value, fetch: false);
+	}
+	public function insert(array $value): bool{
+		$sql = $this->prepare_insert_query($value);
+		var_dump($sql);
+		return $this->prepared_query($sql, $value, fetch: false);
+	}
+	public function delete(int $id): bool{
+		$sql = "DELETE FROM $this->table_name WHERE $this->id_name=:id";
+		return  $this->prepared_query($sql, ["id" => $id], fetch: false);
+	}
 }

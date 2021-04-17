@@ -6,7 +6,7 @@ namespace Hyperion\API;
 
 use DateTime;
 
-class ProfileController extends Controller {
+class ProfileController extends Controller{
 
 	/**
 	 * @inheritDoc
@@ -18,7 +18,7 @@ class ProfileController extends Controller {
 			if($token !== false){
 				$now = new DateTime();
 				$then = DateTime::createFromFormat("Y-m-d H:i:s", $token['expire']);
-				if($now->diff($then)->invert === 0) {
+				if($now->diff($then)->invert === 0){
 					$um = new UserModel();
 					$adm = new AddressModel();
 					$user = $um->select($token['id_client']);
@@ -48,24 +48,22 @@ class ProfileController extends Controller {
 	/**
 	 * @inheritDoc
 	 */
-	public function post(array $args)
-	{
+	public function post(array $args){
 		// TODO: Implement post() method.
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function put(array $args)
-	{
+	public function put(array $args){
 		// TODO: Implement put() method.
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function delete(array $args)
-	{
-		// TODO: Implement delete() method.
+	public function delete(array $args){
+		$am = new AddressModel();
+		var_dump($am->insert(["zip" => 77830, "address" => "nik", "city" => "pamfou", "country" => "NIKMAND", "region" => "saisap"]));
 	}
 }
