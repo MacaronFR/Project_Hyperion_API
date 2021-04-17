@@ -2,7 +2,6 @@
 
 
 namespace Hyperion\API;
-use JetBrains\PhpStorm\ArrayShape;
 
 require_once "autoload.php";
 

@@ -4,7 +4,7 @@ namespace Hyperion\API;
 
 use JetBrains\PhpStorm\ArrayShape;
 
-require_once "Model.php";
+require_once "autoload.php";
 
 class ClientModel extends Model{
 	protected string $table_name = "CLIENT";

@@ -3,7 +3,6 @@
 
 namespace Hyperion\API;
 use PDO;
-use PDOStatement;
 use PDOException;
 
 abstract class Model{

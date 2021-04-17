@@ -3,7 +3,7 @@
 
 namespace Hyperion\API;
 
-
+require_once "autoload.php";
 class CategoryModel extends Model{
 
 	protected string $id_name = "id_category";

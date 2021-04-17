@@ -2,7 +2,7 @@
 
 
 namespace Hyperion\API;
-require_once "Model.php";
+require_once "autoload.php";
 
  class CartModel extends Model{
  protected string $table_name = "CART";

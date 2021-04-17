@@ -2,16 +2,16 @@
 
 use \Hyperion\API\{OAuthController,ConnectionController,StoreController,ProfileController,CategoryController};
 use \Hyperion\API\Router;
-use \Hyperion\API\{TypeController};
+use \Hyperion\API\{ProductHierarchyController};
 
 require_once "autoload.php";
 
 $rt = new Router();
-// /token/{clientid}/{clientsecret}/{usermail}/{userpasswd} => user token
+// /token/{client_id}/{client_secret}/{user_mail}/{user_passwd} => user token
 $rt->get("/token/*/*/*/*", OAuthController::class);
-// /token/{clientid}/{clientsecret} => client token*
+// /token/{client_id}/{client_secret} => client token*
 $rt->get("/token/*/*", OAuthController::class);
-// /connect/{clientid}/{clientsecret}/{usermail}/{userpasswd}
+// /connect/{client_id}/{client_secret}/{user_mail}/{user_passwd}
 $rt->get("/connect/*/*/*/*", ConnectionController::class);
 // /disconnect/{user_token}
 $rt->delete("/disconnect/*", ConnectionController::class);
@@ -19,16 +19,14 @@ $rt->delete("/disconnect/*", ConnectionController::class);
 // {}
 $rt->post("/inscription/*", ConnectionController::class);
 //Store
-// /store
+// /store[/{page}]
 $rt->get("/store", StoreController::class);
-// /store/{page}
 $rt->get("/store/*", StoreController::class);
 //Profile
 // /me/{user_token}
 $rt->get("/me/*", ProfileController::class);
-// /category
+// /category[/{page}]
 $rt->get("/category", CategoryController::class);
-// /category/{id_cat}
 $rt->get("/category/*", CategoryController::class);
 // /category/{user_token}
 // {"name": <category_name>}
@@ -37,8 +35,13 @@ $rt->post("/category/*", CategoryController::class);
 // {"name": <new_category_name>}
 $rt->put("/category/*/*", CategoryController::class);
 //Type
-$rt->get("/category/type/*",TypeController::class);
-$rt->get("/category/type/*/*",TypeController::class);
+//
+// /category/type/{id_category}[/{page}]
+$rt->get("/category/type/*",ProductHierarchyController::class, ["type"]);
+$rt->get("/category/type/*/*",ProductHierarchyController::class, ["type"]);
+// /type/{id_type}/product[/{page}]
+$rt->get("/type/*/product", ProductHierarchyController::class, ["product"]);
+$rt->get("/type/*/product/*", ProductHierarchyController::class, ["product"]);
 if(!$rt->getRouted()){
 	response(404, "Not Found");
 }

@@ -3,6 +3,7 @@
 
 namespace Hyperion\API;
 
+require_once "autoload.php";
 
 class TypeModel extends Model{
     protected string $id_name = "id_type";

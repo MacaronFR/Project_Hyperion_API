@@ -3,6 +3,8 @@
 
 namespace Hyperion\API;
 
+require_once "autoload.php";
+
 class TokenModel extends Model
 {
 	protected string $table_name = "TOKEN";

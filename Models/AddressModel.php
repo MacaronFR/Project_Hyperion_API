@@ -2,7 +2,7 @@
 
 namespace Hyperion\API;
 
-
+require_once "autoload.php";
 class AddressModel extends Model{
 
 	protected string $table_name = "ADDRESSES";

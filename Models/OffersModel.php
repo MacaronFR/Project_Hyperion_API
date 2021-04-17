@@ -3,17 +3,16 @@
 
 namespace Hyperion\API;
 
+require_once "autoload.php";
 
-class offersModel extends Model{
-    protected string $id_name = "id_offers";
-    protected string $table_name = "OFFERS";
-    protected array $column = [
-        "offer"=>"id_offer",
-        "creation"=>"id_creation",
-        "offer"=>"offer",
-        "counter"=>"counter_offer",
-        "status"=>"status",
-        "user"=>"id_user"
-    ];
+class OffersModel extends Model{
+	protected string $id_name = "id_offers";
+	protected string $table_name = "OFFERS";
+	protected array $column = [
+		"offer" => "offer",
+		"counter" => "counter_offer",
+		"status" => "status",
+		"user" => "id_user"
+	];
 
 }

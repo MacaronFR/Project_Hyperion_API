@@ -18,6 +18,12 @@ class ProductModel extends Model{
 		"sell_d" => "selling_date"
 	];
 
+	public function selectAllByType(int $id_type, int $iteration = 0): array|false{
+		$start = 500 * $iteration;
+		$sql = "SELECT PRODUCTS.id_product FROM PRODUCTS INNER JOIN REFERENCE_PRODUCTS RP on PRODUCTS.id_ref = RP.id_product WHERE RP.type=:id LIMIT $start, 500;";
+		return $this->prepared_query($sql, ["id" => $id_type]);
+	}
+
 	public function selectAll(int $iteration = 0): array|false{
 		$start = 500 * $iteration;
 		$end = 500 * ($iteration + 1);
