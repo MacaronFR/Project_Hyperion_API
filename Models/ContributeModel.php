@@ -11,6 +11,6 @@ class ContributeModel extends Model{
         "contributor"=>"id_contributor",
         "value"=>"value",
         "project"=>"id_project",
-        "user"=>"user",
+        "user"=>"id_user",
     ];
 }
