@@ -45,14 +45,12 @@ class ConnectionController implements Controller{
 	 * @inheritDoc
 	 */
 	public function post(array $args){
-
 		$token = $this->tm->selectByToken($args['uri_args'][0]);
 		if($token !== false && ((int)$token['scope']) === 0){
 			$values = $args['post_args'];
 			if(isset($values['name'], $values['fname'], $values['mail'], $values['passwd']) && count($values) === 4){
 				if($this->userM->selectFromMail($values['mail']) !== false){
 					response(400, "Mail already exist");
-					return;
 				}
 				$values['gc'] = 0;
 				$values['type'] = 0;

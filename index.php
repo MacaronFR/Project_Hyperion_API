@@ -9,7 +9,7 @@ require_once "autoload.php";
 $rt = new Router();
 // /token/{client_id}/{client_secret}/{user_mail}/{user_passwd} => user token
 $rt->get("/token/*/*/*/*", OAuthController::class);
-// /token/{client_id}/{client_secret} => client token*
+// /token/{client_id}/{client_secret} => client token
 $rt->get("/token/*/*", OAuthController::class);
 // /connect/{client_id}/{client_secret}/{user_mail}/{user_passwd}
 $rt->get("/connect/*/*/*/*", ConnectionController::class);

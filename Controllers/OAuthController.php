@@ -4,6 +4,8 @@
 namespace Hyperion\API;
 use DateTime;
 use DateInterval;
+use JetBrains\PhpStorm\NoReturn;
+
 require_once "autoload.php";
 
 class OAuthController implements Controller
@@ -22,7 +24,7 @@ class OAuthController implements Controller
 		$this->now = new DateTime();
 	}
 
-	private function newToken(int $scope, int $client, int|null $user){
+	#[NoReturn] private function newToken(int $scope, int $client, int|null $user){
 		do {
 			$token = bin2hex(random_bytes(32));
 		}while($this->tm->selectByToken($token) !== false);
