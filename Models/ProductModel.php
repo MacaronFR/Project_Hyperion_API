@@ -20,26 +20,34 @@ class ProductModel extends Model{
 
 	public function selectAllByType(int $id_type, int $iteration = 0): array|false{
 		$start = 500 * $iteration;
-		$sql = "SELECT PRODUCTS.id_product FROM PRODUCTS INNER JOIN REFERENCE_PRODUCTS RP on PRODUCTS.id_ref = RP.id_product WHERE RP.type=:id LIMIT $start, 500;";
+		$sql = "SELECT PRODUCTS.id_product as id FROM PRODUCTS INNER JOIN REFERENCE_PRODUCTS RP on PRODUCTS.id_ref = RP.id_product WHERE RP.type=:id LIMIT $start, 500;";
 		return $this->prepared_query($sql, ["id" => $id_type]);
 	}
 
-	public function selectAll(int $iteration = 0): array|false{
+	public function selectWithDetail(int $id): array|false{
+		$sql1 = "SELECT S.* FROM PRODUCTS INNER JOIN REFERENCE_PRODUCTS RP on PRODUCTS.id_ref = RP.id_product INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification WHERE PRODUCTS.id_product=:id";
+		$sql2 = "SELECT S.* FROM PRODUCTS INNER JOIN PRODUCT_HAVE_SPEC PHS on PRODUCTS.id_product = PHS.id_product INNER JOIN SPECIFICATION S on PHS.id_spec = S.id_specification WHERE PRODUCTS.id_product=:id";
+		$ref_spec = $this->prepared_query($sql1, ["id" => $id]);
+		$prod_spec = $this->prepared_query($sql2, ["id" => $id]);
+		$prod = [];
+		if($ref_spec !== false && $prod_spec !== false){
+			foreach($ref_spec as $spec){
+				$prod["spec"][$spec["name"]] = $spec["value"];
+			}
+			foreach($prod_spec as $spec){
+				$prod["spec"][$spec["name"]] = $spec["value"];
+			}
+			return $prod;
+		}
+		return false;
+	}
+
+	public function selectAllDetails(int $iteration = 0): array|false{
 		$start = 500 * $iteration;
-		$end = 500 * ($iteration + 1);
-		$query1 = "SELECT PROD.id_product, PROD.buying_price, PROD.selling_price, T.type, REF.id_product as id_ref FROM PRODUCTS PROD INNER JOIN REFERENCE_PRODUCTS REF ON PROD.id_ref = REF.id_product INNER JOIN TYPES T on REF.type = T.id_type LIMIT ${start}, ${end};";
-		$query2 = "SELECT name, value FROM REF_HAVE_SPEC INNER JOIN SPECIFICATION S on REF_HAVE_SPEC.id_spec = S.id_specification WHERE id_product=:id;";
-		$query3 = "SELECT name, value FROM PRODUCT_HAVE_SPEC INNER JOIN SPECIFICATION S on PRODUCT_HAVE_SPEC.id_spec = S.id_specification WHERE id_product=:id;";
+		$query1 = "SELECT PROD.id_product, PROD.buying_price, PROD.selling_price, T.type, REF.id_product as id_ref FROM PRODUCTS PROD INNER JOIN REFERENCE_PRODUCTS REF ON PROD.id_ref = REF.id_product INNER JOIN TYPES T on REF.type = T.id_type LIMIT $start, 500;";
 		$products = $this->query($query1);
 		foreach($products as &$prod){
-			$refspec = $this->prepared_query($query2, ["id" => $prod['id_ref']]);
-			$prodspec = $this->prepared_query($query3, ["id" => $prod['id_product']]);
-			foreach($refspec as $spec){
-				$prod["spec"][$spec["name"]] = $spec["value"];
-			}
-			foreach($prodspec as $spec){
-				$prod["spec"][$spec["name"]] = $spec["value"];
-			}
+			$prod = array_merge($prod, $this->selectWithDetail($prod['id']));
 		}
 		return $products;
 	}
