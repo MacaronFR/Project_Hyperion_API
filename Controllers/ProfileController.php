@@ -61,9 +61,45 @@ class ProfileController implements Controller{
 	/**
 	 * @inheritDoc
 	 */
-	public function put(array $args){
-		// TODO: Implement put() method.
-	}
+			public function put(array $args){
+					if(checkToken($args['uri_args'][0], 3)){
+							if(count($args['put_args']) === 1 && isset($args['put_args']['name'])){
+									$post = $this->um->select($args['uri_args'][1]);
+									$postt = $this->am->select($args['uri_args'][1]);
+									if($post !== false){
+											if($post['name'] !== $args['put_args']['name']){
+													if($this->um->update($args['uri_args'][1], $args['put_args'])){
+															response(201, "Profile Updated");
+													}else{
+															response(500, "Error while updating");
+													}
+											}else{
+													response(204, "No Content");
+											}
+									}else{
+											response(400, "Bad Request");
+									}
+							}else{
+									response(400, "Bad Request");
+							}
+							if($postt !== false){
+									if($postt['name'] !== $args['put_args']['name']){
+											if($this->am->update($args['uri_args'][1], $args['put_args'])){
+													response(201, "Adress Updated");
+											}else{
+													response(500, "Errors while updating");
+											}
+									}else{
+											reponse(204,"No Content");
+									}
+							}else{
+									response(400,"Bad Request");
+							}
+					}else{
+							response(403, "Forbidden");
+					}
+
+			}
 
 	/**
 	 * @inheritDoc
