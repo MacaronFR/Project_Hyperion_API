@@ -3,15 +3,22 @@
 
 namespace Hyperion\API;
 
+use Cassandra\Date;
 use DateTime;
 
 require_once "autoload.php";
 
 class ConnectionController implements Controller{
 	private UserModel $userM;
+	private TokenModel $tm;
+	private DateTime $now;
+	private ClientModel $cm;
 
 	public function __construct(){
 		$this->userM = new UserModel();
+		$this->tm = new TokenModel();
+		$this->now = new DateTime();
+		$this->cm = new ClientModel();
 	}
 
 	/**
@@ -19,8 +26,7 @@ class ConnectionController implements Controller{
 	 * @inheritDoc
 	 */
 	public function get(array $args){
-		$clientM = new ClientModel();
-		$clientInfo = $clientM->selectFromClientID($args['uri_args'][0]);
+		$clientInfo = $this->cm->selectFromClientID($args['uri_args'][0]);
 		if($clientInfo !== false && $args['uri_args'][1] === $clientInfo['secret']){
 			$user = $this->userM->selectFromMail($args['uri_args'][2]);
 			if($user['password'] === $args['uri_args'][3]){
@@ -39,8 +45,8 @@ class ConnectionController implements Controller{
 	 * @inheritDoc
 	 */
 	public function post(array $args){
-		$tm = new TokenModel();
-		$token = $tm->selectByToken($args['uri_args'][0]);
+
+		$token = $this->tm->selectByToken($args['uri_args'][0]);
 		if($token !== false && ((int)$token['scope']) === 0){
 			$values = $args['post_args'];
 			if(isset($values['name'], $values['fname'], $values['mail'], $values['passwd']) && count($values) === 4){
@@ -50,9 +56,9 @@ class ConnectionController implements Controller{
 				}
 				$values['gc'] = 0;
 				$values['type'] = 0;
-				$now = new DateTime();
-				$values['llog'] = $now->format("Y-m-d H:i:s");
-				$values['ac_creation'] = $now->format("Y-m-d H:i:s");
+
+				$values['llog'] = $this->now->format("Y-m-d H:i:s");
+				$values['ac_creation'] = $this->now->format("Y-m-d H:i:s");
 				$values['addr'] = null;
 				if($this->userM->insert($values)){
 					response(201, "User Created");
@@ -79,10 +85,9 @@ class ConnectionController implements Controller{
 	 * @inheritDoc
 	 */
 	public function delete(array $args){
-		$tm = new TokenModel();
-		$token_id = $tm->selectByToken($args["uri_args"][0]);
+		$token_id = $this->tm->selectByToken($args["uri_args"][0]);
 		if($token_id !== false){
-			if($tm->delete($token_id['id_token'])){
+			if($this->tm->delete($token_id['id_token'])){
 				response(200, "Disconnected");
 			}else{
 				response(500, "Error during disconnection");
