@@ -28,5 +28,6 @@ require_once "Controllers/OAuthController.php";
 require_once "Controllers/ProductHierarchyController.php";
 require_once "Controllers/ProfileController.php";
 require_once "Controllers/StoreController.php";
+require_once "Controllers/TypeController.php";
 require_once "Routers.php";
 require_once "utils.php";

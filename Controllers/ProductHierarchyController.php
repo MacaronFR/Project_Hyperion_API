@@ -7,8 +7,17 @@ require_once "autoload.php";
 
 // get all types
 class ProductHierarchyController implements Controller{
+		private TypeModel $tm;
+		private CategoryModel $cm;
+		private ProductModel $pm;
 
-	/**
+		public function __construct(){
+				$this->tm = new TypeModel();
+				$this->cm = new CategoryModel();
+				$this->pm = new ProductModel();
+		}
+
+		/**
 	 * execute Product Hierarchy on category and type
 	 * @param array $args same as get() $args
 	 */
@@ -19,11 +28,9 @@ class ProductHierarchyController implements Controller{
 			$iteration = 0;
 		}
 		if(isset($args['uri_args'][0]) && is_numeric($args['uri_args'][0])){
-			$tm = new TypeModel();
-			$cm = new CategoryModel();
-			$cat = $cm->select($args['uri_args'][0]);
+			$cat = $this->cm->select($args['uri_args'][0]);
 			if($cat !== false){
-				$types = $tm->selectByCategory((int)$args['uri_args'][0], $iteration);
+				$types = $this->tm->selectByCategory((int)$args['uri_args'][0], $iteration);
 				if($types !== false){
 					if(count($types) !== 0){
 						response(200, "Type from category ${cat['name']}", $types);
@@ -48,15 +55,13 @@ class ProductHierarchyController implements Controller{
 			$iteration = 0;
 		}
 		if(isset($args['uri_args'][0]) && is_numeric($args['uri_args'][0])){
-			$pm = new ProductModel();
-			$tm = new TypeModel();
-			$type = $tm->select($args['uri_args'][0]);
+			$type = $this->tm->select($args['uri_args'][0]);
 			if($type !== false){
-				$products = $pm->selectAllByType((int)$args['uri_args'][0], $iteration);
+				$products = $this->pm->selectAllByType((int)$args['uri_args'][0], $iteration);
 				if($products !== false){
 					if(count($products) !== 0){
 						foreach($products as &$prod){
-							$spec = $pm->selectWithDetail($prod['id']);
+							$spec = $this->pm->selectWithDetail($prod['id']);
 							if($spec !== false){
 								$prod = array_merge($prod, );
 							}else{
