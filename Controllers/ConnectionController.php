@@ -53,7 +53,7 @@ class ConnectionController implements Controller{
 					response(400, "Mail already exist");
 				}
 				$values['gc'] = 0;
-				$values['type'] = 0;
+				$values['type'] = 4;
 
 				$values['llog'] = $this->now->format("Y-m-d H:i:s");
 				$values['ac_creation'] = $this->now->format("Y-m-d H:i:s");

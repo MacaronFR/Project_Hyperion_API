@@ -5,20 +5,22 @@ namespace Hyperion\API;
 
 
 use DateTime;
+use JetBrains\PhpStorm\NoReturn;
 
 class ProfileController implements Controller{
 	private UserModel $um;
 	private AddressModel $am;
-		public function __construct(){
-				$this->um = new UserModel();
-				$this->am = new AddressModel();
-		}
+
+	public function __construct(){
+		$this->um = new UserModel();
+		$this->am = new AddressModel();
+	}
 
 
 	/**
 	 * @inheritDoc
 	 */
-	public function get(array $args){
+	#[NoReturn] public function get(array $args){
 		$token_model = new TokenModel();
 		if(count($args["uri_args"]) === 1){
 			$token = $token_model->selectByToken($args["uri_args"][0]);
@@ -61,45 +63,45 @@ class ProfileController implements Controller{
 	/**
 	 * @inheritDoc
 	 */
-			public function put(array $args){
-					if(checkToken($args['uri_args'][0], 3)){
-							if(count($args['put_args']) === 1 && isset($args['put_args']['name'])){
-									$post = $this->um->select($args['uri_args'][1]);
-									$postt = $this->am->select($args['uri_args'][1]);
-									if($post !== false){
-											if($post['name'] !== $args['put_args']['name']){
-													if($this->um->update($args['uri_args'][1], $args['put_args'])){
-															response(201, "Profile Updated");
-													}else{
-															response(500, "Error while updating");
-													}
-											}else{
-													response(204, "No Content");
-											}
-									}else{
-											response(400, "Bad Request");
-									}
-							}else{
-									response(400, "Bad Request");
-							}
-							if($postt !== false){
-									if($postt['name'] !== $args['put_args']['name']){
-											if($this->am->update($args['uri_args'][1], $args['put_args'])){
-													response(201, "Adress Updated");
-											}else{
-													response(500, "Errors while updating");
-											}
-									}else{
-											reponse(204,"No Content");
-									}
-							}else{
-									response(400,"Bad Request");
-							}
+	#[NoReturn] public function put(array $args){
+		if(checkToken($args['uri_args'][0], 3)){
+			if(count($args['put_args']) === 1 && isset($args['put_args']['name'])){
+				$post = $this->um->select($args['uri_args'][1]);
+				$postt = $this->am->select($args['uri_args'][1]);
+				if($post !== false){
+					if($post['name'] !== $args['put_args']['name']){
+						if($this->um->update($args['uri_args'][1], $args['put_args'])){
+							response(201, "Profile Updated");
+						}else{
+							response(500, "Error while updating");
+						}
 					}else{
-							response(403, "Forbidden");
+						response(204, "No Content");
 					}
-
+				}else{
+					response(400, "Bad Request");
+				}
+			}else{
+				response(400, "Bad Request");
 			}
+			if($postt !== false){
+				if($postt['name'] !== $args['put_args']['name']){
+					if($this->am->update($args['uri_args'][1], $args['put_args'])){
+						response(201, "Adress Updated");
+					}else{
+						response(500, "Errors while updating");
+					}
+				}else{
+					reponse(204, "No Content");
+				}
+			}else{
+				response(400, "Bad Request");
+			}
+		}else{
+			response(403, "Forbidden");
+		}
+
+	}
 
 	/**
 	 * @inheritDoc
