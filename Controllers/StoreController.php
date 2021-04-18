@@ -2,6 +2,8 @@
 
 
 namespace Hyperion\API;
+use JetBrains\PhpStorm\NoReturn;
+
 require_once "autoload.php";
 
 class StoreController implements Controller
@@ -11,7 +13,7 @@ class StoreController implements Controller
      * Retrieve the first 500 products on /store or the Nth 500 products for /store/N
 	 * @inheritDoc
 	 */
-	public function get(array $args){
+	#[NoReturn] public function get(array $args){
 		$pm = new ProductModel();
 		if(count($args['uri_args']) === 0){
 			$iteration = 0;
@@ -20,13 +22,11 @@ class StoreController implements Controller
                 $iteration = (int)$args['uri_args'][0];
             }else{
 		        response(400, "Bad Request");
-		        return;
             }
         }else{
             response(400, "Bad Request");
-            return;
         }
-        $products = $pm->selectAll($iteration);
+        $products = $pm->selectAllDetails($iteration);
         if($products) {
             $start = $iteration * 500 + 1;
             $end = ($iteration + 1 )* 500;

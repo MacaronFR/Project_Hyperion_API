@@ -7,6 +7,11 @@ require_once "autoload.php";
 
 // get all types
 class ProductHierarchyController implements Controller{
+
+	/**
+	 * execute Product Hierarchy on category and type
+	 * @param array $args same as get() $args
+	 */
 	private function type(array $args){
 		if(count($args['uri_args']) === 2){
 			$iteration = (int)$args['uri_args'][1];
@@ -50,10 +55,14 @@ class ProductHierarchyController implements Controller{
 				$products = $pm->selectAllByType((int)$args['uri_args'][0], $iteration);
 				if($products !== false){
 					if(count($products) !== 0){
-						/*
-						SELECT S.* FROM PRODUCTS INNER JOIN REFERENCE_PRODUCTS RP on PRODUCTS.id_ref = RP.id_product INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification WHERE PRODUCTS.id_product=:id;
-						SELECT S.* FROM PRODUCTS INNER JOIN PRODUCT_HAVE_SPEC PHS on PRODUCTS.id_product = PHS.id_product INNER JOIN SPECIFICATION S on PHS.id_spec = S.id_specification WHERE PRODUCTS.id_product=:id;
-						 */
+						foreach($products as &$prod){
+							$spec = $pm->selectWithDetail($prod['id']);
+							if($spec !== false){
+								$prod = array_merge($prod, );
+							}else{
+								response(500, "Internal Error");
+							}
+						}
 						response(200, "Product from type ${type['type']}", $products);
 					}else{
 						response(204, "No Content");
