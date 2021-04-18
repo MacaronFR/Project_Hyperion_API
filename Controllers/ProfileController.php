@@ -7,6 +7,13 @@ namespace Hyperion\API;
 use DateTime;
 
 class ProfileController implements Controller{
+	private UserModel $um;
+	private AddressModel $am;
+		public function __construct(){
+				$this->um = new UserModel();
+				$this->am = new AddressModel();
+		}
+
 
 	/**
 	 * @inheritDoc
@@ -19,10 +26,9 @@ class ProfileController implements Controller{
 				$now = new DateTime();
 				$then = DateTime::createFromFormat("Y-m-d H:i:s", $token['expire']);
 				if($now->diff($then)->invert === 0){
-					$um = new UserModel();
-					$adm = new AddressModel();
-					$user = $um->select($token['id_client']);
-					$address = $adm->select($user['address']);
+
+					$user = $this->um->select($token['id_client']);
+					$address = $this->am->select($user['address']);
 					$info = [
 						"name" => $user['name'],
 						"fname" => $user['firstname'],
@@ -49,7 +55,7 @@ class ProfileController implements Controller{
 	 * @inheritDoc
 	 */
 	public function post(array $args){
-		// TODO: Implement post() method.
+
 	}
 
 	/**
@@ -63,7 +69,7 @@ class ProfileController implements Controller{
 	 * @inheritDoc
 	 */
 	public function delete(array $args){
-		$am = new AddressModel();
-		var_dump($am->insert(["zip" => 77830, "address" => "nik", "city" => "pamfou", "country" => "NIKMAND", "region" => "saisap"]));
+		//$am = new AddressModel();
+		var_dump($this->am->insert(["zip" => 77830, "address" => "nik", "city" => "pamfou", "country" => "NIKMAND", "region" => "saisap"]));
 	}
 }
