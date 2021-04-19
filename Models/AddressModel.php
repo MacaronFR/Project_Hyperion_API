@@ -14,4 +14,9 @@ class AddressModel extends Model{
 		"country" => "country",
 		"region" => "region",
 	];
+
+	public function selectByUser(int $id){
+			return $this->prepared_query("SELECT id,zip_code,city,address,country,region FROM ADDRESSES INNER JOIN ON USERS.address = ADRESSES.id WHERE USERS.address = :id",["id"=>$id],unique:true);
+	}
+
 }
