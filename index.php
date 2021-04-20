@@ -2,7 +2,7 @@
 
 use \Hyperion\API\{OAuthController,ConnectionController,StoreController,ProfileController,CategoryController};
 use \Hyperion\API\Router;
-use \Hyperion\API\{ProductHierarchyController};
+use \Hyperion\API\{ProductHierarchyController,ReferenceHierarchyController};
 
 require_once "autoload.php";
 
@@ -44,17 +44,20 @@ $rt->get("/category/type/*/*",ProductHierarchyController::class, ["type"]);
 $rt->get("/type/*/product", ProductHierarchyController::class, ["type_product"]);
 $rt->get("/type/*/product/*", ProductHierarchyController::class, ["type_product"]);
 // /type/{id_type}/reference[/{page}]
-$rt->get("/type/*/reference", ProductHierarchyController::class, ["type_reference"]);
-$rt->get("/type/*/reference/*", ProductHierarchyController::class, ["type_reference"]);
+$rt->get("/type/*/reference", ReferenceHierarchyController::class, ["type_reference"]);
+$rt->get("/type/*/reference/*", ReferenceHierarchyController::class, ["type_reference"]);
 // /mark/{mark_name}/product[/{page}]
 $rt->get("/mark/*/product", ProductHierarchyController::class, ["mark_product"]);
 $rt->get("/mark/*/product/*", ProductHierarchyController::class, ["mark_product"]);
 // /mark/{mark_name}/reference[/{page}]
-$rt->get("/mark/*/reference", ProductHierarchyController::class, ["mark_reference"]);
-$rt->get("/mark/*/reference/*", ProductHierarchyController::class, ["mark_reference"]);
+$rt->get("/mark/*/reference", ReferenceHierarchyController::class, ["mark_reference"]);
+$rt->get("/mark/*/reference/*", ReferenceHierarchyController::class, ["mark_reference"]);
+// /type/{id_type}/mark/{mark_name}/product[/{page}]
+$rt->get("/type/*/mark/*/product", ProductHierarchyController::class, ["type_mark_product"]);
+$rt->get("/type/*/mark/*/product/*", ProductHierarchyController::class, ["type_mark_product"]);
 // /type/{id_type}/mark/{mark_name}/reference[/{page}]
-$rt->get("/type/*/mark/*/reference", ProductHierarchyController::class, ["type_mark_reference"]);
-$rt->get("/type/*/mark/*/reference/*", ProductHierarchyController::class, ["type_mark_reference"]);
+$rt->get("/type/*/mark/*/reference", ReferenceHierarchyController::class, ["type_mark_reference"]);
+$rt->get("/type/*/mark/*/reference/*", ReferenceHierarchyController::class, ["type_mark_reference"]);
 // /type/{id_type}/
 $rt->get("/type/*",TypeController::class);
 if(!$rt->getRouted()){
