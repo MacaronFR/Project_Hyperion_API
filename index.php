@@ -46,10 +46,13 @@ $rt->get("/type/*/product/*", ProductHierarchyController::class, ["type_product"
 // /type/{id_type}/reference[/{page}]
 $rt->get("/type/*/reference", ProductHierarchyController::class, ["type_reference"]);
 $rt->get("/type/*/reference/*", ProductHierarchyController::class, ["type_reference"]);
-// /mark/{id_type}/reference[/{page}]
+// /mark/{mark_name}/product[/{page}]
+$rt->get("/mark/*/product", ProductHierarchyController::class, ["mark_product"]);
+$rt->get("/mark/*/product/*", ProductHierarchyController::class, ["mark_product"]);
+// /mark/{mark_name}/reference[/{page}]
 $rt->get("/mark/*/reference", ProductHierarchyController::class, ["mark_reference"]);
 $rt->get("/mark/*/reference/*", ProductHierarchyController::class, ["mark_reference"]);
-// /mark/{id_type}/reference[/{page}]
+// /type/{id_type}/mark/{mark_name}/reference[/{page}]
 $rt->get("/type/*/mark/*/reference", ProductHierarchyController::class, ["type_mark_reference"]);
 $rt->get("/type/*/mark/*/reference/*", ProductHierarchyController::class, ["type_mark_reference"]);
 // /type/{id_type}/

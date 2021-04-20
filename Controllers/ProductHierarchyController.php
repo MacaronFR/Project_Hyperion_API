@@ -2,6 +2,7 @@
 
 
 namespace Hyperion\API;
+
 use JetBrains\PhpStorm\NoReturn;
 
 require_once "autoload.php";
@@ -9,19 +10,19 @@ require_once "autoload.php";
 
 // get all types
 class ProductHierarchyController implements Controller{
-		private TypeModel $tm;
-		private CategoryModel $cm;
-		private ProductModel $pm;
-		private ReferenceModel $rm;
+	private TypeModel $tm;
+	private CategoryModel $cm;
+	private ProductModel $pm;
+	private ReferenceModel $rm;
 
-		public function __construct(){
-				$this->tm = new TypeModel();
-				$this->cm = new CategoryModel();
-				$this->pm = new ProductModel();
-				$this->rm = new ReferenceModel();
-		}
+	public function __construct(){
+		$this->tm = new TypeModel();
+		$this->cm = new CategoryModel();
+		$this->pm = new ProductModel();
+		$this->rm = new ReferenceModel();
+	}
 
-		/**
+	/**
 	 * execute Product Hierarchy on category and type
 	 * @param array $args same as get() $args
 	 */
@@ -131,12 +132,52 @@ class ProductHierarchyController implements Controller{
 		if(isset($args['uri_args'][0])){
 			$mark = $args['uri_args'][0];
 			$reference = $this->rm->selectAllByMark($mark, $iteration);
-			foreach($reference as &$ref){
-				$spec = $this->rm->selectWithDetail($ref['id']);
-				$ref = array_merge($ref, $spec);
+			if($reference !== false){
+				if(count($reference) === 0){
+					response(204, "No Content");
+				}
+				foreach($reference as &$ref){
+					$spec = $this->rm->selectWithDetail($ref['id']);
+					if($spec !== false){
+						$ref = array_merge($ref, $spec);
+					}else{
+						response(500, "Internal Server Error");
+					}
+				}
+				response(200, "Reference from mark $mark", $reference);
+			}else{
+				response(500, "Internal Server Error");
 			}
-			response(200, "Reference from mark $mark", $reference);
+		}else{
+			response(400, "Bad request");
 		}
+	}
+
+	#[NoReturn] private function mark_prod(array $args){
+		if(count($args['uri_args']) === 2){
+			$iteration = (int)$args['uri_args'][1];
+		}else{
+			$iteration = 0;
+		}
+		if(!isset($args['uri_args'][0])){
+			response(400, "Bad Request");
+		}
+		$mark = $args['uri_args'][0];
+		$reference = $this->pm->selectAllByMark($mark, $iteration);
+		if($reference === false){
+			response(500, "Internal Server Error");
+		}
+		if(count($reference) === 0){
+			response(204, "No Content");
+		}
+		foreach($reference as &$ref){
+			$spec = $this->pm->selectWithDetail($ref['id']);
+			if($spec === false){
+				response(500, "Internal Server Error");
+			}
+			$ref = array_merge($ref, $spec);
+		}
+		response(200, "Reference from mark $mark", $reference);
 	}
 
 	#[NoReturn] private function type_mark_ref(array $args){
@@ -166,6 +207,8 @@ class ProductHierarchyController implements Controller{
 				$this->product($args);
 			}elseif($args['additional'][0] === 'type_reference'){
 				$this->reference($args);
+			}elseif($args['additional'][0] === 'mark_product'){
+				$this->mark_prod($args);
 			}elseif($args['additional'][0] === 'mark_reference'){
 				$this->mark_ref($args);
 			}elseif($args['additional'][0] === 'type_mark_reference'){

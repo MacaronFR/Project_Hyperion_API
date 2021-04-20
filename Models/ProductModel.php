@@ -51,4 +51,14 @@ class ProductModel extends Model{
 		}
 		return $products;
 	}
+
+	public function selectAllByMark(string $mark, int $iteration = 0): array|false{
+		$start = 500 * $iteration;
+		$sql = 	"SELECT PRODUCTS.id_product as id FROM PRODUCTS
+					INNER JOIN REFERENCE_PRODUCTS RP on PRODUCTS.id_ref = RP.id_product
+					INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
+					INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
+				WHERE S.name=\"mark\" AND S.value=:mark LIMIT $start,500;";
+		return $this->prepared_query($sql, ["mark" => $mark]);
+	}
 }
