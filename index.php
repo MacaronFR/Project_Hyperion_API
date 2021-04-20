@@ -41,11 +41,17 @@ $rt->put("/category/*/*", CategoryController::class);
 $rt->get("/category/type/*",ProductHierarchyController::class, ["type"]);
 $rt->get("/category/type/*/*",ProductHierarchyController::class, ["type"]);
 // /type/{id_type}/product[/{page}]
-$rt->get("/type/*/product", ProductHierarchyController::class, ["product"]);
-$rt->get("/type/*/product/*", ProductHierarchyController::class, ["product"]);
+$rt->get("/type/*/product", ProductHierarchyController::class, ["type_product"]);
+$rt->get("/type/*/product/*", ProductHierarchyController::class, ["type_product"]);
 // /type/{id_type}/reference[/{page}]
-$rt->get("/type/*/reference", ProductHierarchyController::class, ["reference"]);
-$rt->get("/type/*/reference/*", ProductHierarchyController::class, ["reference"]);
+$rt->get("/type/*/reference", ProductHierarchyController::class, ["type_reference"]);
+$rt->get("/type/*/reference/*", ProductHierarchyController::class, ["type_reference"]);
+// /mark/{id_type}/reference[/{page}]
+$rt->get("/mark/*/reference", ProductHierarchyController::class, ["mark_reference"]);
+$rt->get("/mark/*/reference/*", ProductHierarchyController::class, ["mark_reference"]);
+// /mark/{id_type}/reference[/{page}]
+$rt->get("/type/*/mark/*/reference", ProductHierarchyController::class, ["type_mark_reference"]);
+$rt->get("/type/*/mark/*/reference/*", ProductHierarchyController::class, ["type_mark_reference"]);
 // /type/{id_type}/
 $rt->get("/type/*",TypeController::class);
 if(!$rt->getRouted()){

@@ -20,6 +20,24 @@ class ReferenceModel extends Model{
 		return $this->prepared_query($sql, ["id" => $id_type]);
 	}
 
+	public function selectAllByMark(string $mark, int $iteration = 0): array|false{
+		$start = 500 * $iteration;
+		$sql = "SELECT REFERENCE_PRODUCTS.id_product as id FROM REFERENCE_PRODUCTS
+    				INNER JOIN REF_HAVE_SPEC RHS on REFERENCE_PRODUCTS.id_product = RHS.id_product
+    				INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
+				WHERE S.name=\"mark\" AND value=:mark LIMIT $start, 500;";
+		return $this->prepared_query($sql, ["mark" => $mark]);
+	}
+
+	public function selectAllByTypeMark(int $type, string $mark, int $iteration = 0): array|false{
+		$start = $iteration * 500;
+		$sql = "SELECT REFERENCE_PRODUCTS.id_product as id FROM REFERENCE_PRODUCTS
+    				INNER JOIN REF_HAVE_SPEC RHS on REFERENCE_PRODUCTS.id_product = RHS.id_product
+    				INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
+				WHERE S.name=\"mark\" AND value=:mark AND type=:type LIMIT $start, 500;";
+		return $this->prepared_query($sql, ["type" => $type, "mark" => $mark]);
+	}
+
 	public function selectWithDetail(int $id): array|false{
 		$sql1 = "SELECT S.* FROM REFERENCE_PRODUCTS RP INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification WHERE RP.id_product=:id";
 		$ref_spec = $this->prepared_query($sql1, ["id" => $id]);
