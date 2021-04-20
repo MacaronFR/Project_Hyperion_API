@@ -25,6 +25,7 @@ $rt->get("/store/*", StoreController::class);
 //Profile
 // /me/{user_token}
 $rt->get("/me/*", ProfileController::class);
+$rt->put("/me/*", ProfileController::class);
 // /category[/{page}]
 $rt->get("/category", CategoryController::class);
 $rt->get("/category/*", CategoryController::class);
