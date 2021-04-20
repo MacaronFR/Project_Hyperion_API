@@ -42,6 +42,9 @@ $rt->get("/category/type/*/*",ProductHierarchyController::class, ["type"]);
 // /type/{id_type}/product[/{page}]
 $rt->get("/type/*/product", ProductHierarchyController::class, ["product"]);
 $rt->get("/type/*/product/*", ProductHierarchyController::class, ["product"]);
+// /type/{id_type}/reference[/{page}]
+$rt->get("/type/*/reference", ProductHierarchyController::class, ["reference"]);
+$rt->get("/type/*/reference/*", ProductHierarchyController::class, ["reference"]);
 // /type/{id_type}/
 $rt->get("/type/*",TypeController::class);
 if(!$rt->getRouted()){

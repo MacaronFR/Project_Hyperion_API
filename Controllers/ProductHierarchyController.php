@@ -2,6 +2,8 @@
 
 
 namespace Hyperion\API;
+use JetBrains\PhpStorm\NoReturn;
+
 require_once "autoload.php";
 
 
@@ -10,18 +12,20 @@ class ProductHierarchyController implements Controller{
 		private TypeModel $tm;
 		private CategoryModel $cm;
 		private ProductModel $pm;
+		private ReferenceModel $rm;
 
 		public function __construct(){
 				$this->tm = new TypeModel();
 				$this->cm = new CategoryModel();
 				$this->pm = new ProductModel();
+				$this->rm = new ReferenceModel();
 		}
 
 		/**
 	 * execute Product Hierarchy on category and type
 	 * @param array $args same as get() $args
 	 */
-	private function type(array $args){
+	#[NoReturn] private function type(array $args){
 		if(count($args['uri_args']) === 2){
 			$iteration = (int)$args['uri_args'][1];
 		}else{
@@ -48,7 +52,7 @@ class ProductHierarchyController implements Controller{
 		}
 	}
 
-	private function product(array $args){
+	#[NoReturn] private function product(array $args){
 		if(count($args['uri_args']) === 2){
 			$iteration = (int)$args['uri_args'][1];
 		}else{
@@ -63,12 +67,47 @@ class ProductHierarchyController implements Controller{
 						foreach($products as &$prod){
 							$spec = $this->pm->selectWithDetail($prod['id']);
 							if($spec !== false){
-								$prod = array_merge($prod, );
+								$prod = array_merge($prod, $spec);
 							}else{
 								response(500, "Internal Error");
 							}
 						}
 						response(200, "Product from type ${type['type']}", $products);
+					}else{
+						response(204, "No Content");
+					}
+				}else{
+					response(500, 'Error retrieving products');
+				}
+			}else{
+				response(404, "Type Not Found");
+			}
+		}else{
+			response(400, "Bad Request");
+		}
+	}
+
+	#[NoReturn] private function reference(array $args){
+		if(count($args['uri_args']) === 2){
+			$iteration = (int)$args['uri_args'][1];
+		}else{
+			$iteration = 0;
+		}
+		if(isset($args['uri_args'][0]) && is_numeric($args['uri_args'][0])){
+			$type = $this->tm->select($args['uri_args'][0]);
+			if($type !== false){
+				$reference = $this->rm->selectAllByType((int)$args['uri_args'][0], $iteration);
+				if($reference !== false){
+					if(count($reference) !== 0){
+						foreach($reference as &$prod){
+							$spec = $this->rm->selectWithDetail($prod['id']);
+							if($spec !== false){
+								$prod = array_merge($prod, $spec);
+							}else{
+								response(500, "Internal Error");
+							}
+						}
+						response(200, "Product from type ${type['type']}", $reference);
 					}else{
 						response(204, "No Content");
 					}
@@ -89,6 +128,8 @@ class ProductHierarchyController implements Controller{
 				$this->type($args);
 			}elseif($args['additional'][0] === 'product'){
 				$this->product($args);
+			}elseif($args['additional'][0] === 'reference'){
+				$this->reference($args);
 			}
 		}
 	}

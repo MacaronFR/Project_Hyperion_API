@@ -5,6 +5,7 @@ namespace Hyperion\API;
 
 use Cassandra\Date;
 use DateTime;
+use JetBrains\PhpStorm\NoReturn;
 
 require_once "autoload.php";
 
@@ -44,7 +45,7 @@ class ConnectionController implements Controller{
 	 * Inscription
 	 * @inheritDoc
 	 */
-	public function post(array $args){
+	#[NoReturn] public function post(array $args){
 		$token = $this->tm->selectByToken($args['uri_args'][0]);
 		if($token !== false && ((int)$token['scope']) === 0){
 			$values = $args['post_args'];
@@ -74,7 +75,7 @@ class ConnectionController implements Controller{
 	/**
 	 * @inheritDoc
 	 */
-	public function put(array $args){
+	#[NoReturn] public function put(array $args){
 		response("405", "Method PUT not allowed");
 	}
 
@@ -82,7 +83,7 @@ class ConnectionController implements Controller{
 	 * Disconnecting
 	 * @inheritDoc
 	 */
-	public function delete(array $args){
+	#[NoReturn] public function delete(array $args){
 		$token_id = $this->tm->selectByToken($args["uri_args"][0]);
 		if($token_id !== false){
 			if($this->tm->delete($token_id['id_token'])){
