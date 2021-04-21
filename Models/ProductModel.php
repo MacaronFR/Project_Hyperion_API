@@ -20,13 +20,27 @@ class ProductModel extends Model{
 
 	public function selectAllByType(int $id_type, int $iteration = 0): array|false{
 		$start = 500 * $iteration;
-		$sql = "SELECT PRODUCTS.id_product as id FROM PRODUCTS INNER JOIN REFERENCE_PRODUCTS RP on PRODUCTS.id_ref = RP.id_product WHERE RP.type=:id LIMIT $start, 500;";
-		return $this->prepared_query($sql, ["id" => $id_type]);
+		$sql = "SELECT P.id_product as id, P.buying_price as buying_price, P.selling_price as selling_price, T.type as type FROM PRODUCTS P 
+    				INNER JOIN REFERENCE_PRODUCTS RP on P.id_ref = RP.id_product 
+    				INNER JOIN TYPES T on RP.type = T.id_type
+				WHERE RP.type=:id LIMIT $start, 500;";
+		$products = $this->prepared_query($sql, ["id" => $id_type]);
+		if($products === false || empty($products)){
+			return $products;
+		}
+		foreach($products as &$prod){
+			$spec = $this->selectWithDetail($prod['id']);
+			if($spec === false){
+				return false;
+			}
+			$prod = array_merge($prod, $spec["spec"]);
+		}
+		return $products;
 	}
 
 	public function selectWithDetail(int $id): array|false{
-		$sql1 = "SELECT S.* FROM PRODUCTS INNER JOIN REFERENCE_PRODUCTS RP on PRODUCTS.id_ref = RP.id_product INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification WHERE PRODUCTS.id_product=:id";
-		$sql2 = "SELECT S.* FROM PRODUCTS INNER JOIN PRODUCT_HAVE_SPEC PHS on PRODUCTS.id_product = PHS.id_product INNER JOIN SPECIFICATION S on PHS.id_spec = S.id_specification WHERE PRODUCTS.id_product=:id";
+		$sql1 = "SELECT name, value FROM PRODUCTS INNER JOIN REFERENCE_PRODUCTS RP on PRODUCTS.id_ref = RP.id_product INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification WHERE PRODUCTS.id_product=:id";
+		$sql2 = "SELECT name, value FROM PRODUCTS INNER JOIN PRODUCT_HAVE_SPEC PHS on PRODUCTS.id_product = PHS.id_product INNER JOIN SPECIFICATION S on PHS.id_spec = S.id_specification WHERE PRODUCTS.id_product=:id";
 		$ref_spec = $this->prepared_query($sql1, ["id" => $id]);
 		$prod_spec = $this->prepared_query($sql2, ["id" => $id]);
 		$prod = [];
@@ -44,7 +58,10 @@ class ProductModel extends Model{
 
 	public function selectAllDetails(int $iteration = 0): array|false{
 		$start = 500 * $iteration;
-		$query1 = "SELECT PROD.id_product, PROD.buying_price, PROD.selling_price, T.type, REF.id_product as id_ref FROM PRODUCTS PROD INNER JOIN REFERENCE_PRODUCTS REF ON PROD.id_ref = REF.id_product INNER JOIN TYPES T on REF.type = T.id_type LIMIT $start, 500;";
+		$query1 = "	SELECT P.id_product as id, P.buying_price as buying_price, P.selling_price as selling_price, T.type as type FROM PRODUCTS P 
+    					INNER JOIN REFERENCE_PRODUCTS RP ON P.id_ref = RP.id_product
+    					INNER JOIN TYPES T on RP.type = T.id_type
+					LIMIT $start, 500;";
 		$products = $this->query($query1);
 		foreach($products as &$prod){
 			$prod = array_merge($prod, $this->selectWithDetail($prod['id']));
@@ -72,13 +89,24 @@ class ProductModel extends Model{
 
 	public function selectAllByTypeMark(int $type, string $mark, int $iteration = 0): array|false{
 		$start = 500 * $iteration;
-		$sql = "SELECT PRODUCTS.id_product as id FROM PRODUCTS
-					INNER JOIN REFERENCE_PRODUCTS RP on PRODUCTS.id_ref = RP.id_product
+		$sql = "SELECT P.id_product as id, P.selling_price as selling_price, P.buying_price as buying_price, T.type as type FROM PRODUCTS P
+					INNER JOIN REFERENCE_PRODUCTS RP on P.id_ref = RP.id_product
 					INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
 					INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
 					INNER JOIN TYPES T on RP.type = T.id_type
 				WHERE S.name=\"mark\" AND S.value=:mark AND T.id_type=:type LIMIT $start,500;";
-		return $this->prepared_query($sql, ["type" => $type, "mark" => $mark]);
+		$products = $this->prepared_query($sql, ["type" => $type, "mark" => $mark]);
+		if($products === false || empty($products)){
+			return $products;
+		}
+		foreach($products as &$prod){
+			$spec = $this->selectWithDetail($prod['id']);
+			if($spec === false){
+				return false;
+			}
+			$prod = array_merge($prod, $spec["spec"]);
+		}
+		return $products;
 	}
 
 	public function selectAllByModel(string $model, int $iteration = 0): array|false{
@@ -94,7 +122,11 @@ class ProductModel extends Model{
 			return $products;
 		}
 		foreach($products as &$prod){
-			$prod = array_merge($prod, $this->selectWithDetail($prod['id'])["spec"]);
+			$spec = $this->selectWithDetail($prod['id']);
+			if($spec === false){
+				return false;
+			}
+			$prod = array_merge($prod, $spec["spec"]);
 		}
 		return $products;
 	}
@@ -112,7 +144,11 @@ class ProductModel extends Model{
 			return $products;
 		}
 		foreach($products as &$prod){
-			$prod = array_merge($prod, $this->selectWithDetail($prod['id'])["spec"]);
+			$spec = $this->selectWithDetail($prod['id']);
+			if($spec === false){
+				return false;
+			}
+			$prod = array_merge($prod, $spec["spec"]);
 		}
 		return $products;
 	}
@@ -136,7 +172,11 @@ class ProductModel extends Model{
 			return $products;
 		}
 		foreach($products as &$prod){
-			$prod = array_merge($prod, $this->selectWithDetail($prod['id'])["spec"]);
+			$spec = $this->selectWithDetail($prod['id']);
+			if($spec === false){
+				return false;
+			}
+			$prod = array_merge($prod, $spec["spec"]);
 		}
 		return $products;
 	}
@@ -144,24 +184,29 @@ class ProductModel extends Model{
 	public function selectAllByTypeMarkModel(int $type, string $mark, string $model, int $iteration = 0): array|false{
 		$start = $iteration * 500;
 		$sql = "SELECT id, buying_price, selling_price, type
-				FROM (SELECT COUNT(P.id_product) as count, P.id_product as id, P.selling_price as selling_price, P.buying_price as buying_price, T.type as type
-					  FROM PRODUCTS P 
-							   INNER JOIN REFERENCE_PRODUCTS RP on P.id_ref = RP.id_product
-							   INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
-							   INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
-							   INNER JOIN TYPES T on RP.type = T.id_type
-					  WHERE ((name = \"model\" AND value = :model)
-						 OR (name = \"mark\" AND value = :mark))
-						 AND RP.type=:type
-					  GROUP BY P.id_product 
-					 ) S
+				FROM (
+				    SELECT COUNT(P.id_product) as count, P.id_product as id, P.selling_price as selling_price, P.buying_price as buying_price, T.type as type
+					FROM PRODUCTS P 
+						INNER JOIN REFERENCE_PRODUCTS RP on P.id_ref = RP.id_product
+						INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
+						INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
+						INNER JOIN TYPES T on RP.type = T.id_type
+					WHERE ((name = \"model\" AND value = :model)
+						OR (name = \"mark\" AND value = :mark))
+						AND RP.type=:type
+					GROUP BY P.id_product 
+					) S
 				WHERE count=2 LIMIT $start,500;";
 		$products = $this->prepared_query($sql, ['type' => $type, 'model' => $model, 'mark' => $mark]);
 		if($products === false || empty($products)){
 			return $products;
 		}
 		foreach($products as &$prod){
-			$prod = array_merge($prod, $this->selectWithDetail($prod['id'])["spec"]);
+			$spec = $this->selectWithDetail($prod['id']);
+			if($spec === false){
+				return false;
+			}
+			$prod = array_merge($prod, $spec["spec"]);
 		}
 		return $products;
 	}

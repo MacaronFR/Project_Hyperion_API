@@ -10,13 +10,9 @@ require_once "autoload.php";
 
 // get all types
 class ProductHierarchyController implements Controller{
-	private TypeModel $tm;
-	private CategoryModel $cm;
 	private ProductModel $pm;
 
 	public function __construct(){
-		$this->tm = new TypeModel();
-		$this->cm = new CategoryModel();
 		$this->pm = new ProductModel();
 	}
 
@@ -25,44 +21,34 @@ class ProductHierarchyController implements Controller{
 	 * @param array $args same as get() $args
 	 */
 
-	#[NoReturn] private function product(array $args){
+	#[NoReturn] private function type_product(array $args){
 		if(count($args['uri_args']) === 2){
+			if(!is_numeric($args['uri_args'][1])){
+				response(400, "Bad Request");
+			}
 			$iteration = (int)$args['uri_args'][1];
 		}else{
 			$iteration = 0;
 		}
-		if(isset($args['uri_args'][0]) && is_numeric($args['uri_args'][0])){
-			$type = $this->tm->select($args['uri_args'][0]);
-			if($type !== false){
-				$products = $this->pm->selectAllByType((int)$args['uri_args'][0], $iteration);
-				if($products !== false){
-					if(count($products) !== 0){
-						foreach($products as &$prod){
-							$spec = $this->pm->selectWithDetail($prod['id']);
-							if($spec !== false){
-								$prod = array_merge($prod, $spec);
-							}else{
-								response(500, "Internal Error");
-							}
-						}
-						response(200, "Product from type ${type['type']}", $products);
-					}else{
-						response(204, "No Content");
-					}
-				}else{
-					response(500, 'Error retrieving products');
-				}
-			}else{
-				response(404, "Type Not Found");
-			}
-		}else{
+		if(!is_numeric($args['uri_args'][0])){
 			response(400, "Bad Request");
 		}
+		$products = $this->pm->selectAllByType((int)$args['uri_args'][0], $iteration);
+		if($products === false){
+			response(500, "Internal Server Error");
+		}
+		if(empty($products)){
+			response(204, "No Content");
+		}
+		response(200, "Product from type " . $products[0]['type'], $products);
 	}
 
 
 	#[NoReturn] private function mark_prod(array $args){
 		if(count($args['uri_args']) === 2){
+			if(!is_numeric($args['uri_args'][1])){
+				response(400, "Bad Request");
+			}
 			$iteration = (int)$args['uri_args'][1];
 		}else{
 			$iteration = 0;
@@ -78,26 +64,29 @@ class ProductHierarchyController implements Controller{
 		if(empty($reference)){
 			response(204, "No Content");
 		}
-		response(200, "Product from mark $mark", $reference);
+		response(200, "Product of mark $mark", $reference);
 	}
 
-	private function type_mark_prod($args){
+	#[NoReturn] private function type_mark_prod($args){
 		if(count($args['uri_args']) === 3){
+			if(!is_numeric($args['uri_args'][2])){
+				response(400, "Bad Request");
+			}
 			$iteration = (int)$args['uri_args'][2];
 		}else{
 			$iteration = 0;
 		}
-		$type = $this->tm->select($args['uri_args'][0]);
-		if(is_numeric($args['uri_args'][0])){
-			$mark_name = $args['uri_args'][1];
-			$type_name = $type['type'];
-			$reference = $this->pm->selectAllByTypeMark((int)$type['id'], $mark_name, $iteration);
-			foreach($reference as &$ref){
-				$spec = $this->pm->selectWithDetail($ref['id']);
-				$ref = array_merge($ref, $spec);
-			}
-			response(200, "Product from mark $mark_name of type $type_name", $reference);
+		if(!is_numeric($args['uri_args'][0])){
+			response(400, "Bad request");
 		}
+		$prod = $this->pm->selectAllByTypeMark((int)$args['uri_args'][0], $args['uri_args'][1], $iteration);
+		if($prod === false){
+			response(500, "Internal Server Error");
+		}
+		if(empty($prod)){
+			response(204, "No content");
+		}
+		response(200, "Product of type " . $prod[0]['type'] . ", mark " . $prod[0]['mark'], $prod);
 	}
 
 	#[NoReturn] private function model_prod($args){
@@ -184,7 +173,7 @@ class ProductHierarchyController implements Controller{
 	public function get(array $args){
 		if(isset($args['additional'])){
 			if($args['additional'][0] === 'type_product'){
-				$this->product($args);
+				$this->type_product($args);
 			}elseif($args['additional'][0] === 'mark_product'){
 				$this->mark_prod($args);
 			}elseif($args['additional'][0] === 'type_mark_product'){
