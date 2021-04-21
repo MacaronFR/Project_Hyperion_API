@@ -6,6 +6,7 @@ namespace Hyperion\API;
 
 use DateTime;
 use JetBrains\PhpStorm\NoReturn;
+
 class ProfileController implements Controller{
 	private UserModel $um;
 	private AddressModel $am;
@@ -58,7 +59,7 @@ class ProfileController implements Controller{
 	 * @inheritDoc
 	 */
 	public function post(array $args){
-			return false;
+		return false;
 
 	}
 
@@ -66,35 +67,38 @@ class ProfileController implements Controller{
 	 * @inheritDoc
 	 */
 	#[NoReturn] public function put(array $args){
-			if(checkToken($args['uri_args'][0], 3)){
-					if(count($args['put_args']) === 1 && isset($args['put_args'])){
-							$user_info = $this->um->select($args['put_args']);
-							if($user_info !== false){
-									if(array_intersect_key($user_info['name'], $args['put_args'])){
-											$user_info->update($args['put_args']);
-									}
-									if(array_intersect_key($user_info['firstname'], $args['put_args'])){
-											$user_info->update($args['put_args']);
-									}
-									if(array_intersect_key($user_info['mail'], $args['put_args'])){
-											$user_info->update($args['put_args']);
-									}
-									$address_info = $this->am->selectByUser($user_info['address']);
-									if(array_intersect_key($user_info['address'], $address_info, $args['put_args'])){
-											$update_address = $address_info->update($args['put_args']);
-											$user_info->update($update_address);
-											}
-							}else{
-									response(404, "Not Found");
-							}
+		if(checkToken($args['uri_args'][0], 3)){ //oublie pas les else
+			if(count($args['put_args']) === 1 && isset($args['put_args'])){ //oublie pas les else
+				$user_info = $this->um->select($args['put_args']);
+				if($user_info !== false){
+					if(array_intersect_key($user_info['name'], $args['put_args'])){ //array_intersect_key renvoie un tableaux
+						$user_info->update($args['put_args']); // $user info est un tableau tu peux pas utilisé une methode dessus
+						//en plus que comptais tu faire avec ->update($args['put_args'][0])
 					}
+					if(array_intersect_key($user_info['firstname'], $args['put_args'])){
+						$user_info->update($args['put_args']);
+					}
+					if(array_intersect_key($user_info['mail'], $args['put_args'])){
+						$user_info->update($args['put_args']);
+					}
+					$address_info = $this->am->selectByUser($user_info['address']);
+					//recup pas les adresses par utilisateur
+					// l'utilsateur il a l'id de son adresse dans son profil utilise l'id c'est plus simple
+					if(array_intersect_key($user_info['address'], $address_info, $args['put_args'])){ //pareil je comprend pas bien
+						$update_address = $address_info->update($args['put_args']); //toujours le update sur un tableau
+						$user_info->update($update_address); //encore une fois
+					}
+				}else{
+					response(404, "Not Found");
+				}
 			}
-	}
+		}
+	}// tu dois fiare un seul array intersect (ou 2 avec l'adresse peut être qui est un cas à part), et ensuite update via le model pas le tableau le user
 
 	/**
 	 * @inheritDoc
 	 */
 	public function delete(array $args){
-			var_dump($this->am->insert(["zip" => 77830, "address" => "nik", "city" => "pamfou", "country" => "NIKMAND", "region" => "saisap"]));
+		var_dump($this->am->insert(["zip" => 77830, "address" => "nik", "city" => "pamfou", "country" => "NIKMAND", "region" => "saisap"]));
 	}
 }
