@@ -2,7 +2,7 @@
 
 use \Hyperion\API\{OAuthController,ConnectionController,StoreController,ProfileController,CategoryController};
 use \Hyperion\API\Router;
-use \Hyperion\API\{ProductHierarchyController,ReferenceHierarchyController};
+use \Hyperion\API\{ProductHierarchyController,ReferenceHierarchyController,MarkModelController};
 
 require_once "autoload.php";
 
@@ -58,8 +58,10 @@ $rt->get("/type/*/mark/*/product/*", ProductHierarchyController::class, ["type_m
 // /type/{id_type}/mark/{mark_name}/reference[/{page}]
 $rt->get("/type/*/mark/*/reference", ReferenceHierarchyController::class, ["type_mark_reference"]);
 $rt->get("/type/*/mark/*/reference/*", ReferenceHierarchyController::class, ["type_mark_reference"]);
-// /type/{id_type}/
-$rt->get("/type/*",TypeController::class);
+
+$rt->get("/type/*/mark", MarkModelController::class, ["type_mark"]);
+$rt->get("/type/*/mark/*", MarkModelController::class, ["type_mark"]);
+
 if(!$rt->getRouted()){
 	response(404, "Not Found");
 }
