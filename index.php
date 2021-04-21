@@ -77,6 +77,15 @@ $rt->get("/model/*", MarkModelController::class, ["model"]);
 $rt->get("/model/*/product", ProductHierarchyController::class, ['model_product']);
 $rt->get("/model/*/product/*", ProductHierarchyController::class, ['model_product']);
 
+$rt->get("/mark/*/model/*/product", ProductHierarchyController::class, ['mark_model_product']);
+$rt->get("/mark/*/model/*/product/*", ProductHierarchyController::class, ['mark_model_product']);
+
+$rt->get("/type/*/model/*/product", ProductHierarchyController::class, ['type_model_product']);
+$rt->get("/type/*/model/*/product/*", ProductHierarchyController::class, ['type_model_product']);
+
+$rt->get("/type/*/mark/*/model/*/product", ProductHierarchyController::class, ['type_mark_model_product']);
+$rt->get("/type/*/mark/*/model/*/product/*", ProductHierarchyController::class, ['type_mark_model_product']);
+
 if(!$rt->getRouted()){
 	response(404, "Not Found");
 }

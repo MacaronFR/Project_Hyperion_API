@@ -75,17 +75,10 @@ class ProductHierarchyController implements Controller{
 		if($reference === false){
 			response(500, "Internal Server Error");
 		}
-		if(count($reference) === 0){
+		if(empty($reference)){
 			response(204, "No Content");
 		}
-		foreach($reference as &$ref){
-			$spec = $this->pm->selectWithDetail($ref['id']);
-			if($spec === false){
-				response(500, "Internal Server Error");
-			}
-			$ref = array_merge($ref, $spec);
-		}
-		response(200, "Reference from mark $mark", $reference);
+		response(200, "Product from mark $mark", $reference);
 	}
 
 	private function type_mark_prod($args){
@@ -109,7 +102,7 @@ class ProductHierarchyController implements Controller{
 
 	#[NoReturn] private function model_prod($args){
 		if(count($args['uri_args']) === 2){
-			if(!is_numeric($args['uri_args'][0])){
+			if(!is_numeric($args['uri_args'][1])){
 				response(400, "Bad Request");
 			}
 			$iteration = (int)$args['uri_args'][1];
@@ -127,6 +120,67 @@ class ProductHierarchyController implements Controller{
 		response(200, "Product of model " . $args['uri_args'][0] . " page $iteration", $product);
 	}
 
+	#[NoReturn] private function type_model_prod($args){
+		if(count($args['uri_args']) === 3){
+			if(!is_numeric($args['uri_args'][2])){
+				response(400, "Bad Request");
+			}
+			$iteration = (int)$args['uri_args'][2];
+		}else{
+			$iteration = 0;
+		}
+		$product = $this->pm->selectAllByTypeModel($args['uri_args'][0], $args['uri_args'][1], $iteration);
+		if($product === false){
+			response(500, "Internal Server Error");
+		}
+		if(empty($product)){
+			response(204, "No content");
+		}
+		$iteration++;
+		response(200, "Product of type " . $product[0]['type'] . ", model " . $product[0]['model'] . ", page $iteration", $product);
+	}
+
+	#[NoReturn] public function mark_model_prod(array $args){
+		if(count($args['uri_args']) === 3){
+			if(!is_numeric($args['uri_args'][2])){
+				response(400, "Bad Request");
+			}
+			$iteration = (int)$args['uri_args'][2];
+		}else{
+			$iteration = 0;
+		}
+		$products = $this->pm->selectAllByMarkModel($args['uri_args'][0], $args['uri_args'][1], $iteration);
+		if($products === false){
+			response(500, "Internal Server Error");
+		}
+		if(empty($products)){
+			response(204, "No content");
+		}
+		response(200, "Product of mark , model ", $products);
+	}
+
+	#[NoReturn] public function type_mark_model_prod(array $args){
+		if(count($args['uri_args']) === 4){
+			if(!is_numeric($args['uri_args'][3])){
+				response(400, "Bad Request");
+			}
+			$iteration = (int)$args['uri_args'][2];
+		}else{
+			$iteration = 0;
+		}
+		if(!is_numeric($args['uri_args'][0])){
+			response(400, "Bad Request");
+		}
+		$product = $this->pm->selectAllByTypeMarkModel($args['uri_args'][0], $args['uri_args'][1], $args['uri_args'][2], $iteration);
+		if($product === false){
+			response(500, "Internal Server Error");
+		}
+		if(empty($product)){
+			response(204, "No Content");
+		}
+		response(200, "Product of type " . $product[0]['type'] . ", mark " . $product[0]["mark"] . ", model " . $product[0]['model'], $product);
+	}
+
 	public function get(array $args){
 		if(isset($args['additional'])){
 			if($args['additional'][0] === 'type_product'){
@@ -137,6 +191,12 @@ class ProductHierarchyController implements Controller{
 				$this->type_mark_prod($args);
 			}elseif($args['additional'][0] === 'model_product'){
 				$this->model_prod($args);
+			}elseif($args['additional'][0] === 'mark_model_product'){
+				$this->mark_model_prod($args);
+			}elseif($args['additional'][0] === 'type_model_product'){
+				$this->type_model_prod($args);
+			}elseif($args['additional'][0] === 'type_mark_model_product'){
+				$this->type_mark_model_prod($args);
 			}
 		}
 	}
