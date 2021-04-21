@@ -24,32 +24,6 @@ class ProductHierarchyController implements Controller{
 	 * execute Product Hierarchy on category and type
 	 * @param array $args same as get() $args
 	 */
-	#[NoReturn] private function type(array $args){
-		if(count($args['uri_args']) === 2){
-			$iteration = (int)$args['uri_args'][1];
-		}else{
-			$iteration = 0;
-		}
-		if(isset($args['uri_args'][0]) && is_numeric($args['uri_args'][0])){
-			$cat = $this->cm->select($args['uri_args'][0]);
-			if($cat !== false){
-				$types = $this->tm->selectByCategory((int)$args['uri_args'][0], $iteration);
-				if($types !== false){
-					if(count($types) !== 0){
-						response(200, "Type from category ${cat['name']}", $types);
-					}else{
-						response(204, "No Content");
-					}
-				}else{
-					response(500, 'Error retrieving types');
-				}
-			}else{
-				response(404, "Category Not Found");
-			}
-		}else{
-			response(400, "Bad Request");
-		}
-	}
 
 	#[NoReturn] private function product(array $args){
 		if(count($args['uri_args']) === 2){
@@ -133,16 +107,36 @@ class ProductHierarchyController implements Controller{
 		}
 	}
 
+	#[NoReturn] private function model_prod($args){
+		if(count($args['uri_args']) === 2){
+			if(!is_numeric($args['uri_args'][0])){
+				response(400, "Bad Request");
+			}
+			$iteration = (int)$args['uri_args'][1];
+		}else{
+			$iteration = 0;
+		}
+		$product = $this->pm->selectAllByModel($args['uri_args'][0], $iteration);
+		if($product === false){
+			response(500, "Internal Server Error");
+		}
+		if(empty($product)){
+			response(204, "No content");
+		}
+		$iteration++;
+		response(200, "Product of model " . $args['uri_args'][0] . " page $iteration", $product);
+	}
+
 	public function get(array $args){
 		if(isset($args['additional'])){
-			if($args['additional'][0] === 'type'){
-				$this->type($args);
-			}elseif($args['additional'][0] === 'type_product'){
+			if($args['additional'][0] === 'type_product'){
 				$this->product($args);
 			}elseif($args['additional'][0] === 'mark_product'){
 				$this->mark_prod($args);
 			}elseif($args['additional'][0] === 'type_mark_product'){
 				$this->type_mark_prod($args);
+			}elseif($args['additional'][0] === 'model_product'){
+				$this->model_prod($args);
 			}
 		}
 	}

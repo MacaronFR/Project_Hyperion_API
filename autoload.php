@@ -32,3 +32,4 @@ require_once "Controllers/StoreController.php";
 require_once "Controllers/MarkModelController.php";
 require_once "Routers.php";
 require_once "utils.php";
+require_once "base85.class.php";

@@ -33,7 +33,7 @@ class Router{
 	 * @param Controller|null $default_controller Controller used if no route match and default() method is called
 	 */
 	public function __construct(Controller|null $default_controller = null){
-		$this->uri = $_SERVER["REQUEST_URI"];
+		$this->uri = rawurldecode($_SERVER["REQUEST_URI"]);
 		$this->method = $_SERVER["REQUEST_METHOD"];
 		$this->routed = false;
 		$headers = getallheaders();

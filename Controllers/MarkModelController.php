@@ -16,6 +16,33 @@ class MarkModelController implements Controller{
 		$this->tm = new TypeModel();
 	}
 
+	#[NoReturn] private function type(array $args){
+		if(count($args['uri_args']) === 2){
+			$iteration = (int)$args['uri_args'][1];
+		}else{
+			$iteration = 0;
+		}
+		if(isset($args['uri_args'][0]) && is_numeric($args['uri_args'][0])){
+			$cat = $this->cm->select($args['uri_args'][0]);
+			if($cat !== false){
+				$types = $this->tm->selectByCategory((int)$args['uri_args'][0], $iteration);
+				if($types !== false){
+					if(count($types) !== 0){
+						response(200, "Type from category ${cat['name']}", $types);
+					}else{
+						response(204, "No Content");
+					}
+				}else{
+					response(500, 'Error retrieving types');
+				}
+			}else{
+				response(404, "Category Not Found");
+			}
+		}else{
+			response(400, "Bad Request");
+		}
+	}
+
 	#[NoReturn] private function markByType(array $args){
 		if(count($args['uri_args']) === 2){
 			$iteration = $args['uri_args'][1];
@@ -122,7 +149,9 @@ class MarkModelController implements Controller{
 	 * @inheritDoc
 	 */
 	public function get(array $args){
-		if($args['additional'][0] === "type_mark"){
+		if($args['additional'][0] === 'type'){
+			$this->type($args);
+		}elseif($args['additional'][0] === "type_mark"){
 			$this->markByType($args);
 		}elseif($args['additional'][0] === "mark_model"){
 			$this->modelByMark($args);

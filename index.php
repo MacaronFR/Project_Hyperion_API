@@ -38,8 +38,8 @@ $rt->put("/category/*/*", CategoryController::class);
 //Type
 //
 // /category/type/{id_category}[/{page}]
-$rt->get("/category/type/*",ProductHierarchyController::class, ["type"]);
-$rt->get("/category/type/*/*",ProductHierarchyController::class, ["type"]);
+$rt->get("/category/*type/",MarkModelController::class, ["type"]);
+$rt->get("/category/*/type/*",MarkModelController::class, ["type"]);
 // /type/{id_type}/product[/{page}]
 $rt->get("/type/*/product", ProductHierarchyController::class, ["type_product"]);
 $rt->get("/type/*/product/*", ProductHierarchyController::class, ["type_product"]);
@@ -73,6 +73,9 @@ $rt->get("/mark/*", MarkModelController::class, ["mark"]);
 
 $rt->get("/model", MarkModelController::class, ["model"]);
 $rt->get("/model/*", MarkModelController::class, ["model"]);
+
+$rt->get("/model/*/product", ProductHierarchyController::class, ['model_product']);
+$rt->get("/model/*/product/*", ProductHierarchyController::class, ['model_product']);
 
 if(!$rt->getRouted()){
 	response(404, "Not Found");
