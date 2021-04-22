@@ -8,10 +8,8 @@ use JetBrains\PhpStorm\NoReturn;
 
 class CategoryController implements Controller{
 	private CategoryModel $cm;
-	private TokenModel $tm;
 	public function __construct(){
 		$this->cm = new CategoryModel();
-		$this->tm = new TokenModel();
 	}
 
 	/**
@@ -67,7 +65,7 @@ class CategoryController implements Controller{
 	/**
 	 * @inheritDoc
 	 */
-	public function put(array $args){
+	#[NoReturn] public function put(array $args){
 		if(checkToken($args['uri_args'][0], 3)){
 			if(count($args['put_args']) === 1 && isset($args['put_args']['name'])){
 				$cat = $this->cm->select($args['uri_args'][1]);
@@ -95,7 +93,7 @@ class CategoryController implements Controller{
 	/**
 	 * @inheritDoc
 	 */
-	public function delete(array $args){
+	#[NoReturn] public function delete(array $args){
 		if(!checkToken($args['uri_args'][0], 3)){
 			response(403, "Forbidden");
 		}
@@ -108,6 +106,14 @@ class CategoryController implements Controller{
 		}
 		if(empty($cat)){
 			response(404, "Not found");
+		}
+		$tm = new TypeModel();
+		$types = $tm->selectByCategory($args['uri_args'][1]);
+		if($types === false){
+			response(500, "Internal Server Error");
+		}
+		if(!empty($types)){
+			response(403, "Types link to Category");
 		}
 		if($this->cm->delete($args['uri_args'][1])){
 			response(204, "No content");
