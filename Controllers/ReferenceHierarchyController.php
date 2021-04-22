@@ -7,11 +7,9 @@ namespace Hyperion\API;
 use JetBrains\PhpStorm\NoReturn;
 
 class ReferenceHierarchyController implements Controller{
-	private TypeModel $tm;
 	private ReferenceModel $rm;
 
 	public function __construct(){
-		$this->tm = new TypeModel();
 		$this->rm = new ReferenceModel();
 	}
 
