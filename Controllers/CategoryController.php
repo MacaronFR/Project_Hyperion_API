@@ -96,6 +96,23 @@ class CategoryController implements Controller{
 	 * @inheritDoc
 	 */
 	public function delete(array $args){
-		// TODO: Implement delete() method.
+		if(!checkToken($args['uri_args'][0], 3)){
+			response(403, "Forbidden");
+		}
+		if(!is_numeric($args['uri_args'][1])){
+			response(400, "Bad request");
+		}
+		$cat = $this->cm->select($args['uri_args'][1]);
+		if($cat === false){
+			response(500, "Internal server Error");
+		}
+		if(empty($cat)){
+			response(404, "Not found");
+		}
+		if($this->cm->delete($args['uri_args'][1])){
+			response(204, "No content");
+		}else{
+			response(500, "Internal Server Error");
+		}
 	}
 }

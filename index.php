@@ -39,6 +39,8 @@ $rt->post("/category/*", CategoryController::class);
 // /category/{client_token}/{id_cat}
 // {"name": <new_category_name>}
 $rt->put("/category/*/*", CategoryController::class);
+// /category/{client_token}/{id_cat}
+$rt->delete("/category/*/*", CategoryController::class);
 //Type
 //
 // /category/type/{id_category}[/{page}]
