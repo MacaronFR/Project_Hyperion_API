@@ -113,7 +113,7 @@ class CategoryController implements Controller{
 			response(500, "Internal Server Error");
 		}
 		if(!empty($types)){
-			response(403, "Types link to Category");
+			response(409, "Types link to Category");
 		}
 		if($this->cm->delete($args['uri_args'][1])){
 			response(204, "No content");
