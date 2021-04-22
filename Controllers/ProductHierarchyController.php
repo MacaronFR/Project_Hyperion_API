@@ -16,11 +16,6 @@ class ProductHierarchyController implements Controller{
 		$this->pm = new ProductModel();
 	}
 
-	/**
-	 * execute Product Hierarchy on category and type
-	 * @param array $args same as get() $args
-	 */
-
 	#[NoReturn] private function type_product(array $args){
 		if(count($args['uri_args']) === 2){
 			if(!is_numeric($args['uri_args'][1])){
@@ -153,7 +148,7 @@ class ProductHierarchyController implements Controller{
 			if(!is_numeric($args['uri_args'][3])){
 				response(400, "Bad Request");
 			}
-			$iteration = (int)$args['uri_args'][2];
+			$iteration = (int)$args['uri_args'][3];
 		}else{
 			$iteration = 0;
 		}
