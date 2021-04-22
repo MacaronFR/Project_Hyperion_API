@@ -47,7 +47,7 @@ abstract class Model{
 	 * @param bool $fetch Query have to be fetch ?
 	 * @return array|bool
 	 */
-	protected function prepared_query(string $statement, array $param, bool $unique = false, bool $fetch = true): array|bool{
+	protected function prepared_query(string $statement, array $param, bool $unique = false, bool $fetch = true, bool $last_id = false): array|bool|int{
 		$req = $this->bdd->prepare($statement);
 		foreach($param as $name => $value){
 			$req->bindValue($name, $value);
@@ -58,8 +58,11 @@ abstract class Model{
 				if ($unique)
 					return $req->fetch(PDO::FETCH_ASSOC);
 				return $req->fetchAll(PDO::FETCH_ASSOC);
-			}else
+			}else{
+				if($last_id)
+					return $this->bdd->lastInsertId();
 				return $req->rowCount() !== 0;
+			}
 		}catch (PDOException $e){
 			echo "Error : ".$e->getMessage();
 			return false;
@@ -124,9 +127,9 @@ abstract class Model{
 		$value["id"] = $id;
 		return $this->prepared_query($sql, $value, fetch: false);
 	}
-	public function insert(array $value): bool{
+	public function insert(array $value): int|false{
 		$sql = $this->prepare_insert_query($value);
-		return $this->prepared_query($sql, $value, fetch: false);
+		return $this->prepared_query($sql, $value, fetch: false, last_id: true);
 	}
 	public function delete(int $id): bool{
 		$sql = "DELETE FROM $this->table_name WHERE $this->id_name=:id";

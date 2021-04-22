@@ -46,8 +46,9 @@ class CategoryController implements Controller{
 		if(checkToken($args['uri_args'][0], 3)){
 			if(count($args['post_args']) === 1 && isset($args['post_args']['name'])){
 				if($this->cm->selectByName($args['post_args']['name']) === false){
-					if($this->cm->insert(['name' => $args['post_args']['name']])){
-						response(201, "Category created");
+					$res = $this->cm->insert(['name' => $args['post_args']['name']]);
+					if($res !== false){
+						response(201, "Category created", [$res]);
 					}else{
 						response(500, "Error while creating category");
 					}
