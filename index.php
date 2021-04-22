@@ -6,6 +6,10 @@ use \Hyperion\API\{ProductHierarchyController,ReferenceHierarchyController,MarkM
 
 require_once "autoload.php";
 
+if($_SERVER['REQUEST_METHOD'] === "OPTIONS"){
+	response(200, "OK");
+}
+
 $rt = new Router();
 // /token/{client_id}/{client_secret}/{user_mail}/{user_passwd} => user token
 $rt->get("/token/*/*/*/*", OAuthController::class);
