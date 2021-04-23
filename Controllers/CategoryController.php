@@ -8,6 +8,7 @@ use JetBrains\PhpStorm\NoReturn;
 
 class CategoryController implements Controller{
 	private CategoryModel $cm;
+
 	public function __construct(){
 		$this->cm = new CategoryModel();
 	}
@@ -43,24 +44,23 @@ class CategoryController implements Controller{
 	 * @inheritDoc
 	 */
 	#[NoReturn] public function post(array $args){
-		if(checkToken($args['uri_args'][0], 3)){
-			if(count($args['post_args']) === 1 && isset($args['post_args']['name'])){
-				if($this->cm->selectByName($args['post_args']['name']) === false){
-					$res = $this->cm->insert(['name' => $args['post_args']['name']]);
-					if($res !== false){
-						response(201, "Category created", [$res]);
-					}else{
-						response(500, "Error while creating category");
-					}
-				}else{
-					response(202, "Category Already exist");
-				}
-			}else{
-				response(400, "Bad Request");
-			}
-		}else{
+		if(!checkToken($args['uri_args'][0], 3)){
 			response(403, "Forbidden");
 		}
+		if(!isset($args['post_args']['name'])){
+			response(400, "Bad Request");
+		}
+		if(empty($args['post_args']['name'])){
+			response(400, "Bad Request");
+		}
+		if($this->cm->selectByName($args['post_args']['name']) !== false){
+			response(202, "Category Already exist");
+		}
+		$res = $this->cm->insert(['name' => $args['post_args']['name']]);
+		if($res === false){
+			response(500, "Error while creating category");
+		}
+		response(201, "Category created", [$res]);
 	}
 
 	/**
@@ -70,7 +70,10 @@ class CategoryController implements Controller{
 		if(!checkToken($args['uri_args'][0], 3)){
 			response(403, "Forbidden");
 		}
-		if(count($args['put_args']) !== 1 || !isset($args['put_args']['name'])){
+		if(!isset($args['put_args']['name'])){
+			response(400, "Bad Request");
+		}
+		if(empty($args['put_args']['name'])){
 			response(400, "Bad Request");
 		}
 		$cat = $this->cm->select($args['uri_args'][1]);
