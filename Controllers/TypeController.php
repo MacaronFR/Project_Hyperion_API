@@ -4,17 +4,21 @@
 namespace Hyperion\API;
 
 
+use JetBrains\PhpStorm\NoReturn;
+
 class TypeController implements Controller{
-	private TypeModel $tym;
+	private TypeModel $tm;
+	private CategoryModel $cm;
 
 	public function __construct(){
-		$this->tym = new TypeModel();
+		$this->tm = new TypeModel();
+		$this->cm = new CategoryModel();
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function get(array $args){
+	#[NoReturn] public function get(array $args){
 		if(isset($args['uri_args'][0])){
 			if(is_numeric($args['uri_args'][0])){
 				$iteration = $args['uri_args'][0];
@@ -24,12 +28,21 @@ class TypeController implements Controller{
 		}else{
 			$iteration = 0;
 		}
-		$types = $this->tym->selectAll($iteration);
+		$types = $this->tm->selectAll($iteration);
 		if($types === false){
 			response(500, "Internal Server Error");
 		}
 		if(empty($types)){
 			response(204, "No Content");
+		}
+		if(isset($args['additional'][0]) && $args['additional'][0] === "cat"){
+			foreach($types as &$type){
+				$cat = $this->cm->select($type['category']);
+				if($cat === false){
+					response(500, "Internal Server Error");
+				}
+				$type['category'] = $cat['name'];
+			}
 		}
 		response(200, "Types", $types);
 	}
@@ -39,8 +52,8 @@ class TypeController implements Controller{
 	 */
 	public function post(array $args){
 		if(checkToken($args['uri_args'][0], 3)) if(isset($args['post_args']['name']) && count($args['post_args']) === 1){
-			if($this->tym->selectByName($args['post_args']['name']) === false){
-				if($this->tym->insert(['name' => $args['post_args']['name']])){
+			if($this->tm->selectByName($args['post_args']['name']) === false){
+				if($this->tm->insert(['name' => $args['post_args']['name']])){
 					response(201, "Type has been created");
 				}else{
 					response(402, "Type Already Exist");
