@@ -3,6 +3,7 @@
 use \Hyperion\API\{OAuthController,ConnectionController,StoreController,ProfileController,CategoryController};
 use \Hyperion\API\Router;
 use \Hyperion\API\{ProductHierarchyController,ReferenceHierarchyController,MarkModelController,SpecController};
+use \Hyperion\API\{TypeController};
 
 require_once "autoload.php";
 
@@ -45,7 +46,7 @@ $rt->put("/category/*/*", CategoryController::class);
 // /category/{client_token}/{id_cat}
 $rt->delete("/category/*/*", CategoryController::class);
 //Type
-//
+$rt->get("/type", TypeController::class);
 // /category/type/{id_category}[/{page}]
 $rt->get("/category/*type/",MarkModelController::class, ["type"]);
 $rt->get("/category/*/type/*",MarkModelController::class, ["type"]);
