@@ -67,27 +67,26 @@ class CategoryController implements Controller{
 	 * @inheritDoc
 	 */
 	#[NoReturn] public function put(array $args){
-		if(checkToken($args['uri_args'][0], 3)){
-			if(count($args['put_args']) === 1 && isset($args['put_args']['name'])){
-				$cat = $this->cm->select($args['uri_args'][1]);
-				if($cat !== false){
-					if($cat['name'] !== $args['put_args']['name']){
-						if($this->cm->update($args['uri_args'][1], $args['put_args'])){
-							response(200, "Category Updated");
-						}else{
-							response(500, "Error while updating");
-						}
-					}else{
-						response(204, "No change");
-					}
-				}else{
-					response(400, "Bad Request, Invalid category ID");
-				}
-			}else{
-				response(400, "Bad Request");
-			}
-		}else{
+		if(!checkToken($args['uri_args'][0], 3)){
 			response(403, "Forbidden");
+		}
+		if(count($args['put_args']) !== 1 || !isset($args['put_args']['name'])){
+			response(400, "Bad Request");
+		}
+		$cat = $this->cm->select($args['uri_args'][1]);
+		if($cat === false){
+			response(500, "Internal Server Error");
+		}
+		if($this->cm->selectByName($args['put_args']['name'])){
+			response(202, "Category name already exist");
+		}
+		if($cat['name'] === $args['put_args']['name']){
+			response(204, "No change");
+		}
+		if($this->cm->update($args['uri_args'][1], $args['put_args'])){
+			response(200, "Category Updated");
+		}else{
+			response(500, "Error while updating");
 		}
 	}
 
