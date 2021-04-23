@@ -41,7 +41,7 @@ class TypeController implements Controller{
 				if($cat === false){
 					response(500, "Internal Server Error");
 				}
-				$type['category'] = $cat['name'];
+				$type['category_name'] = $cat['name'];
 			}
 		}
 		response(200, "Types", $types);
