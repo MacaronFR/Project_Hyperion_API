@@ -67,33 +67,21 @@ class ProfileController implements Controller{
 	 * @inheritDoc
 	 */
 	#[NoReturn] public function put(array $args){
-		if(checkToken($args['uri_args'][0], 3)){ //oublie pas les else
-			if(count($args['put_args']) === 1 && isset($args['put_args'])){ //oublie pas les else
+		if(checkToken($args['uri_args'][0], 3)){
+			if(count($args['put_args']) === 1 && isset($args['put_args'])){
 				$user_info = $this->um->select($args['put_args']);
-				if($user_info !== false){
-					if(array_intersect_key($user_info['name'], $args['put_args'])){ //array_intersect_key renvoie un tableaux
-						$user_info->update($args['put_args']); // $user info est un tableau tu peux pas utilisé une methode dessus
-						//en plus que comptais tu faire avec ->update($args['put_args'][0])
-					}
-					if(array_intersect_key($user_info['firstname'], $args['put_args'])){
-						$user_info->update($args['put_args']);
-					}
-					if(array_intersect_key($user_info['mail'], $args['put_args'])){
-						$user_info->update($args['put_args']);
-					}
-					$address_info = $this->am->selectByUser($user_info['address']);
-					//recup pas les adresses par utilisateur
-					// l'utilsateur il a l'id de son adresse dans son profil utilise l'id c'est plus simple
-					if(array_intersect_key($user_info['address'], $address_info, $args['put_args'])){ //pareil je comprend pas bien
-						$update_address = $address_info->update($args['put_args']); //toujours le update sur un tableau
-						$user_info->update($update_address); //encore une fois
+				if( $user_info !== false){
+					if($tmp = array_intersect_key($user_info,$args['put_args'])){
+						$this->um->update($tmp);
 					}
 				}else{
-					response(404, "Not Found");
+					response(404,"Not Found");
 				}
 			}
+		}else{
+			response(403, "Bad Credentials");
 		}
-	}// tu dois fiare un seul array intersect (ou 2 avec l'adresse peut être qui est un cas à part), et ensuite update via le model pas le tableau le user
+	}
 
 	/**
 	 * @inheritDoc
