@@ -68,20 +68,34 @@ class ProfileController implements Controller{
 	 */
 	#[NoReturn] public function put(array $args){
 		if(checkToken($args['uri_args'][0], 3)){
-			if(count($args['put_args']) === 1 && isset($args['put_args'])){
+			if(isset($args['put_args'])){
+			if(isset($args['uri_args']) && is_numeric($args['uri_args'][1])){
 				$user_info = $this->um->select($args['put_args']);
 				if( $user_info !== false){
-					if($tmp = array_intersect_key($user_info,$args['put_args'])){
-						$this->um->update($tmp);
+					$address_info = $this->am->select($user_info['addr']);
+					if($tmp = array_intersect_key($args('put_args'),$user_info)){
+						if($this->um->update($tmp['id'],$tmp)){
+							response(200,"Profile Updated");
+						}else{
+							response(202,'No update');
+						}
 					}
+					if($temp = array_merge($args['put_args'],$address_info)){
+						if($this->am->selectIdentical($temp)){
+							var_dump($temp);
+						}
+					}
+
+					}else{
+					response(404, "Not Found");
+				}
+
+			}
 				}else{
 					response(404,"Not Found");
 				}
 			}
-		}else{
-			response(403, "Bad Credentials");
 		}
-	}
 
 	/**
 	 * @inheritDoc

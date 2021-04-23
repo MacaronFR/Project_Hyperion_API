@@ -15,8 +15,9 @@ class AddressModel extends Model{
 		"region" => "region",
 	];
 
-	public function selectByUser(int $id){
-			return $this->prepared_query("SELECT id,zip_code,city,address,country,region FROM ADDRESSES INNER JOIN ON USERS.address = ADRESSES.id WHERE USERS.address = :id",["id"=>$id],unique:true);
+	public function selectIdentical(array $fields){
+		$sql = "select *  from ".$this->table_name." WHERE zip_code=:zip and city=:city and address=:address and country=:country and region=:region";
+		return $this->prepared_query($sql,$fields);
 	}
 
 }

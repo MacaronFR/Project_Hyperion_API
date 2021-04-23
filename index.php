@@ -2,7 +2,7 @@
 
 use \Hyperion\API\{OAuthController,ConnectionController,StoreController,ProfileController,CategoryController};
 use \Hyperion\API\Router;
-use \Hyperion\API\{ProductHierarchyController,ReferenceHierarchyController,MarkModelController};
+use \Hyperion\API\{ProductHierarchyController,ReferenceHierarchyController,MarkModelController,SpecController};
 
 require_once "autoload.php";
 
@@ -102,6 +102,10 @@ $rt->get("/mark/*/model/*/reference", ReferenceHierarchyController::class, ['mar
 $rt->get("/type/*/model/*/reference", ReferenceHierarchyController::class, ['type_model_reference']);
 
 $rt->get("/type/*/mark/*/model/*/reference", ReferenceHierarchyController::class, ['type_mark_model_reference']);
+
+// Specification route
+
+$rt->get("/specification/*",SpecController::class);
 
 if(!$rt->getRouted()){
 	response(404, "Not Found");
