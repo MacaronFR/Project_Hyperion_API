@@ -115,8 +115,8 @@ abstract class Model{
 	}
 	public function select(int $id): array|false{
 		$sql = "SELECT";
-		foreach($this->column as $item){
-			$sql .= " $item,";
+		foreach($this->column as $name => $item){
+			$sql .= " $item as $name,";
 		}
 		$sql .= " $this->id_name as id";
 		$sql .= " FROM $this->table_name WHERE $this->id_name=:id ";

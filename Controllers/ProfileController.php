@@ -67,35 +67,54 @@ class ProfileController implements Controller{
 	 * @inheritDoc
 	 */
 	#[NoReturn] public function put(array $args){
-		if(checkToken($args['uri_args'][0], 3)){
-			if(isset($args['put_args'])){
-			if(isset($args['uri_args']) && is_numeric($args['uri_args'][1])){
-				$user_info = $this->um->select($args['put_args']);
-				if( $user_info !== false){
-					$address_info = $this->am->select($user_info['addr']);
-					if($tmp = array_intersect_key($args('put_args'),$user_info)){
-						if($this->um->update($tmp['id'],$tmp)){
-							response(200,"Profile Updated");
-						}else{
-							response(202,'No update');
-						}
-					}
-					if($temp = array_merge($args['put_args'],$address_info)){
-						if($this->am->selectIdentical($temp)){
-							var_dump($temp);
-						}
-					}
-
-					}else{
-					response(404, "Not Found");
+		if(!checkToken($args['uri_args'][0], 3)){
+			response(403, "Forbidden");
+		}
+		if(!isset($args['uri_args']) || !is_numeric($args['uri_args'][1])){
+			response(400, "Bad Request");
+		}
+		if(!isset($args['put_args'])){
+			response(400, "Bad Request");
+		}
+		$user_info = $this->um->select($args['uri_args'][1]);
+		unset($args['put_args']['id']);
+		if($user_info === false){
+			response(404, "User not found");
+		}
+		$address_keys = ["address", "zip", "city", "country", "region"];
+		if(isset($args['put_args']['addr']) && is_array($args['put_args']['addr'])){
+			if($user_info['addr'] !== null){
+				$address_info = $this->am->select($user_info['addr']);
+				unset($address_info['id']);
+				$new_address = array_merge($address_info, array_intersect_key($args['put_args']['addr'], $address_info));
+			}else{
+				if(array_intersect($address_keys, array_keys($args['put_args']['addr'])) !== $address_keys){
+					response(400, "Bad Request");
 				}
-
+				foreach($address_keys as $name){
+					$new_address[$name] = $args['put_args']['addr'][$name];
+				}
 			}
-				}else{
-					response(404,"Not Found");
+			$exist = $this->am->selectIdentical($new_address);
+			if($exist !== false){
+				$args['put_args']['addr'] = $exist['id'];
+			}else{
+				$new_id = $this->am->insert($new_address);
+				if($new_id === false){
+					response(500, "Internal Server Error");
 				}
+				$args['put_args']['addr'] = $new_id;
 			}
 		}
+		$user_update = array_intersect_key($args['put_args'], $user_info);
+		if(!empty($user_update)){
+			if($this->um->update($user_info['id'], $user_update)){
+				response(200, "Profile Updated");
+			}else{
+				response(204, "No update");
+			}
+		}
+	}
 
 	/**
 	 * @inheritDoc

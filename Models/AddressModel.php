@@ -16,8 +16,13 @@ class AddressModel extends Model{
 	];
 
 	public function selectIdentical(array $fields){
-		$sql = "select *  from ".$this->table_name." WHERE zip_code=:zip and city=:city and address=:address and country=:country and region=:region";
-		return $this->prepared_query($sql,$fields);
+		$sql = "SELECT ";
+		foreach($this->column as $name => $column){
+			$sql .= "$column as $name, ";
+		}
+		$sql .= "$this->id_name as id ";
+		$sql .= "FROM $this->table_name WHERE zip_code=:zip AND city=:city AND address=:address AND country=:country AND region=:region;";
+		return $this->prepared_query($sql,$fields, unique: true);
 	}
 
 }
