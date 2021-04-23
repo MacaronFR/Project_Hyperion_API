@@ -30,20 +30,9 @@ class ProfileController implements Controller{
 			if($token !== false){
 				$then = DateTime::createFromFormat("Y-m-d H:i:s", $token['expire']);
 				if($this->now->diff($then)->invert === 0){
-
 					$user = $this->um->select($token['id_client']);
-					$address = $this->am->select($user['address']);
-					$info = [
-						"name" => $user['name'],
-						"fname" => $user['firstname'],
-						"gc" => $user['green_coins'],
-						"type" => $user['type'],
-						"mail" => $user['mail'],
-						"llog" => $user['last_login'],
-						"ac_creation" => $user['account_creation'],
-						"address" => $address,
-					];
-					response(200, "User info", $info);
+					$user["addr"] = $this->am->select($user['address']);
+					response(200, "User info", $user);
 				}else{
 					response(401, "Invalid Credentials");
 				}
