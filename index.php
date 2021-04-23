@@ -47,7 +47,7 @@ $rt->put("/category/*/*", CategoryController::class);
 $rt->delete("/category/*/*", CategoryController::class);
 //Type
 $rt->get("/type", TypeController::class);
-$rt->get("/type_cat", TypeController::class, ['cat']);
+$rt->get("/type_cat{/*}", TypeController::class, ['cat']);
 // /category/type/{id_category}[/{page}]
 $rt->get("/category/*type/",MarkModelController::class, ["type"]);
 $rt->get("/category/*/type/*",MarkModelController::class, ["type"]);
