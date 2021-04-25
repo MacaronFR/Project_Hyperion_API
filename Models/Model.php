@@ -114,6 +114,15 @@ abstract class Model{
 		$sql .= " FROM $this->table_name LIMIT $start, $this->max_row";
 		return $this->query($sql);
 	}
+
+	public function selectTotal(): int|false{
+		$sql = "SELECT COUNT($this->id_name) as count FROM $this->table_name";
+		$res = $this->query($sql);
+		if($res !== false){
+			return (int)$res[0]['count'];
+		}
+		return false;
+	}
 	public function select(int $id): array|false{
 		$sql = "SELECT";
 		foreach($this->column as $name => $item){

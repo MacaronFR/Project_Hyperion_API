@@ -32,6 +32,11 @@ class CategoryController implements Controller{
 			if(empty($result)){
 				response(204, "No content");
 			}else{
+				$total = $this->cm->selectTotal();
+				if($total === false){
+					response(500, "Internal Server Error");
+				}
+				$result['total'] = $total;
 				response(200, "Category $start to $end", $result);
 			}
 		}else{
