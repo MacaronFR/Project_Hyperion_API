@@ -56,19 +56,33 @@ class ProfileController implements Controller{
 	 * @inheritDoc
 	 */
 	#[NoReturn] public function put(array $args){
-		if(!checkToken($args['uri_args'][0], 3)){
+		if(!isset($args['additional']) && !checkToken($args['uri_args'][0], 3)){
 			response(403, "Forbidden");
 		}
-		if(!isset($args['uri_args']) || !is_numeric($args['uri_args'][1])){
+		if(!isset($args['uri_args']) || (!isset($args['additional']) && !is_numeric($args['uri_args'][1]))){
 			response(400, "Bad Request");
 		}
 		if(!isset($args['put_args'])){
 			response(400, "Bad Request");
 		}
-		$user_info = $this->um->select($args['uri_args'][1]);
+		$token_info = $this->tm->selectByToken($args['uri_args'][0]);
+		if(!isset($args['additional'])){
+			$user_info = $this->um->select($args['uri_args'][1]);
+		}else{
+			$user_info = $this->um->select($token_info['user']);
+		}
 		unset($args['put_args']['id']);
 		if($user_info === false){
 			response(404, "User not found");
+		}
+		if(!isset($args['additional']) && (int)$token_info['scope'] !== 0 && $token_info['user'] !== $args['uri_args'][1] && $token_info['scope'] >= $user_info['type']){
+			response(403, "Forbidden");
+		}
+		if(isset($args['put_args']['type']) && (int)$args['put_args']['type'] > $token_info['scope']){
+			response(403, "Forbidden");
+		}
+		if(isset($args['additional'])){
+			unset($args['put_args']['id'], $args['put_args']['gc'], $args['put_args']['type'], $args['put_args']['llog'], $args['put_args']['ac_creation']);
 		}
 		$address_keys = ["address", "zip", "city", "country", "region"];
 		if(isset($args['put_args']['addr']) && is_array($args['put_args']['addr'])){

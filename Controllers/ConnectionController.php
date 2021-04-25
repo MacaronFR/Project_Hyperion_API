@@ -3,7 +3,6 @@
 
 namespace Hyperion\API;
 
-use Cassandra\Date;
 use DateTime;
 use JetBrains\PhpStorm\NoReturn;
 
@@ -86,7 +85,7 @@ class ConnectionController implements Controller{
 	#[NoReturn] public function delete(array $args){
 		$token_id = $this->tm->selectByToken($args["uri_args"][0]);
 		if($token_id !== false){
-			if($this->tm->delete($token_id['id_token'])){
+			if($this->tm->delete($token_id['id'])){
 				response(200, "Disconnected");
 			}else{
 				response(500, "Error during disconnection");

@@ -30,7 +30,7 @@ $rt->get("/store/*", StoreController::class);
 //Profile
 // /me/{user_token}
 $rt->get("/me/*", ProfileController::class);
-$rt->put("/me/*", ProfileController::class);
+$rt->put("/me/*", ProfileController::class, ['me']);
 // /profile/{token}/{user_id}
 $rt->get("/profile/*/*",ProfileController::class);
 $rt->put("/profile/*/*",ProfileController::class);
