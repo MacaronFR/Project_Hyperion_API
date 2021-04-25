@@ -35,8 +35,8 @@ $rt->put("/me/*", ProfileController::class, ['me']);
 $rt->get("/profile/*/*",ProfileController::class);
 $rt->put("/profile/*/*",ProfileController::class);
 // /category[/{page}]
-$rt->get("/category", CategoryController::class);
-$rt->get("/category/*", CategoryController::class);
+$rt->get("/category{/*{/*/*}}", CategoryController::class);
+//$rt->get("/category/*", CategoryController::class);
 // /category/{user_token}
 // {"name": <category_name>}
 $rt->post("/category/*", CategoryController::class);
