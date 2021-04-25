@@ -105,7 +105,7 @@ abstract class Model{
 	}
 
 	public function selectAll(int $iteration = 0): array|false{
-		$start = 500 * $iteration;
+		$start = $this->max_row * $iteration;
 		$sql = "SELECT";
 		foreach($this->column as $key => $item){
 			$sql .= " $item as $key,";
