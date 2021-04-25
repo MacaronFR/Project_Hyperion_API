@@ -13,6 +13,7 @@ abstract class Model{
 	protected string $table_name;
 	protected string $id_name;
 	protected array $column;
+	protected int $max_row = 500;
 	/**
 	 * Models constructor.
 	 * @codeCoverageIgnore
@@ -110,7 +111,7 @@ abstract class Model{
 			$sql .= " $item as $key,";
 		}
 		$sql .= " $this->id_name as id";
-		$sql .= " FROM $this->table_name LIMIT $start, 500";
+		$sql .= " FROM $this->table_name LIMIT $start, $this->max_row";
 		return $this->query($sql);
 	}
 	public function select(int $id): array|false{

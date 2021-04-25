@@ -11,6 +11,7 @@ class CategoryModel extends Model{
 	protected array $column = [
 		"name" => "name"
 	];
+	protected int $max_row = 10;
 	public function selectByName(string $name): array| false{
 		return $this->prepared_query("SELECT id_category as id, name FROM CATEGORY WHERE name=:name", ["name" => $name], unique: true);
 	}
