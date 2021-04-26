@@ -33,7 +33,7 @@ class CategoryController implements Controller{
 			$search = $args['uri_args'][1];
 			$sort = $args['uri_args'][3] ?? 'id';
 			$result = $this->cm->selectAllFilter($search, $order, $sort, $page);
-			$totalFilter = $this->cm->selectTotalFilter($search, $order, $sort, $page);
+			$totalFilter = $this->cm->selectTotalFilter($search, $order, $sort);
 			$total = $this->cm->selectTotal();
 		}else{
 			$result = $this->cm->selectAll($page);

@@ -151,7 +151,7 @@ abstract class Model{
 		return $this->prepared_query($sql, ["search" => $search]);
 	}
 
-	public function selectTotalFilter(string $search, string $order, string $sort, int $iteration = 0): int|false{
+	public function selectTotalFilter(string $search, string $order, string $sort): int|false{
 		if($sort === 'id'){
 			$sort = $this->id_name;
 		}else{
@@ -161,14 +161,12 @@ abstract class Model{
 				return false;
 			}
 		}
-		$start = $this->max_row * $iteration;
 		$sql = "SELECT COUNT($this->id_name) as count FROM $this->table_name WHERE ";
 		foreach($this->column as $item){
 			$sql .= "$item LIKE :search OR ";
 		}
 		$sql .= "$this->id_name LIKE :search ";
 		$sql .= "ORDER BY $sort $order ";
-		$sql .= "LIMIT $start, $this->max_row;";
 		$search = "%" . $search . "%";
 		$total = $this->prepared_query($sql, ["search" => $search], unique: true);
 		if($total === false){
