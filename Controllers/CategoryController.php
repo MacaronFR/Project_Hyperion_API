@@ -26,8 +26,11 @@ class CategoryController implements Controller{
 			}
 		}
 		if(count($args['uri_args']) > 1){
+			$order = strtoupper($args['uri_args'][2]) ?? 'ASC';
+			if($order !== "ASC" && $order !== "DESC"){
+				response(400, "Bad Request");
+			}
 			$search = $args['uri_args'][1];
-			$order = $args['uri_args'][2] ?? 'asc';
 			$sort = $args['uri_args'][3] ?? 'id';
 			$result = $this->cm->selectAllFilter($search, $order, $sort, $page);
 			$totalFilter = $this->cm->selectTotalFilter($search, $order, $sort, $page);
