@@ -26,9 +26,10 @@ class CategoryController implements Controller{
 			}
 		}
 		if(count($args['uri_args']) > 1){
-			$order = strtoupper($args['uri_args'][2]) ?? 'ASC';
+			$order = $args['uri_args'][2] ?? 'ASC';
+			$order = strtoupper($order);
 			if($order !== "ASC" && $order !== "DESC"){
-				response(400, "Bad Request");
+				response(409, "Bad Request");
 			}
 			$search = $args['uri_args'][1];
 			$sort = $args['uri_args'][3] ?? 'id';
