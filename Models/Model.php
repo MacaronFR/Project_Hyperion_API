@@ -123,6 +123,60 @@ abstract class Model{
 		}
 		return false;
 	}
+
+	public function selectAllFilter(string $search, string $order, string $sort, int $iteration = 0): array|false{
+		if($sort === 'id'){
+			$sort = $this->id_name;
+		}else{
+			if(key_exists($sort, $this->column)){
+				$sort = $this->column[$sort];
+			}else{
+				return false;
+			}
+		}
+		$start = $this->max_row * $iteration;
+		$sql = "SELECT";
+		foreach($this->column as $key => $item){
+			$sql .= " $item as $key,";
+		}
+		$sql .= " $this->id_name as id FROM $this->table_name ";
+		$sql .= "WHERE ";
+		foreach($this->column as $item){
+			$sql .= "$item LIKE :search OR ";
+		}
+		$sql .= "$this->id_name LIKE :search ";
+		$sql .= "ORDER BY $sort $order ";
+		$sql .= "LIMIT $start, $this->max_row;";
+		$search = "%" . $search . "%";
+		return $this->prepared_query($sql, ["search" => $search]);
+	}
+
+	public function selectTotalFilter(string $search, string $order, string $sort, int $iteration = 0): int|false{
+		if($sort === 'id'){
+			$sort = $this->id_name;
+		}else{
+			if(key_exists($sort, $this->column)){
+				$sort = $this->column[$sort];
+			}else{
+				return false;
+			}
+		}
+		$start = $this->max_row * $iteration;
+		$sql = "SELECT COUNT($this->id_name) as count FROM $this->table_name WHERE ";
+		foreach($this->column as $item){
+			$sql .= "$item LIKE :search OR ";
+		}
+		$sql .= "$this->id_name LIKE :search ";
+		$sql .= "ORDER BY $sort $order ";
+		$sql .= "LIMIT $start, $this->max_row;";
+		$search = "%" . $search . "%";
+		$total = $this->prepared_query($sql, ["search" => $search], unique: true);
+		if($total === false){
+			return $total;
+		}
+		return $total['count'];
+	}
+
 	public function select(int $id): array|false{
 		$sql = "SELECT";
 		foreach($this->column as $name => $item){

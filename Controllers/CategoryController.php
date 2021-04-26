@@ -18,31 +18,39 @@ class CategoryController implements Controller{
 	 */
 	#[NoReturn] public function get(array $args){
 		$page = 0;
-		if(count($args['uri_args']) === 1){
+		if(count($args['uri_args']) >= 1){
 			if(is_numeric($args['uri_args'][0])){
 				$page = (int)$args['uri_args'][0];
 			}else{
 				response(400, "Bad Request");
 			}
 		}
-		$result = $this->cm->selectAll($page);
-		$start = $page * 500 + 1;
-		$end = ($page + 1) * 500;
-		if($result !== false){
-			if(empty($result)){
-				response(204, "No content");
-			}else{
-				$total = $this->cm->selectTotal();
-				if($total === false){
-					response(500, "Internal Server Error");
-				}
-				$result['total'] = $total;
-				response(200, "Category $start to $end", $result);
-			}
+		if(count($args['uri_args']) > 1){
+			$search = $args['uri_args'][1];
+			$order = $args['uri_args'][2] ?? 'asc';
+			$sort = $args['uri_args'][3] ?? 'id';
+			$result = $this->cm->selectAllFilter($search, $order, $sort, $page);
+			$totalFilter = $this->cm->selectTotalFilter($search, $order, $sort, $page);
+			$total = $this->cm->selectTotal();
 		}else{
+			$result = $this->cm->selectAll($page);
+			$total = $this->cm->selectTotal();
+			$totalFilter = $total;
+		}
+		$start = $page * 10 + 1;
+		$end = ($page + 1) * 10;
+		if($result === false){
 			response(500, "Error while retrieving data");
 		}
-
+		if(empty($result)){
+			response(204, "No content");
+		}
+		if($total === false || $totalFilter === false){
+			response(500, "Internal Server Error");
+		}
+		$result['total'] = $totalFilter;
+		$result['totalNotFiltered'] = $total;
+		response(200, "Category $start to $end", $result);
 	}
 
 	/**
