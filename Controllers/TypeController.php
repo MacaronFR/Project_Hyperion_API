@@ -114,6 +114,12 @@ class TypeController implements Controller{
 		if(empty($new_field)){
 			response(400, "Bad Request");
 		}
+		if(isset($new_field['type'])){
+			$exist = $this->tm->selectByType($new_field['type']);
+			if($exist !== false){
+				response(202, "Type exist");
+			}
+		}
 		foreach($new_field as $key => $f){
 			if((string)$f === $type[$key]){
 				unset($new_field[$key]);
