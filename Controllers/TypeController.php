@@ -68,7 +68,8 @@ class TypeController implements Controller{
 				if($cat_name === false){
 					response(500, "Internal Server Error");
 				}
-				$res['category_name'] = $cat_name['name'];
+				$res['category_id'] = $res['category'];
+				$res['category'] = $cat_name['name'];
 			}
 		}
 		$result['total'] = $totalFilter;
