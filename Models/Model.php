@@ -41,12 +41,14 @@ abstract class Model{
 			return false;
 		}
 	}
+
 	/**
 	 * @param string $statement Statement to prepare and query
 	 * @param array $param Array of param of form $param["param_name"] = $param_value
 	 * @param bool $unique If the query return only one row
 	 * @param bool $fetch Query have to be fetch ?
-	 * @return array|bool
+	 * @param bool $last_id
+	 * @return array|bool|int
 	 */
 	protected function prepared_query(string $statement, array $param, bool $unique = false, bool $fetch = true, bool $last_id = false): array|bool|int{
 		$req = $this->bdd->prepare($statement);
@@ -104,14 +106,16 @@ abstract class Model{
 		return $query;
 	}
 
-	public function selectAll(int $iteration = 0): array|false{
+	public function selectAll(int $iteration = 0, bool $limit = true): array|false{
 		$start = $this->max_row * $iteration;
 		$sql = "SELECT";
 		foreach($this->column as $key => $item){
 			$sql .= " $item as $key,";
 		}
 		$sql .= " $this->id_name as id";
-		$sql .= " FROM $this->table_name LIMIT $start, $this->max_row";
+		$sql .= " FROM $this->table_name";
+		if($limit)
+			$sql .= "LIMIT $start, $this->max_row";
 		return $this->query($sql);
 	}
 

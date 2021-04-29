@@ -37,7 +37,7 @@ class CategoryController implements Controller{
 			$totalFilter = $this->cm->selectTotalFilter($search, $order, $sort);
 			$total = $this->cm->selectTotal();
 		}else{
-			$result = $this->cm->selectAll($page);
+			$result = $this->cm->selectAll(limit: false);
 			$total = $this->cm->selectTotal();
 			$totalFilter = $total;
 		}
