@@ -46,8 +46,8 @@ $rt->put("/category/*/*", CategoryController::class);
 // /category/{client_token}/{id_cat}
 $rt->delete("/category/*/*", CategoryController::class);
 //Type
-$rt->get("/type", TypeController::class);
-$rt->get("/type_cat{/*}", TypeController::class, ['cat']);
+$rt->get("/type{/*{/search/*{/order/*/sort/*}}}", TypeController::class);
+$rt->get("/type_cat{/*{/search/*{/order/*/sort/*}}}", TypeController::class, ['cat']);
 // /category/type/{id_category}[/{page}]
 $rt->get("/category/*type/",MarkModelController::class, ["type"]);
 $rt->get("/category/*/type/*",MarkModelController::class, ["type"]);

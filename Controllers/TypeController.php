@@ -19,32 +19,52 @@ class TypeController implements Controller{
 	 * @inheritDoc
 	 */
 	#[NoReturn] public function get(array $args){
-		if(isset($args['uri_args'][0])){
+		$page = 0;
+		if(count($args['uri_args']) >= 1){
 			if(is_numeric($args['uri_args'][0])){
-				$iteration = $args['uri_args'][0];
+				$page = (int)$args['uri_args'][0];
 			}else{
 				response(400, "Bad Request");
 			}
-		}else{
-			$iteration = 0;
 		}
-		$types = $this->tm->selectAll($iteration);
-		if($types === false){
+		if(count($args['uri_args']) > 1){
+			$order = $args['uri_args'][2] ?? 'ASC';
+			$order = strtoupper($order);
+			if($order !== "ASC" && $order !== "DESC"){
+				response(409, "Bad Request");
+			}
+			$search = $args['uri_args'][1];
+			$sort = $args['uri_args'][3] ?? 'id';
+			$result = $this->tm->selectAllFilter($search, $order, $sort, $page);
+			$totalFilter = $this->tm->selectTotalFilter($search, $order, $sort);
+			$total = $this->tm->selectTotal();
+		}else{
+			if(count($args['uri_args']) === 0){
+				$result = $this->tm->selectAll(limit: false);
+			}else{
+				$result = $this->tm->selectAll($page);
+			}
+			$total = $this->tm->selectTotal();
+			$totalFilter = $total;
+		}
+		if($result === false){
+			response(500, "Error while retrieving data");
+		}
+		if(empty($result)){
+			response(204, "No content");
+		}
+		if($total === false || $totalFilter === false){
 			response(500, "Internal Server Error");
 		}
-		if(empty($types)){
-			response(204, "No Content");
+		$start = $page * 10 + 1;
+		if(count($args['uri_args']) === 0){
+			$end = $totalFilter;
+		}else{
+			$end = ($page + 1) * 10;
 		}
-		if(isset($args['additional'][0]) && $args['additional'][0] === "cat"){
-			foreach($types as &$type){
-				$cat = $this->cm->select($type['category']);
-				if($cat === false){
-					response(500, "Internal Server Error");
-				}
-				$type['category_name'] = $cat['name'];
-			}
-		}
-		response(200, "Types", $types);
+		$result['total'] = $totalFilter;
+		$result['totalNotFiltered'] = $total;
+		response(200, "Category $start to $end", $result);
 	}
 
 	/**
