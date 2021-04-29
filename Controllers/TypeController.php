@@ -82,23 +82,30 @@ class TypeController implements Controller{
 	/**
 	 * @inheritDoc
 	 */
-	public function post(array $args){
-		if(checkToken($args['uri_args'][0], 3)) if(isset($args['post_args']['name']) && count($args['post_args']) === 1){
-			if($this->tm->selectByName($args['post_args']['name']) === false){
-				if($this->tm->insert(['name' => $args['post_args']['name']])){
-					response(201, "Type has been created");
-				}else{
-					response(402, "Type Already Exist");
-				}
-			}else{
-				response(400, "Bad Requests");
-			}
-		}else{
+	#[NoReturn] public function post(array $args){
+		if(!checkToken($args['uri_args'][0], 3)){
 			response(403, "Forbidden");
 		}
+		if(empty($args['post_args']) || !isset($args['post_args']['type'], $args['post_args']['category'])){
+			response(400, "Bad Request, Missing fields");
+		}
+		$type = $this->tm->selectByType($args['post_args']['type']);
+		if($type !== false){
+			response(209, "Conflict, Type already Exist");
+		}
+		$cat = $this->cm->select($args['post_args']['category']);
+		if($cat === false){
+			response(404, "Category Not Found ");
+		}
+		$values = array_intersect_key($args['post_args'], ["type" => 0, 'category' => 0]);
+		$res = $this->tm->insert($values);
+		if($res){
+			response(201, "Type Created");
+		}
+		response(500, "Internal Server Error");
 	}
 
-	public function put(array $args){
+	#[NoReturn] public function put(array $args){
 		if(!checkToken($args['uri_args'][0], 3)){
 			response(403, "Forbidden");
 		}
@@ -144,7 +151,7 @@ class TypeController implements Controller{
 		}
 	}
 
-	public function delete(array $args){
+	#[NoReturn] public function delete(array $args){
 		if(!checkToken($args['uri_args'][0], 3)){
 			response(403, "Forbidden");
 		}
