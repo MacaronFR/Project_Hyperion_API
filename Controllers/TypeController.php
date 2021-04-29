@@ -62,6 +62,15 @@ class TypeController implements Controller{
 		}else{
 			$end = ($page + 1) * 10;
 		}
+		if(isset($args['additional'][0]) && $args['additional'][0] === 'cat'){
+			foreach($result as &$res){
+				$cat_name = $this->cm->select($res['category']);
+				if($cat_name === false){
+					response(500, "Internal Server Error");
+				}
+				$res['category_name'] = $cat_name['name'];
+			}
+		}
 		$result['total'] = $totalFilter;
 		$result['totalNotFiltered'] = $total;
 		response(200, "Category $start to $end", $result);
