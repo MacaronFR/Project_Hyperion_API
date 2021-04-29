@@ -115,7 +115,7 @@ abstract class Model{
 		$sql .= " $this->id_name as id";
 		$sql .= " FROM $this->table_name";
 		if($limit)
-			$sql .= "LIMIT $start, $this->max_row";
+			$sql .= " LIMIT $start, $this->max_row";
 		return $this->query($sql);
 	}
 

@@ -37,12 +37,14 @@ class CategoryController implements Controller{
 			$totalFilter = $this->cm->selectTotalFilter($search, $order, $sort);
 			$total = $this->cm->selectTotal();
 		}else{
-			$result = $this->cm->selectAll(limit: false);
+			if(count($args['uri_args']) === 0){
+				$result = $this->cm->selectAll(limit: false);
+			}else{
+				$result = $this->cm->selectAll($page);
+			}
 			$total = $this->cm->selectTotal();
 			$totalFilter = $total;
 		}
-		$start = $page * 10 + 1;
-		$end = ($page + 1) * 10;
 		if($result === false){
 			response(500, "Error while retrieving data");
 		}
@@ -51,6 +53,12 @@ class CategoryController implements Controller{
 		}
 		if($total === false || $totalFilter === false){
 			response(500, "Internal Server Error");
+		}
+		$start = $page * 10 + 1;
+		if(count($args['uri_args']) === 0){
+			$end = $totalFilter;
+		}else{
+			$end = ($page + 1) * 10;
 		}
 		$result['total'] = $totalFilter;
 		$result['totalNotFiltered'] = $total;
