@@ -44,10 +44,7 @@ function parse_body(): array| false{
 	if($return !== null){
 		$response['content'] = $return;
 	}
-	if($status === 209){
-		header("HTTP/1.1 209 $message");
-	}
-	http_response_code($status);
+	header("HTTP/1.1 $status $message");
 	echo json_encode($response);
 	exit();
 }
