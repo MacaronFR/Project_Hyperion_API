@@ -14,7 +14,12 @@ class SpecController implements Controller{
 	}
 
 	public function get(array $args){
-		// TODO: Implement get() method.
+		if(coount($args['uri_args']) === 1 && is_numeric($args['uri_args'][1])){
+			$iteration = (int)$args['uri_args'][1];
+			$this->sm->select($iteration);
+		}else{
+			response(400,"Bad Request");
+		}
 	}
 	public function post(array $args){
 		// TODO: Implement post() method.
