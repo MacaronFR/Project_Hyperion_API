@@ -97,7 +97,43 @@ class TypeController implements Controller{
 	}
 
 	public function put(array $args){
-		// TODO: Implement put() method.
+		if(!checkToken($args['uri_args'][0], 3)){
+			response(403, "Forbidden");
+		}
+		if(!is_numeric($args['uri_args'][1])){
+			response(400, "Bad request");
+		}
+		if(empty($args['put_args'])){
+			response(400, "Bad Request");
+		}
+		$type = $this->tm->select($args['uri_args'][1]);
+		if($type === false){
+			response(404, "Not Found");
+		}
+		$new_field = array_intersect_key($args['put_args'], $type);
+		if(empty($new_field)){
+			response(400, "Bad Request");
+		}
+		foreach($new_field as $key => $f){
+			if((string)$f === $type[$key]){
+				unset($new_field[$key]);
+			}
+		}
+		if(empty($new_field)){
+			response(204, "No Update");
+		}
+		if(isset($new_field['category'])){
+			$cat = $this->cm->select($new_field['category']);
+			if($cat === false){
+				response(404, "Category not found");
+			}
+		}
+		$res = $this->tm->update($args['uri_args'][1], $new_field);
+		if($res === false){
+			response(500, "Internal Server Error");
+		}else{
+			response(200, "Updated");
+		}
 	}
 
 	public function delete(array $args){
