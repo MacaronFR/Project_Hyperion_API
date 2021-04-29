@@ -9,10 +9,12 @@ use JetBrains\PhpStorm\NoReturn;
 class TypeController implements Controller{
 	private TypeModel $tm;
 	private CategoryModel $cm;
+	private ReferenceModel $rm;
 
 	public function __construct(){
 		$this->tm = new TypeModel();
 		$this->cm = new CategoryModel();
+		$this->rm = new ReferenceModel();
 	}
 
 	/**
@@ -143,6 +145,27 @@ class TypeController implements Controller{
 	}
 
 	public function delete(array $args){
-		// TODO: Implement delete() method.
+		if(!checkToken($args['uri_args'][0], 3)){
+			response(403, "Forbidden");
+		}
+		if(!is_numeric($args['uri_args'][1])){
+			response(400, "Bad request");
+		}
+		$type = $this->tm->select($args['uri_args'][1]);
+		if($type === false){
+			response(404, "Not Found");
+		}
+		$ref = $this->rm->selectAllByType($args['uri_args'][1]);
+		if($ref === false){
+			response(500, "Internal Server Error");
+		}
+		if(!empty($ref)){
+			response(209, "Conflict");
+		}
+		$res = $this->tm->delete($args['uri_args'][1]);
+		if($res === false){
+			response(500, "Internal Server Error");
+		}
+		response(204, "Type Deleted");
 	}
 }
