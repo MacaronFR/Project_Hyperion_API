@@ -8,13 +8,13 @@ class SpecController implements Controller{
 	private TokenModel $tm;
 	private SpecificationModel $sm;
 
-	#[Pure] public function __construct(){
+	 public function __construct(){
 		$this->sm = new SpecificationModel();
 		$this->tm = new TokenModel();
 	}
 
 	public function get(array $args){
-		if(coount($args['uri_args']) === 1 && is_numeric($args['uri_args'][1])){
+		if(count($args['uri_args']) === 1 && is_numeric($args['uri_args'][1])){
 			$iteration = (int)$args['uri_args'][1];
 			$this->sm->select($iteration);
 		}else{
