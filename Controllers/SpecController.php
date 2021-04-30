@@ -70,7 +70,26 @@ class SpecController implements Controller{
 	}
 
 	public function post(array $args){
-		// TODO: Implement post() method.
+		if(!checkToken($args['uri_args'][0],3)){
+			response(403,"Forbidden");
+		}
+		if(!is_numeric($args['uri_args'][0][1])){
+			response(400,"Bad Request");
+		}
+		if(empty($args['post_args']) && !isset($args['post_args']['name']) && !isset($args['post_args']['value'])){
+			response(400,"Bad Request");
+		}
+		$value = array_intersect_key($args["post_args"],["name"=>0,"value"=>0]);
+		$exist = $this->sm->selectIdentical($value);
+		if($exist !== false){
+			response(202,"Already Exist");
+		}
+
+		$result = $this->sm->insert($value);
+		if($result === false){
+			response(500,"Internal Server Error");
+		}
+		response(201,"Created");
 	}
 
 	public function put(array $args){

@@ -117,6 +117,7 @@ $rt->get("/specification{/*{/search/*{/order/*/sort/*}}}",SpecController::class)
 // /specification/{token}/{id}
 $rt->put("/specification/*/*",SpecController::class);
 $rt->delete("/specification/*/*",SpecController::class);
+$rt->post('/specification/*',SpecController::class);
 if(!$rt->getRouted()){
 	response(404, "Not Found");
 }
