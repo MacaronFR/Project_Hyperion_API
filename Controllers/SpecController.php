@@ -12,10 +12,12 @@ require_once "autoload.php";
 class SpecController implements Controller{
 	private TokenModel $tm;
 	private SpecificationModel $sm;
+	private RefHaveSpecModel $rm;
 
 	public function __construct(){
 		$this->tm = new TokenModel();
 		$this->sm = new SpecificationModel();
+		$this->rm = new RefHaveSpecModel();
 	}
 
 	#[NoReturn] public function get(array $args){
@@ -112,6 +114,26 @@ class SpecController implements Controller{
 	}
 
 	public function delete(array $args){
-		// TODO: Implement delete() method.
+		if(!checkToken($args['uri_args'][0],3)){
+			response(403,"Forbidden");
+		}
+		if(!is_numeric($args['uri_args'][1])){
+			response(400,"Bad Request");
+		}
+		$spec = $this->sm->select($args['uri_args'][1]);
+		if($spec === false){
+			response(404,"Not Found");
+		}
+		$ref = $this->rm->selectAllBySpec($spec);
+		if($ref === false){
+			response(500,"Internal Server Error");
+		}
+		if(!empty($ref)){
+			response(209,"Conflict");
+		}
+		$result = $this->sm->delete($args['uri_args'][1]);
+		if($result){response(204,"Deleted");}
+
+
 	}
 }
