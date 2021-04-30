@@ -31,6 +31,7 @@ require_once "Controllers/ProfileController.php";
 require_once "Controllers/ReferenceHierarchyController.php";
 require_once "Controllers/StoreController.php";
 require_once "Controllers/TypeController.php";
+require_once "Controllers/SpecController.php";
 require_once "Routers.php";
 require_once "utils.php";
 require_once "base85.class.php";
