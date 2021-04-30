@@ -97,7 +97,7 @@ class SpecController implements Controller{
 		}
 		$tmp = array_merge($spec,$new_spec);
 		unset($tmp['id']);
-		if($this->sm->selectIdentical($tmp) === false){
+		if($this->sm->selectIdentical($tmp) !== false){
 			response(202,"Already Exist");
 		}
 		if(empty($new_spec)){
