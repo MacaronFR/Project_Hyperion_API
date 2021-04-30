@@ -20,6 +20,7 @@ class SpecificationModel extends Model{
 		}
 		$sql .= "$this->id_name as id ";
 		$sql .= "FROM $this->table_name WHERE name=:name AND value=:value;";
+		var_dump($sql,$fields);
 		return $this->prepared_query($sql,$fields, unique: true);
 	}
 }
