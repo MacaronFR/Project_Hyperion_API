@@ -14,6 +14,7 @@ class SpecificationModel extends Model{
     ];
 
 
+
 	public function selectByName(string $name): array|false{
 		return $this->prepared_query("SELECT type, value FROM SPECIFICATION WHERE name=:name", ['name' => $name], unique: true);
 	}

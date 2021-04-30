@@ -8,6 +8,7 @@ use JetBrains\PhpStorm\NoReturn;
 
 require_once "autoload.php";
 
+
 class SpecController implements Controller{
 	private TokenModel $tm;
 	private SpecificationModel $sm;
