@@ -30,6 +30,7 @@ require_once "Controllers/ProductHierarchyController.php";
 require_once "Controllers/ProfileController.php";
 require_once "Controllers/ReferenceHierarchyController.php";
 require_once "Controllers/StoreController.php";
+require_once "Controllers/SpecController.php";
 require_once "Controllers/TypeController.php";
 require_once "Controllers/SpecController.php";
 require_once "Routers.php";

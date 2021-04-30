@@ -113,7 +113,7 @@ $rt->get("/type/*/mark/*/model/*/reference", ReferenceHierarchyController::class
 
 // Specification route
 
-$rt->get("/specification/*",SpecController::class);
+$rt->get("/specification{/*{/search/*{/order/*/sort/*}}}",SpecController::class);
 
 if(!$rt->getRouted()){
 	response(404, "Not Found");
