@@ -73,9 +73,6 @@ class SpecController implements Controller{
 		if(!checkToken($args['uri_args'][0],3)){
 			response(403,"Forbidden");
 		}
-		if(!is_numeric($args['uri_args'][0][1])){
-			response(400,"Bad Request");
-		}
 		if(empty($args['post_args']) && !isset($args['post_args']['name']) && !isset($args['post_args']['value'])){
 			response(400,"Bad Request");
 		}
