@@ -12,7 +12,7 @@ class RefHaveSpecModel extends Model{
         "product"=>"id_product",
         "spec"=>"id_spec"
     ];
-	public function selectAllBySpec(string $spec, int $iteration = 0, bool $limit = true): array|false{
+	public function selectAllBySpec(int $spec, int $iteration = 0, bool $limit = true): array|false{
 		$start = $this->max_row * $iteration;
 		$sql = "SELECT";
 		foreach($this->column as $key => $item){

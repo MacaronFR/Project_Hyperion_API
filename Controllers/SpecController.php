@@ -124,7 +124,7 @@ class SpecController implements Controller{
 		if($spec === false){
 			response(404,"Not Found");
 		}
-		$ref = $this->rm->selectAllBySpec($spec);
+		$ref = $this->rm->selectAllBySpec($spec['id']);
 		if($ref === false){
 			response(500,"Internal Server Error");
 		}
