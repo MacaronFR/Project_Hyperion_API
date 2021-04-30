@@ -12,6 +12,7 @@ class SpecificationModel extends Model{
         "name"=>"name",
         "value"=>"value"
     ];
+    protected int $max_row;
 
 	public function selectIdentical(array $fields){
 		$sql = "SELECT ";
