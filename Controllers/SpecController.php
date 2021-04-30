@@ -95,6 +95,9 @@ class SpecController implements Controller{
 				unset($new_spec[$key]);
 			}
 		}
+		if($this->sm->selectIdentical($new_spec) === false){
+			response(202,"Already Exist");
+		}
 		if(empty($new_spec)){
 			response(204,"No Update");
 		}
@@ -102,7 +105,7 @@ class SpecController implements Controller{
 		if($result === false){
 			response(500,"Internal Server Error");
 		}
-		response(201,"Updated");
+		response(200,"Updated");
 
 	}
 

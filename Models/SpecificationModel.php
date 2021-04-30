@@ -13,9 +13,13 @@ class SpecificationModel extends Model{
         "value"=>"value"
     ];
 
-
-
-	public function selectByName(string $name): array|false{
-		return $this->prepared_query("SELECT type, value FROM SPECIFICATION WHERE name=:name", ['name' => $name], unique: true);
+	public function selectIdentical(array $fields){
+		$sql = "SELECT ";
+		foreach($this->column as $name => $column){
+			$sql .= "$column as $name, ";
+		}
+		$sql .= "$this->id_name as id ";
+		$sql .= "FROM $this->table_name WHERE name=:name AND value=:value;";
+		return $this->prepared_query($sql,$fields, unique: true);
 	}
 }
