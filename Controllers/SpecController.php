@@ -73,7 +73,7 @@ class SpecController implements Controller{
 		if(!checkToken($args['uri_args'][0],3)){
 			response(403,"Forbidden");
 		}
-		if(empty($args['post_args']) && !isset($args['post_args']['name']) && !isset($args['post_args']['value'])){
+		if(empty($args['post_args']) || !isset($args['post_args']['name']) || !isset($args['post_args']['value'])){
 			response(400,"Bad Request");
 		}
 		$value = array_intersect_key($args["post_args"],["name"=>0,"value"=>0]);
