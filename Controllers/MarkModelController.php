@@ -10,37 +10,34 @@ class MarkModelController implements Controller{
 
 	private ReferenceModel $rm;
 	private TypeModel $tm;
+	private CategoryModel $cm;
 
 	public function __construct(){
 		$this->rm = new ReferenceModel();
 		$this->tm = new TypeModel();
+		$this->cm = new CategoryModel();
 	}
 
 	#[NoReturn] private function type(array $args){
-		if(count($args['uri_args']) === 2){
-			$iteration = (int)$args['uri_args'][1];
-		}else{
-			$iteration = 0;
-		}
-		if(isset($args['uri_args'][0]) && is_numeric($args['uri_args'][0])){
-			$cat = $this->cm->select($args['uri_args'][0]);
-			if($cat !== false){
-				$types = $this->tm->selectByCategory((int)$args['uri_args'][0], $iteration);
-				if($types !== false){
-					if(count($types) !== 0){
-						response(200, "Type from category ${cat['name']}", $types);
-					}else{
-						response(204, "No Content");
-					}
-				}else{
-					response(500, 'Error retrieving types');
-				}
-			}else{
-				response(404, "Category Not Found");
-			}
-		}else{
+		if(!is_numeric($args['uri_args'][0])){
 			response(400, "Bad Request");
 		}
+		$cat = $this->cm->select($args['uri_args'][0]);
+		if($cat === false){
+			response(404, "Category Not Found");
+		}
+		if(count($args['uri_args']) === 2){
+			$types = $this->tm->selectByCategory((int)$args['uri_args'][0], (int)$args['uri_args'][1]);
+		}else{
+			$types = $this->tm->selectByCategory((int)$args['uri_args'][0], limit: false);
+		}
+		if($types === false){
+			response(500, 'Error retrieving types');
+		}
+		if(count($types) !== 0){
+			response(200, "Type from category ${cat['name']}", $types);
+		}
+		response(204, "No Content");
 	}
 
 	#[NoReturn] private function markByType(array $args){
@@ -107,7 +104,7 @@ class MarkModelController implements Controller{
 		response(200, "Models of mark " . $args['uri_args'][1], $models);
 	}
 
-	public function mark($args){
+	#[NoReturn] public function mark($args){
 		if(count($args['uri_args']) === 2){
 			if(!is_numeric($args['uri_args'][1])){
 				response(400, "Bad Request");
@@ -126,7 +123,7 @@ class MarkModelController implements Controller{
 		response(200, "Marks", $mark);
 	}
 
-	public function model($args){
+	#[NoReturn] public function model($args){
 		if(count($args['uri_args']) === 2){
 			if(!is_numeric($args['uri_args'][1])){
 				response(400, "Bad Request");

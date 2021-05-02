@@ -55,8 +55,7 @@ $rt->delete("/type/*/*", TypeController::class);
 // /type/{user_token}
 $rt->post("/type/*", TypeController::class);
 // /category/type/{id_category}[/{page}]
-$rt->get("/category/*type/",MarkModelController::class, ["type"]);
-$rt->get("/category/*/type/*",MarkModelController::class, ["type"]);
+$rt->get("/category/*/type{/*}",MarkModelController::class, ["type"]);
 // /type/{id_type}/product[/{page}]
 $rt->get("/type/*/product", ProductHierarchyController::class, ["type_product"]);
 $rt->get("/type/*/product/*", ProductHierarchyController::class, ["type_product"]);
@@ -112,11 +111,13 @@ $rt->get("/type/*/model/*/reference", ReferenceHierarchyController::class, ['typ
 $rt->get("/type/*/mark/*/model/*/reference", ReferenceHierarchyController::class, ['type_mark_model_reference']);
 
 // Specification route
-
+// /specification[/{page}[/search/{search}[/order/{direction}/sort{column}]]]
 $rt->get("/specification{/*{/search/*{/order/*/sort/*}}}",SpecController::class);
 // /specification/{token}/{id}
 $rt->put("/specification/*/*",SpecController::class);
+// /specification/{token}/{id}
 $rt->delete("/specification/*/*",SpecController::class);
+// /specification/{token}
 $rt->post('/specification/*',SpecController::class);
 if(!$rt->getRouted()){
 	response(404, "Not Found");

@@ -13,9 +13,13 @@ class TypeModel extends Model{
 		"category" => "category"
 	];
 
-	public function selectByCategory(int $id_category, int $iteration = 0): array|false{
+	public function selectByCategory(int $id_category, int $iteration = 0, bool $limit = true): array|false{
 		$start = $iteration * 500;
-		return $this->prepared_query("SELECT type,category FROM TYPES WHERE category=:id LIMIT $start,500", ["id" => $id_category]);
+		$sql = "SELECT type,category FROM TYPES WHERE category=:id ";
+		if($limit){
+			$sql .= "LIMIT $start, $this->max_row";
+		}
+		return $this->prepared_query($sql, ["id" => $id_category]);
 	}
 
 	public function selectByType(string $name): array|false{
