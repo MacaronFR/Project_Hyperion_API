@@ -96,13 +96,16 @@ class ReferenceModel extends Model{
 		return false;
 	}
 
-	public function selectAllMarkType(int $type, int $iteration = 0): array|false{
-		$start = 500 * $iteration;
+	public function selectAllMarkType(int $type, int $iteration = 0, bool $limit = true): array|false{
 		$sql = "SELECT S.value as value, S.id_specification as id FROM REFERENCE_PRODUCTS RP
 					INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
 					INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
 					INNER JOIN TYPES T on RP.type = T.id_type
-				WHERE S.name=\"mark\" AND id_type=:type GROUP BY S.value LIMIT $start,500;";
+				WHERE S.name=\"mark\" AND id_type=:type GROUP BY S.value";
+		if($limit){
+			$start = $iteration * $this->max_row;
+			$sql .= "LIMIT $start, $this->max_row";
+		}
 		return $this->prepared_query($sql, ["type" => $type]);
 	}
 

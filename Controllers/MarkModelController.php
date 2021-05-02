@@ -43,11 +43,6 @@ class MarkModelController implements Controller{
 	}
 
 	#[NoReturn] private function markByType(array $args){
-		if(count($args['uri_args']) === 2){
-			$iteration = $args['uri_args'][1];
-		}else{
-			$iteration = 0;
-		}
 		if(!is_numeric($args['uri_args'][0])){
 			response(400, "Bad Request");
 		}
@@ -58,7 +53,11 @@ class MarkModelController implements Controller{
 		if(empty($type)){
 			response(400, "Invalid Type");
 		}
-		$marks = $this->rm->selectAllMarkType((int)$args['uri_args'][0], $iteration);
+		if(count($args['uri_args']) === 2){
+			$marks = $this->rm->selectAllMarkType((int)$args['uri_args'][0], $args['uri_args'][1]);
+		}else{
+			$marks = $this->rm->selectAllMarkType((int)$args['uri_args'][0], limit: false);
+		}
 		if($marks === false){
 			response(500, "Internal Server Error");
 		}
@@ -68,6 +67,7 @@ class MarkModelController implements Controller{
 		foreach($marks as &$mark){
 			unset($mark['id_product']);
 		}
+		$marks['totalNotFiltered'] = $marks['total'] = count($marks);
 		response(200, "Mark of type " . $type['type'], $marks);
 	}
 
