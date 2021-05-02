@@ -98,7 +98,7 @@ class ReferenceModel extends Model{
 
 	public function selectAllMarkType(int $type, int $iteration = 0): array|false{
 		$start = 500 * $iteration;
-		$sql = "SELECT S.value, FROM REFERENCE_PRODUCTS RP
+		$sql = "SELECT S.value as value, S.id_specification as id FROM REFERENCE_PRODUCTS RP
 					INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
 					INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
 					INNER JOIN TYPES T on RP.type = T.id_type
