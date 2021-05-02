@@ -35,6 +35,8 @@ class MarkModelController implements Controller{
 			response(500, 'Error retrieving types');
 		}
 		if(count($types) !== 0){
+			$types['total'] = $this->cm->selectTotal();
+			$types['totalNotFiltered'] = $types['total'];
 			response(200, "Type from category ${cat['name']}", $types);
 		}
 		response(204, "No Content");
