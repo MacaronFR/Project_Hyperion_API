@@ -86,8 +86,8 @@ class ConnectionController implements Controller{
 		if($token_id === false){
 			response(404, "User token not found");
 		}
+		API_log($args['uri_args'][0], "USERS", "Disconnect User");
 		if($this->tm->delete($token_id['id'])){
-			API_log($args['uri_args'][0], "USERS", "Disconnect User");
 			response(200, "Disconnected");
 		}
 		response(500, "Error during disconnection");
