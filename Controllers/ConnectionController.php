@@ -56,7 +56,7 @@ class ConnectionController implements Controller{
 			response(400, "Bad Request");
 		}
 		if($this->um->selectFromMail($values['mail']) !== false){
-			response(400, "Mail already exist");
+			response(409, "Mail already exist");
 		}
 		$values['gc'] = 0;
 		$values['type'] = 4;
