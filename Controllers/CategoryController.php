@@ -85,7 +85,7 @@ class CategoryController implements Controller{
 		if($res === false){
 			response(500, "Error while creating category");
 		}
-		API_log($args['uri_args'][0], "CATEGORY", "Category Created");
+		API_log($args['uri_args'][0], "CATEGORY", "Category $res Created");
 		response(201, "Category created", [$res]);
 	}
 
@@ -113,6 +113,7 @@ class CategoryController implements Controller{
 			response(204, "No change");
 		}
 		if($this->cm->update($args['uri_args'][1], $args['put_args'])){
+			API_log($args['uri_args'][0], "CATEGORY", "Category ${args['uri_args'][1]} updated");
 			response(200, "Category Updated");
 		}else{
 			response(500, "Error while updating");
@@ -145,6 +146,7 @@ class CategoryController implements Controller{
 			response(409, "Types link to Category");
 		}
 		if($this->cm->delete($args['uri_args'][1])){
+			API_log($args['uri_args'][0], "CATEGORY", "Category Deleted");
 			response(204, "No content");
 		}else{
 			response(500, "Internal Server Error");
