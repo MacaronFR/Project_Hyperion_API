@@ -83,7 +83,7 @@ class OAuthController implements Controller
 					$diff = $now->diff(DateTime::createFromFormat("Y-m-d H:i:s", $token["expire"]));
 					if($diff->invert === 1){
 						$this->tm->delete($token['id_token']);
-						$this->newToken($clientInfo['scope'], $clientInfo['id_client'], null);
+						$this->newToken($clientInfo['scope'], $clientInfo['id_client'], $clientInfo['user']);
 					}else{
 						do{
 							$end = $now->add(new DateInterval("PT2H"));
@@ -92,7 +92,7 @@ class OAuthController implements Controller
 						response(200, "Token refreshed", ['token' => $token['value'], 'expire' => $end->format("Y-m-d H:i:s")]);
 					}
 				}else{
-					$this->newToken($clientInfo['scope'], $clientInfo['id_client'], null);
+					$this->newToken($clientInfo['scope'], $clientInfo['id_client'], $clientInfo['user']);
 				}
 			}else{
 				response(401, "Invalid Credentials");

@@ -20,9 +20,10 @@ class ClientModel extends Model{
 	#[ArrayShape([
 		'id_client' => 'int',
 		'secret' => 'string',
-		'scope' => 'int'
+		'scope' => 'int',
+		'user' => 'int'
 	])]
 	public function selectFromClientID(string $client_id): array|false{
-		return $this->prepared_query("SELECT id_client, client_secret as secret, scope FROM CLIENT WHERE client_id=:id", ['id' => $client_id], true);
+		return $this->prepared_query("SELECT id_client, client_secret as secret, scope, user FROM CLIENT WHERE client_id=:id", ['id' => $client_id], true);
 	}
 }
