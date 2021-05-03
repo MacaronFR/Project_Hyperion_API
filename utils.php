@@ -64,7 +64,7 @@ function checkToken(string $token, int $level): bool{
 	return $res !== false && checkValidity($res['end']) && $res['scope'] < $level;
 }
 
-function log(string $token, string $table, string $message): bool{
+function API_log(string $token, string $table, string $message): bool{
 	$lm = new LogsModel();
 	$tm = new TokenModel();
 	$um = new UserModel();
