@@ -14,14 +14,13 @@ class SpecificationModel extends Model{
     ];
     protected int $max_row = 10;
 
-	public function selectIdentical(array $fields){
+	public function selectIdentical(array $fields): array|false{
 		$sql = "SELECT ";
 		foreach($this->column as $name => $column){
 			$sql .= "$column as $name, ";
 		}
 		$sql .= "$this->id_name as id ";
 		$sql .= "FROM $this->table_name WHERE name=:name AND value=:value;";
-
 		return $this->prepared_query($sql,$fields, unique: true);
 	}
 }
