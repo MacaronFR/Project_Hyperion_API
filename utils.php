@@ -1,5 +1,8 @@
 <?php
 
+use Hyperion\API\ClientModel;
+use Hyperion\API\LogsModel;
+use Hyperion\API\UserModel;
 use JetBrains\PhpStorm\NoReturn;
 use Hyperion\API\TokenModel;
 
@@ -59,4 +62,26 @@ function checkToken(string $token, int $level): bool{
 	$tm = new TokenModel();
 	$res = $tm->selectByToken($token);
 	return $res !== false && checkValidity($res['end']) && $res['scope'] < $level;
+}
+
+function log(string $token, string $table, string $message): bool{
+	$lm = new LogsModel();
+	$tm = new TokenModel();
+	$um = new UserModel();
+	$cm = new ClientModel();
+	$info = $tm->selectByToken($token);
+	if($info === false){
+		return false;
+	}
+	$user = $um->select($info['user']);
+	if($user === false){
+		return false;
+	}
+	$client = $cm->select($info['client']);
+	if($client === false){
+		return false;
+	}
+	$username = $user['fname'] . " " .$user['fname'] . ":" . $user['id'];
+	$res = $lm->insert(['action' => "Operation on $table by user $username on client ${client['name']}\n\t$message"]);
+	return $res === false;
 }
