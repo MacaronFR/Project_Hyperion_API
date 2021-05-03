@@ -113,7 +113,7 @@ class CategoryController implements Controller{
 			response(204, "No change");
 		}
 		if($this->cm->update($args['uri_args'][1], $args['put_args'])){
-			API_log($args['uri_args'][0], "CATEGORY", "Category ${args['uri_args'][1]} updated");
+			API_log($args['uri_args'][0], "CATEGORY", "Category " . $args['uri_args'][1] . " updated");
 			response(200, "Category Updated");
 		}else{
 			response(500, "Error while updating");
