@@ -47,7 +47,7 @@ class ProfileController implements Controller{
 	/**
 	 * @inheritDoc
 	 */
-	public function post(array $args){
+	#[NoReturn] public function post(array $args){
 		return false;
 
 	}
@@ -122,7 +122,7 @@ class ProfileController implements Controller{
 	/**
 	 * @inheritDoc
 	 */
-	public function delete(array $args){
+	#[NoReturn] public function delete(array $args){
 		var_dump($this->am->insert(["zip" => 77830, "address" => "nik", "city" => "pamfou", "country" => "NIKMAND", "region" => "saisap"]));
 	}
 }

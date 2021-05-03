@@ -43,21 +43,21 @@ class StoreController implements Controller{
 		/**
 		 * @inheritDoc
 		 */
-		public function post(array $args){
+		#[NoReturn] public function post(array $args){
 				return false;
 		}
 
 		/**
 		 * @inheritDoc
 		 */
-		public function put(array $args){
+		#[NoReturn] public function put(array $args){
 				return false;
 		}
 
 		/**
 		 * @inheritDoc
 		 */
-		public function delete(array $args){
+		#[NoReturn] public function delete(array $args){
 				return false;
 		}
 }

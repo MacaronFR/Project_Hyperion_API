@@ -69,7 +69,7 @@ class SpecController implements Controller{
 		response(200, "Category $start to $end", $result);
 	}
 
-	public function post(array $args){
+	#[NoReturn] public function post(array $args){
 		if(!checkToken($args['uri_args'][0],3)){
 			response(403,"Forbidden");
 		}
@@ -89,7 +89,7 @@ class SpecController implements Controller{
 		response(201,"Created");
 	}
 
-	public function put(array $args){
+	#[NoReturn] public function put(array $args){
 		if(!checkToken($args['uri_args'][0],3)){
 			response(403, "Forbidden");
 		}
@@ -129,7 +129,7 @@ class SpecController implements Controller{
 
 	}
 
-	public function delete(array $args){
+	#[NoReturn] public function delete(array $args){
 		if(!checkToken($args['uri_args'][0],3)){
 			response(403,"Forbidden");
 		}

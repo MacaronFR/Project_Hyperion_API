@@ -46,7 +46,7 @@ class OAuthController implements Controller
 	 * Send token to the client (new if no one exist or is expire and refresh in other case)
 	 * @param array $args
 	 */
-	public function get(array $args){
+	#[NoReturn] public function get(array $args){
 		if(count($args['uri_args']) === 4){
 			$clientInfo = $this->cm->selectFromClientID($args['uri_args'][0]);
 			if($clientInfo !== false && $clientInfo['secret'] === $args['uri_args'][1]){
@@ -102,13 +102,13 @@ class OAuthController implements Controller
 	/**
 	 * @inheritDoc
 	 */
-	public function post(array $args){}
+	#[NoReturn] public function post(array $args){}
 	/**
 	 * @inheritDoc
 	 */
-	public function put(array $args){}
+	#[NoReturn] public function put(array $args){}
 	/**
 	 * @inheritDoc
 	 */
-	public function delete(array $args){}
+	#[NoReturn] public function delete(array $args){}
 }

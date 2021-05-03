@@ -147,7 +147,7 @@ class MarkModelController implements Controller{
 	/**
 	 * @inheritDoc
 	 */
-	public function get(array $args){
+	#[NoReturn] public function get(array $args){
 		if($args['additional'][0] === 'type'){
 			$this->type($args);
 		}elseif($args['additional'][0] === "type_mark"){
@@ -166,21 +166,21 @@ class MarkModelController implements Controller{
 	/**
 	 * @inheritDoc
 	 */
-	public function post(array $args){
+	#[NoReturn] public function post(array $args){
 		return false;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function put(array $args){
+	#[NoReturn] public function put(array $args){
 		return false;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function delete(array $args){
+	#[NoReturn] public function delete(array $args){
 		return false;
 	}
 }

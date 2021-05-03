@@ -25,7 +25,7 @@ class ConnectionController implements Controller{
 	 * Connect user by providing client credentials and user credentials
 	 * @inheritDoc
 	 */
-	public function get(array $args){
+	#[NoReturn] public function get(array $args){
 		$clientInfo = $this->cm->selectFromClientID($args['uri_args'][0]);
 		if($clientInfo !== false && $args['uri_args'][1] === $clientInfo['secret']){
 			$user = $this->userM->selectFromMail($args['uri_args'][2]);

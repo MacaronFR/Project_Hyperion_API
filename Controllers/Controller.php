@@ -4,6 +4,8 @@
 namespace Hyperion\API;
 
 
+use JetBrains\PhpStorm\NoReturn;
+
 /**
  * Class Controller
  * @package Controller
@@ -14,25 +16,25 @@ interface Controller
 	/**
 	 * Must be instanced for using the get() method and control GET request
 	 * @param array $args Argument passed to the controller by the router
-	 * @return mixed
+	 * @return no-return
 	 */
-	public function get(array $args);
+	#[NoReturn]public function get(array $args);
 	/**
 	 * Must be instanced for using the post() method and control POST request
 	 * @param array $args Argument passed to the controller by the router
-	 * @return mixed
+	 * @return no-return
 	 */
-	public function post(array $args);
+	#[NoReturn]public function post(array $args);
 	/**
 	 * Must be instanced for using the put() method and control PUT request
 	 * @param array $args Argument passed to the controller by the router
-	 * @return mixed
+	 * @return no-return
 	 */
-	public function put(array $args);
+	#[NoReturn]public function put(array $args);
 	/**
 	 * Must be instanced for using the delete() method and control DELETE request
 	 * @param array $args Argument passed to the controller by the router
-	 * @return mixed
+	 * @return no-return
 	 */
-	public function delete(array $args);
+	#[NoReturn]public function delete(array $args);
 }

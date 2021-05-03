@@ -165,7 +165,7 @@ class ProductHierarchyController implements Controller{
 		response(200, "Product of type " . $product[0]['type'] . ", mark " . $product[0]["mark"] . ", model " . $product[0]['model'], $product);
 	}
 
-	public function get(array $args){
+	#[NoReturn] public function get(array $args){
 		if(isset($args['additional'])){
 			if($args['additional'][0] === 'type_product'){
 				$this->type_product($args);
@@ -188,21 +188,21 @@ class ProductHierarchyController implements Controller{
 	/**
 	 * @inheritDoc
 	 */
-	public function post(array $args){
+	#[NoReturn] public function post(array $args){
 		return false;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function put(array $args){
+	#[NoReturn] public function put(array $args){
 		return false;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function delete(array $args){
+	#[NoReturn] public function delete(array $args){
 		return false;
 	}
 
