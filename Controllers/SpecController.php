@@ -69,43 +69,54 @@ class SpecController implements Controller{
 		response(200, "Category $start to $end", $result);
 	}
 
+	public function spec_name(array $args){
+		if(!empty($args['uri_args'][0])){
+			if(!is_numeric($args['uri_args'][0])){
+				response(400,"Bad Request");
+			}
+			$this->sm->selectAll($args['uri_args'][0],true);
+		}
+			$this->rm->selectAll(0,false);
+	}
+
+
 	#[NoReturn] public function post(array $args){
-		if(!checkToken($args['uri_args'][0],3)){
-			response(403,"Forbidden");
+		if(!checkToken($args['uri_args'][0], 3)){
+			response(403, "Forbidden");
 		}
 		if(empty($args['post_args']) || !isset($args['post_args']['name']) || !isset($args['post_args']['value'])){
-			response(400,"Bad Request");
+			response(400, "Bad Request");
 		}
-		$value = array_intersect_key($args["post_args"],["name"=>0,"value"=>0]);
+		$value = array_intersect_key($args["post_args"], ["name" => 0, "value" => 0]);
 		$exist = $this->sm->selectIdentical($value);
 		if($exist !== false){
-			response(202,"Already Exist");
+			response(202, "Already Exist");
 		}
 
 		$result = $this->sm->insert($value);
 		if($result === false){
-			response(500,"Internal Server Error");
+			response(500, "Internal Server Error");
 		}
-		response(201,"Created");
+		response(201, "Created");
 	}
 
 	#[NoReturn] public function put(array $args){
-		if(!checkToken($args['uri_args'][0],3)){
+		if(!checkToken($args['uri_args'][0], 3)){
 			response(403, "Forbidden");
 		}
 		if(!is_numeric($args['uri_args'][1])){
-			response(400,"Bad Request");
+			response(400, "Bad Request");
 		}
 		if(empty($args['put_args'])){
-			response(400,"Bad Request");
+			response(400, "Bad Request");
 		}
 		$spec = $this->sm->select($args['uri_args'][1]);
 		if($spec === false){
-			response(404,"Not Found");
+			response(404, "Not Found");
 		}
-		$new_spec = array_intersect_key($args['put_args'],$spec);
+		$new_spec = array_intersect_key($args['put_args'], $spec);
 		if(empty($new_spec)){
-			response(400,"Bad Request");
+			response(400, "Bad Request");
 		}
 
 		foreach($new_spec as $key => $val){
@@ -113,42 +124,44 @@ class SpecController implements Controller{
 				unset($new_spec[$key]);
 			}
 		}
-		$tmp = array_merge($spec,$new_spec);
+		$tmp = array_merge($spec, $new_spec);
 		unset($tmp['id']);
 		if($this->sm->selectIdentical($tmp) !== false){
-			response(202,"Already Exist");
+			response(202, "Already Exist");
 		}
 		if(empty($new_spec)){
-			response(204,"No Update");
+			response(204, "No Update");
 		}
 		$result = $this->sm->update($args['uri_args'][1], $new_spec);
 		if($result === false){
-			response(500,"Internal Server Error");
+			response(500, "Internal Server Error");
 		}
-		response(200,"Updated");
+		response(200, "Updated");
 
 	}
 
 	#[NoReturn] public function delete(array $args){
-		if(!checkToken($args['uri_args'][0],3)){
-			response(403,"Forbidden");
+		if(!checkToken($args['uri_args'][0], 3)){
+			response(403, "Forbidden");
 		}
 		if(!is_numeric($args['uri_args'][1])){
-			response(400,"Bad Request");
+			response(400, "Bad Request");
 		}
 		$spec = $this->sm->select($args['uri_args'][1]);
 		if($spec === false){
-			response(404,"Not Found");
+			response(404, "Not Found");
 		}
 		$ref = $this->rm->selectAllBySpec($spec['id']);
 		if($ref === false){
-			response(500,"Internal Server Error");
+			response(500, "Internal Server Error");
 		}
 		if(!empty($ref)){
-			response(209,"Conflict");
+			response(209, "Conflict");
 		}
 		$result = $this->sm->delete($args['uri_args'][1]);
-		if($result){response(204,"Deleted");}
+		if($result){
+			response(204, "Deleted");
+		}
 
 
 	}
