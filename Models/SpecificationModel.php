@@ -23,4 +23,13 @@ class SpecificationModel extends Model{
 		$sql .= "FROM $this->table_name WHERE name=:name AND value=:value;";
 		return $this->prepared_query($sql,$fields, unique: true);
 	}
+	public function selectAllName(int $iteration = 0, bool $limit = true): array|false{
+		$start = $this->max_row * $iteration;
+		$sql = "SELECT";
+		$sql .= " $this->column['name'] as name";
+		$sql .= " FROM $this->table_name";
+		if($limit)
+			$sql .= " LIMIT $start, $this->max_row";
+		return $this->query($sql);
+	}
 }
