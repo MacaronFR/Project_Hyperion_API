@@ -113,7 +113,7 @@ $rt->get("/type/*/mark/*/model/*/reference", ReferenceHierarchyController::class
 // Specification route
 // /specification[/{page}[/search/{search}[/order/{direction}/sort{column}]]]
 $rt->get("/specification{/*{/search/*{/order/*/sort/*}}}",SpecController::class);
-$rt->get("/specification/name{/*}",SpecController::class ['name']);
+$rt->get("/specification/name{/*}",SpecController::class, ['name']);
 // /specification/{token}/{id}
 $rt->put("/specification/*/*",SpecController::class);
 // /specification/{token}/{id}

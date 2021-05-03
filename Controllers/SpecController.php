@@ -74,9 +74,25 @@ class SpecController implements Controller{
 			if(!is_numeric($args['uri_args'][0])){
 				response(400,"Bad Request");
 			}
-			$this->sm->selectAll($args['uri_args'][0],true);
+			$res = $this->sm->selectAll($args['uri_args'][0]);
+
+		}else{
+			$res = $this->sm->selectAll(limit:false);
 		}
-			$this->rm->selectAll(0,false);
+		if($res === false){
+			response(500,"Internal Server Error");
+		}else{
+			if(empty($res)){
+				response(204,'No Content');
+			}
+		}
+		$total = $this->sm->selectTotal();
+		if($total === false){
+			response(500,"Internal Server Error");
+		}
+		$res["total"] = $total;
+		$res["totalNF"] = $total;
+		response(200,'Specification Name');
 	}
 
 
