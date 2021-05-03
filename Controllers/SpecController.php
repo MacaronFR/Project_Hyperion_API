@@ -74,10 +74,10 @@ class SpecController implements Controller{
 			if(!is_numeric($args['uri_args'][0])){
 				response(400,"Bad Request");
 			}
-			$res = $this->sm->selectAll($args['uri_args'][0]);
+			$res = $this->sm->selectAllName($args['uri_args'][0]);
 
 		}else{
-			$res = $this->sm->selectAll(limit:false);
+			$res = $this->sm->selectAllName(limit:false);
 		}
 		if($res === false){
 			response(500,"Internal Server Error");
