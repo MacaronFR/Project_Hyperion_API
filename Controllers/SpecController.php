@@ -66,13 +66,13 @@ class SpecController implements Controller{
 		}
 		$result['total'] = $totalFilter;
 		$result['totalNotFiltered'] = $total;
-		response(200, "Category $start to $end", $result);
+		response(200, "Spécification $start to $end", $result);
 	}
 
 	public function spec_name(array $args){
 		if(!empty($args['uri_args'][0])){
 			if(!is_numeric($args['uri_args'][0])){
-				response(400,"Bad Request");
+				response(400, "Bad Request");
 			}
 			$res = $this->sm->selectAllName($args['uri_args'][0]);
 
