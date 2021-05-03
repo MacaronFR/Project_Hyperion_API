@@ -8,9 +8,13 @@ use JetBrains\PhpStorm\NoReturn;
 
 class ReferenceHierarchyController implements Controller{
 	private ReferenceModel $rm;
+	private SpecificationModel $sm;
+	private RefHaveSpecModel $rhsm;
 
 	public function __construct(){
 		$this->rm = new ReferenceModel();
+		$this->sm = new SpecificationModel();
+		$this->rhsm = new RefHaveSpecModel();
 	}
 
 	#[NoReturn] private function type_reference(array $args){
@@ -126,7 +130,7 @@ class ReferenceHierarchyController implements Controller{
 	/**
 	 * @inheritDoc
 	 */
-	public function get(array $args){
+	#[NoReturn] public function get(array $args){
 		if($args['additional'][0] === 'type_reference'){
 			$this->type_reference($args);
 		}elseif($args['additional'][0] === 'mark_reference'){
@@ -147,21 +151,81 @@ class ReferenceHierarchyController implements Controller{
 	/**
 	 * @inheritDoc
 	 */
-	public function post(array $args){
+	#[NoReturn] public function post(array $args){
+		if(!checkToken($args['uri_args'][0], 3)){
+			response(403, "Forbidden");
+		}
+		if(!isset($args['post_args']['type'], $args['post_args']['mark'], $args['post_args']['model'], $args['post_args']['specs'], $args['post_args']['buying'], $args['post_args']['selling'])){
+			response(400, "Bad request");
+		}
+		if(!is_numeric($args['post_args']['type']) || !is_numeric($args['post_args']['mark']) || !is_numeric($args['post_args']['selling']) || !is_numeric($args['post_args']['buying'])){
+			response(400, "Bad Request");
+		}
+		if(!is_array($args['post_args']['specs'])){
+			response(400, "Bad Request");
+		}
+		$mark = $this->sm->select($args['post_args']['mark']);
+		if($mark === false){
+			response(400, "Bad Request, Mark not found");
+		}
+		$specs = [];
+		foreach($args['post_args']['specs'] as $spec){
+			if(!isset($spec['name'], $spec['value']) || !is_array($spec['value'])){
+				response(400, "Bad Request");
+			}
+			$specs[] = ["name" => $spec['name'], "value" => $spec['value']];
+		}
+		$exist = $this->rm->selectByTypeMarkModel($args['post_args']['type'], $mark['value'], $args['post_args']['model']);
+		if($exist !== false){
+			response(209, "Conflict");
+		}
+		$val = array_intersect_key($args['post_args'], ["type" => 0, "buying" => 0, "selling" => 0]);
+		$new_ref = $this->rm->insert($val);
+		if($new_ref === false){
+			response(500, "Internal Server Error");
+		}
+		$model_exist = $this->sm->selectIdentical(["name" => "model", "value" => $args['post_args']['model']]);
+		if($model_exist === false){
+			$model = $this->sm->insert(["name" => "model", "value" => $args['post_args']['model']]);
+		}else{
+			$model = $model_exist['id'];
+		}
+		if($this->rhsm->insert(["product" => $new_ref , "spec" => $model]) === false){
+			response(500, "Internal Server Error");
+		}
+		if($this->rhsm->insert(["product" => $new_ref , "spec" => $args['post_args']['mark']]) === false){
+			response(500, "Internal Server Error");
+		}
+		foreach($specs as $spec){
+			foreach($spec['value'] as $val){
+				$spec_id = $this->sm->selectIdentical(["name" => $spec['name'], "value" => $val]);
+				if($spec_id === false){
+					$spec_id = $this->sm->insert(["name" => $spec['name'], "value" => $val]);
+					if($spec_id === false){
+						response(500, "Internal Server Error");
+					}
+				}else{
+					$spec_id = $spec_id['id'];
+				}
+				if($this->rhsm->insert(['product' => $new_ref, 'spec' => $spec_id]) === false){
+					response(500, "Internal Server Error");
+				}
+			}
+		}
+		response(201, "Reference created");
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	#[NoReturn] public function put(array $args){
 		return false;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function put(array $args){
-		return false;
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function delete(array $args){
+	#[NoReturn] public function delete(array $args){
 		return false;
 	}
 }

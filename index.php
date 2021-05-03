@@ -119,6 +119,9 @@ $rt->put("/specification/*/*",SpecController::class);
 $rt->delete("/specification/*/*",SpecController::class);
 // /specification/{token}
 $rt->post('/specification/*',SpecController::class);
+
+// /specification/{token}
+$rt->post('/reference/*', ReferenceHierarchyController::class);
 if(!$rt->getRouted()){
 	response(404, "Not Found");
 }
