@@ -85,7 +85,7 @@ class CategoryController implements Controller{
 		if($res === false){
 			response(500, "Error while creating category");
 		}
-		API_log("CATEGORY", $args['uri_args'][0], "Category Created");
+		API_log($args['uri_args'][0], "CATEGORY", "Category Created");
 		response(201, "Category created", [$res]);
 	}
 

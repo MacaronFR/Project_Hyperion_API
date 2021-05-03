@@ -82,6 +82,6 @@ function API_log(string $token, string $table, string $message): bool{
 		return false;
 	}
 	$username = $user['fname'] . " " .$user['fname'] . ":" . $user['id'];
-	$res = $lm->insert(['action' => "Operation on $table by user $username on client ${client['name']}\n\t$message"]);
+	$res = $lm->insert(['action' => "Operation on $table by user $username on client ${client['name']}\n\t$message", "user" => $user['id'], "client" => $client['id']]);
 	return $res === false;
 }
