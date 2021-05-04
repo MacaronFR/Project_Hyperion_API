@@ -107,7 +107,11 @@ class MarkModelController implements Controller{
 		if(empty($models)){
 			response(204, "No Content");
 		}
-		$models['total'] = $models['totalNotFiltered'] = count($models); //TODO improve total recuperation
+		$total = $this->sm->selectTotalModelByTypeMark($args['uri_args'][0], $args['uri_args'][1]);
+		if($total === false){
+			response(500, "Internal Server Error");
+		}
+		$models['total'] = $models['totalNotFiltered'] = $total;
 		response(200, "Models of mark " . $args['uri_args'][1], $models);
 	}
 

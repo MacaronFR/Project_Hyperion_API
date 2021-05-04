@@ -51,7 +51,7 @@ class SpecificationModel extends Model{
 		if($limit){
 			$sql_ref_mark_type .= " LIMIT $start,500;";
 		}
-		$sql_model = 	"SELECT id_specification as id, value FROM SPECIFICATION S
+		$sql_model = "SELECT id_specification as id, value FROM SPECIFICATION S
 							INNER JOIN REF_HAVE_SPEC RHS on S.id_specification = RHS.id_spec
 						WHERE id_product=:id AND name=\"model\";";
 		$ref_mark_type = $this->prepared_query($sql_ref_mark_type, ["type" => $type, "mark" => $mark]);
@@ -62,5 +62,13 @@ class SpecificationModel extends Model{
 			$models[] = $this->prepared_query($sql_model, ["id" => $item['id']], unique: true);
 		}
 		return $models;
+	}
+
+	public function selectTotalModelByTypeMark(int $type, string $mark): int|false{
+		$sql_ref_mark_type = "SELECT COUNT(RP.id_product) as id FROM REFERENCE_PRODUCTS RP
+							INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
+							INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
+						WHERE name=\"mark\" and value=:mark AND type=:type";
+		return $this->prepared_query($sql_ref_mark_type, ["type" => $type, "mark" => $mark], unique: true);
 	}
 }
