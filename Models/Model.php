@@ -33,9 +33,12 @@ abstract class Model{
 	 * @param string $statement Statement to query
 	 * @return false|array
 	 */
-	protected function query(string $statement): false|array{
+	protected function query(string $statement, bool $unique = false): false|array{
 		try {
 			$res = $this->bdd->query($statement);
+			if($unique){
+				return $res->fetch(PDO::FETCH_ASSOC);
+			}
 			return $res->fetchAll(PDO::FETCH_ASSOC);
 		}catch(PDOException){
 			return false;
