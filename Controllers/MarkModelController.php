@@ -90,15 +90,17 @@ class MarkModelController implements Controller{
 	}
 
 	#[NoReturn] public function modelByTypeMark(array $args){
-		if(count($args['uri_args']) === 3){
-			$iteration = $args['uri_args'][2];
-		}else{
-			$iteration = 0;
-		}
 		if(!is_numeric($args['uri_args'][0])){
 			response(400, "Bad Request");
 		}
-		$models = $this->rm->selectAllModelByTypeMark($args['uri_args'][0], $args['uri_args'][1], $iteration);
+		if(count($args['uri_args']) === 3){
+			if(!is_numeric($args['uri_args'][2])){
+				response(400, "Bad Request");
+			}
+			$models = $this->sm->selectAllModelByTypeMark($args['uri_args'][0], $args['uri_args'][1], $args['uri_args'][2]);
+		}else{
+			$models = $this->sm->selectAllModelByTypeMark($args['uri_args'][0], $args['uri_args'][1], limit: false);
+		}
 		if($models === false){
 			response(500, "Internal Server Error");
 		}

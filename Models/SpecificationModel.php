@@ -35,10 +35,32 @@ class SpecificationModel extends Model{
 
 	public function selectAllMark(int $iteration = 0, bool $limit = true): array|false{
 		$start = $iteration * $this->max_row;
-		$sql = "SELECT id_specification as id, value FROM $this->table_name WHERE name=\"mark\"";
+		$sql = "SELECT id_specification as id, value FROM SPECIFICATION WHERE name=\"mark\"";
 		if($limit){
 			$sql .= " LIMIT $start,500";
 		}
 		return $this->query($sql);
+	}
+
+	public function selectAllModelByTypeMark(int $type, string $mark, int $iteration = 0, bool $limit = true): array|false{
+		$start = $iteration * $this->max_row;
+		$sql_ref_mark_type = "SELECT RP.id_product as id FROM REFERENCE_PRODUCTS RP
+							INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
+							INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
+						WHERE name=\"mark\" and value=:mark AND type=:type";
+		if($limit){
+			$sql_ref_mark_type .= " LIMIT $start,500;";
+		}
+		$sql_model = 	"SELECT id_specification as id, value FROM SPECIFICATION S
+							INNER JOIN REF_HAVE_SPEC RHS on S.id_specification = RHS.id_spec
+						WHERE id_product=:id AND name=\"model\";";
+		$ref_mark_type = $this->prepared_query($sql_ref_mark_type, ["type" => $type, "mark" => $mark]);
+		if($ref_mark_type === false || count($ref_mark_type) === 0){
+			return $ref_mark_type;
+		}
+		foreach($ref_mark_type as $item){
+			$models[] = $this->prepared_query($sql_model, ["id" => $item['id']], unique: true);
+		}
+		return $models;
 	}
 }

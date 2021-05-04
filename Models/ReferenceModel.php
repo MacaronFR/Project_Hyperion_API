@@ -129,25 +129,6 @@ class ReferenceModel extends Model{
 		return $models;
 	}
 
-	public function selectAllModelByTypeMark(int $type, string $mark, int $iteration = 0): array|false{
-		$start = $iteration * 500;
-		$sql_ref_mark_type = "SELECT RP.id_product as id FROM REFERENCE_PRODUCTS RP
-							INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
-							INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
-						WHERE name=\"mark\" and value=:mark AND type=:type LIMIT $start,500;";
-		$sql_model = 	"SELECT value FROM SPECIFICATION S
-							INNER JOIN REF_HAVE_SPEC RHS on S.id_specification = RHS.id_spec
-						WHERE id_product=:id AND name=\"model\";";
-		$ref_mark_type = $this->prepared_query($sql_ref_mark_type, ["type" => $type, "mark" => $mark]);
-		if($ref_mark_type === false || count($ref_mark_type) === 0){
-			return $ref_mark_type;
-		}
-		foreach($ref_mark_type as $item){
-			$models[] = $this->prepared_query($sql_model, ["id" => $item['id']], unique: true)["value"];
-		}
-		return $models;
-	}
-
 	public function selectByModel(string $model): array|false{
 		$sql = "SELECT RP.id_product as id, RP.selling_price as selling_price, RP.buying_price as buying_price, T.type AS type FROM REFERENCE_PRODUCTS RP
 					INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
