@@ -12,10 +12,11 @@ class TypeModel extends Model{
 		"type" => "type",
 		"category" => "category"
 	];
+	protected int $max_row = 10;
 
 	public function selectByCategory(int $id_category, int $iteration = 0, bool $limit = true): array|false{
-		$start = $iteration * 500;
-		$sql = "SELECT type,category FROM TYPES WHERE category=:id ";
+		$start = $iteration * $this->max_row;
+		$sql = "SELECT type, id_type as id FROM TYPES WHERE category=:id ";
 		if($limit){
 			$sql .= "LIMIT $start, $this->max_row";
 		}
