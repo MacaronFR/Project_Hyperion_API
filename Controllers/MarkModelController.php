@@ -11,8 +11,10 @@ class MarkModelController implements Controller{
 	private ReferenceModel $rm;
 	private TypeModel $tm;
 	private CategoryModel $cm;
+	private SpecificationModel $sm;
 
 	public function __construct(){
+		$this->sm = new SpecificationModel();
 		$this->rm = new ReferenceModel();
 		$this->tm = new TypeModel();
 		$this->cm = new CategoryModel();
@@ -111,11 +113,10 @@ class MarkModelController implements Controller{
 			if(!is_numeric($args['uri_args'][1])){
 				response(400, "Bad Request");
 			}
-			$iteration = $args['uri_args'][1];
+			$mark = $this->sm->selectAllMark($args['uri_args'][1]);
 		}else{
-			$iteration = 0;
+			$mark = $this->sm->selectAllMark(limit: false);
 		}
-		$mark = $this->rm->selectAllMark($iteration);
 		if($mark === false){
 			response(500, "Internal Server Error");
 		}

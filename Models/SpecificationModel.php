@@ -32,4 +32,13 @@ class SpecificationModel extends Model{
 			$sql .= " LIMIT $start, $this->max_row";
 		return $this->query($sql);
 	}
+
+	public function selectAllMark(int $iteration = 0, bool $limit = true): array|false{
+		$start = $iteration * $this->max_row;
+		$sql = "SELECT id_specification as id, value FROM $this->table_name WHERE name=\"mark\"";
+		if($limit){
+			$sql .= " LIMIT $start,500";
+		}
+		return $this->query($sql);
+	}
 }

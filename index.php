@@ -84,8 +84,7 @@ $rt->get("/mark/*/model/*", MarkModelController::class, ["mark_model"]);
 $rt->get("/type/*/mark/*/model", MarkModelController::class, ["type_mark_model"]);
 $rt->get("/type/*/mark/*/model/*", MarkModelController::class, ["type_mark_model"]);
 
-$rt->get("/mark", MarkModelController::class, ["mark"]);
-$rt->get("/mark/*", MarkModelController::class, ["mark"]);
+$rt->get("/mark{/*}", MarkModelController::class, ["mark"]);
 
 $rt->get("/model", MarkModelController::class, ["model"]);
 $rt->get("/model/*", MarkModelController::class, ["model"]);
