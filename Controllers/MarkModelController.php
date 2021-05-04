@@ -107,6 +107,7 @@ class MarkModelController implements Controller{
 		if(empty($models)){
 			response(204, "No Content");
 		}
+		$models['total'] = $models['totalNotFiltered'] = count($models); //TODO improve total recuperation
 		response(200, "Models of mark " . $args['uri_args'][1], $models);
 	}
 
