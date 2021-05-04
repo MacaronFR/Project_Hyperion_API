@@ -138,17 +138,21 @@ class MarkModelController implements Controller{
 			if(!is_numeric($args['uri_args'][1])){
 				response(400, "Bad Request");
 			}
-			$iteration = $args['uri_args'][1];
+			$model = $this->sm->selectAllModel($args['uri_args'][1]);
 		}else{
-			$iteration = 0;
+			$model = $this->sm->selectAllModel(limit: false);
 		}
-		$model = $this->rm->selectAllModel($iteration);
 		if($model === false){
 			response(500, "Internal Server Error");
 		}
 		if(empty($model)){
 			response(204, "No content");
 		}
+		$total = $this->sm->selectTotalModel();
+		if($total === false){
+			response(500, "Internal Server Error");
+		}
+		$model['total'] = $model['totalNotFiltered'] = $total;
 		response(200, "Models", $model);
 	}
 

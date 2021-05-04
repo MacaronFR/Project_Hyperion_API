@@ -37,7 +37,7 @@ class SpecificationModel extends Model{
 		$start = $iteration * $this->max_row;
 		$sql = "SELECT id_specification as id, value FROM SPECIFICATION WHERE name=\"mark\"";
 		if($limit){
-			$sql .= " LIMIT $start,500";
+			$sql .= " LIMIT $start, $this->max_row";
 		}
 		return $this->query($sql);
 	}
@@ -49,7 +49,7 @@ class SpecificationModel extends Model{
 							INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
 						WHERE name=\"mark\" and value=:mark AND type=:type";
 		if($limit){
-			$sql_ref_mark_type .= " LIMIT $start,500;";
+			$sql_ref_mark_type .= " LIMIT $start, $this->max_row;";
 		}
 		$sql_model = "SELECT id_specification as id, value FROM SPECIFICATION S
 							INNER JOIN REF_HAVE_SPEC RHS on S.id_specification = RHS.id_spec
@@ -69,6 +69,28 @@ class SpecificationModel extends Model{
 							INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
 							INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
 						WHERE name=\"mark\" and value=:mark AND type=:type";
-		return (int)($this->prepared_query($sql_ref_mark_type, ["type" => $type, "mark" => $mark], unique: true)['count']);
+		$res = $this->prepared_query($sql_ref_mark_type, ["type" => $type, "mark" => $mark], unique: true);
+		if($res === false){
+			return false;
+		}
+		return (int)$res['count'];
+	}
+
+	public function selectAllModel(int $iteration = 0, bool $limit = true): array|false{
+		$start = $iteration * $this->max_row;
+		$sql = "SELECT value FROM SPECIFICATION S WHERE name=\"model\"";
+		if($limit){
+			$sql .= " LIMIT $start, $this->max_row";
+		}
+		return $this->query($sql);
+	}
+
+	public function selectTotalModel(): int|false{
+		$sql = "SELECT COUNT(id_specification) as count FROM SPECIFICATION S WHERE name=\"model\"";
+		$res = $this->query($sql, unique: true);
+		if($res === false){
+			return false;
+		}
+		return (int)$res['count'];
 	}
 }

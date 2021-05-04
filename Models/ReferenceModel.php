@@ -210,14 +210,4 @@ class ReferenceModel extends Model{
 		}
 		return array_merge($references, $spec["spec"]);
 	}
-
-	public function selectAllModel(int $iteration = 0): array|false{
-		$start = $iteration * 500;
-		$sql = "SELECT value FROM SPECIFICATION S WHERE name=\"model\" LIMIT $start,500";
-		$models = $this->query($sql);
-		foreach($models as &$model){
-			$model = $model['value'];
-		}
-		return $models;
-	}
 }
