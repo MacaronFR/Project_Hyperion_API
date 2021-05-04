@@ -65,10 +65,10 @@ class SpecificationModel extends Model{
 	}
 
 	public function selectTotalModelByTypeMark(int $type, string $mark): int|false{
-		$sql_ref_mark_type = "SELECT COUNT(RP.id_product) as id FROM REFERENCE_PRODUCTS RP
+		$sql_ref_mark_type = "SELECT COUNT(RP.id_product) as count FROM REFERENCE_PRODUCTS RP
 							INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
 							INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
 						WHERE name=\"mark\" and value=:mark AND type=:type";
-		return $this->prepared_query($sql_ref_mark_type, ["type" => $type, "mark" => $mark], unique: true);
+		return (int)($this->prepared_query($sql_ref_mark_type, ["type" => $type, "mark" => $mark], unique: true)['count']);
 	}
 }
