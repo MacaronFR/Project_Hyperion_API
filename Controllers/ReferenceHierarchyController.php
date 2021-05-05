@@ -17,6 +17,55 @@ class ReferenceHierarchyController implements Controller{
 		$this->rhsm = new RefHaveSpecModel();
 	}
 
+	#[NoReturn] public function ref($args){
+		$page = 0;
+		if(count($args['uri_args']) >= 1){
+			if(is_numeric($args['uri_args'][0])){
+				$page = (int)$args['uri_args'][0];
+			}else{
+				response(400, "Bad Request");
+			}
+		}
+		if(count($args['uri_args']) > 1){
+			$order = $args['uri_args'][2] ?? 'ASC';
+			$order = strtoupper($order);
+			if($order !== "ASC" && $order !== "DESC"){
+				response(409, "Bad Request");
+			}
+			$search = $args['uri_args'][1];
+			$sort = $args['uri_args'][3] ?? 'id';
+			$result = $this->rm->selectAllFilter($search, $order, $sort, $page);
+			$totalFilter = $this->rm->selectTotalFilter($search, $order, $sort);
+			$total = $this->rm->selectTotal();
+		}else{
+			if(count($args['uri_args']) === 0){
+				$result = $this->rm->selectAll(limit: false);
+			}else{
+				$result = $this->rm->selectAll($page);
+			}
+			$total = $this->rm->selectTotal();
+			$totalFilter = $total;
+		}
+		if($result === false){
+			response(500, "Internal Server Error");
+		}
+		if(empty($result)){
+			response(204, "No content");
+		}
+		if($total === false || $totalFilter === false){
+			response(501, "Internal Server Error");
+		}
+		$start = $page * 10 + 1;
+		if(count($args['uri_args']) === 0){
+			$end = $totalFilter;
+		}else{
+			$end = ($page + 1) * 10;
+		}
+		$result['total'] = $totalFilter;
+		$result['totalNotFiltered'] = $total;
+		response(200, "References $start to $end", $result);
+	}
+
 	#[NoReturn] private function type_reference(array $args){
 		if(count($args['uri_args']) === 2){
 			if(!is_numeric($args['uri_args'][1])){
@@ -145,6 +194,8 @@ class ReferenceHierarchyController implements Controller{
 			$this->type_model_reference($args);
 		}elseif($args['additional'][0] === 'type_mark_model_reference'){
 			$this->type_mark_model_reference($args);
+		}elseif($args['additional'][0] === 'ref'){
+			$this->ref($args);
 		}
 	}
 

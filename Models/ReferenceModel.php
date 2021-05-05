@@ -6,19 +6,20 @@ namespace Hyperion\API;
 require_once "autoload.php";
 
 class ReferenceModel extends Model{
-	protected string $id_name = "id_reference";
+	protected string $id_name = "id_product";
 	protected string $table_name = "REFERENCE_PRODUCTS";
 	protected array $column = [
 		"selling" => "selling_price",
 		"buying" => "buying_price",
 		"type" => "type"
 	];
+	protected int $max_row = 10;
 
 	public function selectAllByType(int $type, int $iteration = 0): array|false{
 		$start = 500 * $iteration;
 		$sql = "SELECT RP.id_product as id, RP.buying_price as buying_price, RP.selling_price as selling_price, T.type as type FROM REFERENCE_PRODUCTS RP
 					INNER JOIN TYPES T on RP.type = T.id_type
-				WHERE RP.type=:id LIMIT $start, 500;";
+				WHERE RP.type=:id LIMIT $start, $this->max_row;";
 		$references = $this->prepared_query($sql, ["id" => $type]);
 		if($references === false || empty($references)){
 			return $references;
@@ -39,7 +40,7 @@ class ReferenceModel extends Model{
     				INNER JOIN TYPES T on RP.type = T.id_type
     				INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
     				INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
-				WHERE S.name=\"mark\" AND value=:mark LIMIT $start, 500;";
+				WHERE S.name=\"mark\" AND value=:mark LIMIT $start, $this->max_row;";
 		$references = $this->prepared_query($sql, ["mark" => $mark]);
 		if($references === false || empty($references)){
 			return $references;
@@ -60,7 +61,7 @@ class ReferenceModel extends Model{
     				INNER JOIN TYPES T on RP.type = T.id_type
     				INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
     				INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
-				WHERE S.name=\"mark\" AND value=:mark AND RP.type=:type LIMIT $start, 500;";
+				WHERE S.name=\"mark\" AND value=:mark AND RP.type=:type LIMIT $start, $this->max_row;";
 		$references = $this->prepared_query($sql, ["type" => $type, "mark" => $mark]);
 		if($references === false || empty($references)){
 			return $references;
