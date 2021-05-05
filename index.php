@@ -106,6 +106,8 @@ $rt->get("/reference{/*{/search/*{/order/*/sort/*}}}",ReferenceHierarchyControll
 $rt->get("/reference/detail{/*{/search/*{/order/*/sort/*}}}",ReferenceHierarchyController::class, ['ref_detail']);
 // /reference/{token}
 $rt->post('/reference/*', ReferenceHierarchyController::class);
+// /reference/{token}/{id}
+$rt->delete("/reference/*/*", ReferenceHierarchyController::class);
 if(!$rt->getRouted()){
 	response(404, "Not Found");
 }

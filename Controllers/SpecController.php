@@ -178,7 +178,6 @@ class SpecController implements Controller{
 		if($result){
 			response(204, "Deleted");
 		}
-
-
+		response(500, "Internal Server Error");
 	}
 }

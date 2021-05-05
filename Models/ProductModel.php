@@ -210,4 +210,17 @@ class ProductModel extends Model{
 		}
 		return $products;
 	}
+
+	public function selectAllByRef(int $ref_id, int $iteration = 0, bool $limit = true): array|false{
+		$sql = "SELECT ";
+		foreach($this->column as $n =>$c){
+			$sql .= "$c as $n, ";
+		}
+		$sql .= "$this->id_name as id FROM $this->table_name WHERE id_ref=:ref";
+		if($limit){
+			$start = $iteration * $this->max_row;
+			$sql .= " LIMIT $start, $this->max_row";
+		}
+		return $this->prepared_query($sql, ['ref' => $ref_id]);
+	}
 }

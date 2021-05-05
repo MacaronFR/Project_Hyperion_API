@@ -10,11 +10,13 @@ class ReferenceHierarchyController implements Controller{
 	private ReferenceModel $rm;
 	private SpecificationModel $sm;
 	private RefHaveSpecModel $rhsm;
+	private ProductModel $pm;
 
 	public function __construct(){
 		$this->rm = new ReferenceModel();
 		$this->sm = new SpecificationModel();
 		$this->rhsm = new RefHaveSpecModel();
+		$this->pm = new ProductModel();
 	}
 
 	#[NoReturn] public function ref($args, bool $detail = false){
@@ -290,6 +292,35 @@ class ReferenceHierarchyController implements Controller{
 	 * @inheritDoc
 	 */
 	#[NoReturn] public function delete(array $args){
-		return false;
+		if(!checkToken($args['uri_args'][0], 3)){
+			response(403, "Forbidden");
+		}
+		if(!is_numeric($args['uri_args'][1])){
+			response(400, "Bad Request");
+		}
+		$ref = $this->rm->select($args['uri_args'][1]);
+		if($ref === false){
+			response(404, "Not Found");
+		}
+		$prod = $this->pm->selectAllByRef($args['uri_args'][1]);
+		if($prod === false){
+			response(500, "Internal Server Error");
+		}
+		if(!empty($prod)){
+			response(209, "Conflict");
+		}
+		$have_spec = $this->rhsm->selectAllFromRef($args['uri_args'][1]);
+		if($have_spec === false){
+			response(500, "Internal Server Error");
+		}
+		if(!empty($have_spec)){
+			if(!$this->rhsm->deleteFromRef($args['uri_args'][1])){
+				response(501, "Internal Server Error");
+			}
+		}
+		if($this->rm->delete($args['uri_args'][1])){
+			response(204, "Deleted");
+		}
+		response(500, "Internal Server Error");
 	}
 }
