@@ -211,4 +211,32 @@ class ReferenceModel extends Model{
 		}
 		return array_merge($references, $spec["spec"]);
 	}
+
+	public function selectAllFilterWithDetail(string $search, string $order, string $sort, int $iteration = 0): array|false{
+		if($sort === 'id'){
+			$sort = $this->id_name;
+		}else{
+			if(key_exists($sort, $this->column)){
+				$sort = $this->column[$sort];
+			}else{
+				return false;
+			}
+		}
+		$start = $this->max_row * $iteration;
+		$sql = "SELECT";
+		foreach($this->column as $key => $item){
+			$sql .= " $item as $key,";
+		}
+		$sql .= " $this->id_name as id FROM $this->table_name ";
+		$sql .= "WHERE ";
+		foreach($this->column as $item){
+			$sql .= "$item LIKE :search OR ";
+		}
+		$sql .= "$this->id_name LIKE :search ";
+		$sql .= "ORDER BY $sort $order ";
+		$sql .= "LIMIT $start, $this->max_row;";
+		$search = "%" . $search . "%";
+		var_dump($sql);
+		return $this->prepared_query($sql, ["search" => $search]);
+	}
 }

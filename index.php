@@ -102,6 +102,8 @@ $rt->delete("/specification/*/*",SpecController::class);
 $rt->post('/specification/*',SpecController::class);
 // /reference[/{page}[/search/{search}[/order/{direction}/sort{column}]]]
 $rt->get("/reference{/*{/search/*{/order/*/sort/*}}}",ReferenceHierarchyController::class, ['ref']);
+// /reference/detail[/{page}[/search/{search}[/order/{direction}/sort{column}]]]
+$rt->get("/reference/detail{/*{/search/*{/order/*/sort/*}}}",ReferenceHierarchyController::class, ['ref_detail']);
 // /reference/{token}
 $rt->post('/reference/*', ReferenceHierarchyController::class);
 if(!$rt->getRouted()){
