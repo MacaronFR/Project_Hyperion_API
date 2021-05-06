@@ -3,6 +3,8 @@
 
 namespace Hyperion\API;
 
+use JetBrains\PhpStorm\ArrayShape;
+
 require_once "autoload.php";
 
 class SpecificationModel extends Model{
@@ -40,6 +42,11 @@ class SpecificationModel extends Model{
 			$sql .= " LIMIT $start, $this->max_row";
 		}
 		return $this->query($sql);
+	}
+
+	public function selectTotalMark(): array|false{
+		$sql = "SELECT COUNT(id_specification) as count FROM SPECIFICATION WHERE name=\"mark\"";
+		return $this->query($sql, unique: true);
 	}
 
 	public function selectAllModelByTypeMark(int $type, string $mark, int $iteration = 0, bool $limit = true): array|false{
