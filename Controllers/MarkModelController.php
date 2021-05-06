@@ -134,7 +134,7 @@ class MarkModelController implements Controller{
 		if($total === false){
 			response(500, "Internal Server Error");
 		}
-		$mark['totalNotFiltered'] = $mark['total'] = (int)['count'];
+		$mark['totalNotFiltered'] = $mark['total'] = (int)$total['count'];
 		response(200, "Marks", $mark);
 	}
 
