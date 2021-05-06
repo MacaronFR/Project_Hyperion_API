@@ -130,7 +130,11 @@ class MarkModelController implements Controller{
 		if(empty($mark)){
 			response(204, "No content");
 		}
-		$mark['totalNotFiltered'] = $mark['total'] = $this->sm->selectTotalMark();
+		$total = $this->sm->selectTotalMark();
+		if($total === false){
+			response(500, "Internal Server Error");
+		}
+		$mark['totalNotFiltered'] = $mark['total'] = (int)['count'];
 		response(200, "Marks", $mark);
 	}
 
