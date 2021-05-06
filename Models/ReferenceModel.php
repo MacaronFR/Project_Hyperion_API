@@ -110,13 +110,16 @@ class ReferenceModel extends Model{
 		return $this->prepared_query($sql, ["type" => $type]);
 	}
 
-	public function selectAllModelByMark(string $mark, int $iteration = 0): array|false{
-		$start = $iteration * 500;
+	public function selectAllModelByMark(string $mark, int $iteration = 0, $limit = false): array|false{
+		$start = $iteration * $this->max_row;
 		$sql_ref_mark = "SELECT RP.id_product as id, T.type FROM REFERENCE_PRODUCTS RP
     						INNER JOIN TYPES T on RP.type = T.id_type
 							INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
 							INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
-						WHERE name=\"mark\" and value=:mark LIMIT $start,500;";
+						WHERE name=\"mark\" and value=:mark";
+		if($limit){
+			$sql_ref_mark .= " LIMIT $start, $this->max_row;";
+		}
 		$sql_model = 	"SELECT value FROM SPECIFICATION S
 							INNER JOIN REF_HAVE_SPEC RHS on S.id_specification = RHS.id_spec
 						WHERE id_product=:id AND name=\"model\";";
@@ -128,6 +131,15 @@ class ReferenceModel extends Model{
 			$models[$item['type']][] = $this->prepared_query($sql_model, ["id" => $item['id']], unique: true)["value"];
 		}
 		return $models;
+	}
+
+	public function selectTotalModelByMark(string $mark){
+		$sql_ref_mark = "SELECT COUNT(RP.id_product) as count FROM REFERENCE_PRODUCTS RP
+    						INNER JOIN TYPES T on RP.type = T.id_type
+							INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
+							INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
+						WHERE name=\"mark\" and value=:mark";
+		return $this->prepared_query($sql_ref_mark, ["mark" => $mark], unique: true);
 	}
 
 	public function selectByModel(string $model): array|false{
