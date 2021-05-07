@@ -50,7 +50,7 @@ abstract class Model{
 	 * @param array $param Array of param of form $param["param_name"] = $param_value
 	 * @param bool $unique If the query return only one row
 	 * @param bool $fetch Query have to be fetch ?
-	 * @param bool $last_id
+	 * @param bool $last_id Want to retrieve the last inserted ID (not compatible with fetch)
 	 * @return array|bool|int
 	 */
 	protected function prepared_query(string $statement, array $param, bool $unique = false, bool $fetch = true, bool $last_id = false): array|bool|int{
@@ -75,14 +75,11 @@ abstract class Model{
 		}
 	}
 
-	protected function prepare_query_string(array $fields, int $type): string|false{
-		return match($type){
-			self::INSERT => $this->prepare_insert_query($fields),
-			self::UPDATE => $this->prepare_update_query($fields),
-			default => false
-		};
-	}
-
+	/**
+	 * Prepare from $fields the insert query associated
+	 * @param array $fields all Fields to insert
+	 * @return string|false Query or false on error
+	 */
 	protected function prepare_insert_query(array $fields): string|false{
 		$query = "INSERT INTO " . $this->table_name . " ";
 		$column = "(";
@@ -97,6 +94,12 @@ abstract class Model{
 		$query .= $column . ") VALUES " . "$param" . ");";
 		return $query;
 	}
+
+	/**
+	 * Prepare from $fields the update query associated
+	 * @param array $fields all fields to insert
+	 * @return string|false Query or false on error
+	 */
 	protected function prepare_update_query(array $fields): string|false{
 		$query = "UPDATE " . $this->table_name . " SET ";
 		$arg = "";
@@ -109,6 +112,12 @@ abstract class Model{
 		return $query;
 	}
 
+	/**
+	 * Select All Row from table, if limit is set to true, retrieve $this->max_row starting at $iteration * $this->max_row
+	 * @param int $iteration
+	 * @param bool $limit
+	 * @return array|false
+	 */
 	public function selectAll(int $iteration = 0, bool $limit = true): array|false{
 		$start = $this->max_row * $iteration;
 		$sql = "SELECT";
@@ -122,6 +131,9 @@ abstract class Model{
 		return $this->query($sql);
 	}
 
+	/**
+	 * @return int|false Select the total row in the table
+	 */
 	public function selectTotal(): int|false{
 		$sql = "SELECT COUNT($this->id_name) as count FROM $this->table_name";
 		$res = $this->query($sql);
