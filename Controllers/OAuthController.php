@@ -48,16 +48,16 @@ class OAuthController implements Controller
 	 */
 	#[NoReturn] public function get(array $args){
 		if(count($args['uri_args']) === 4){
-			$clientInfo = $this->cm->selectFromClientID($args['uri_args'][0]);
+			$clientInfo = $this->cm->select($args['uri_args'][0], "client");
 			if($clientInfo !== false && $clientInfo['secret'] === $args['uri_args'][1]){
-				$userInfo = $this->um->selectFromMail($args['uri_args'][2]);
-				if($userInfo !== false && $userInfo['password'] === $args['uri_args'][3]){
-					$token = $this->tm->selectByUser((int)$userInfo['id_user']);
+				$userInfo = $this->um->select($args['uri_args'][2], "mail");
+				if($userInfo !== false && $userInfo['passwd'] === $args['uri_args'][3]){
+					$token = $this->tm->selectByUser((int)$userInfo['id']);
 					if($token !== false){
 						$diff = $this->now->diff(DateTime::createFromFormat("Y-m-d H:i:s", $token["expire"]));
 						if($diff->invert === 1){
 							$this->tm->delete($token['id_token']);
-							$this->newToken($userInfo['type'], $clientInfo['id_client'], $userInfo['id_user']);
+							$this->newToken($userInfo['type'], $clientInfo['id'], $userInfo['id']);
 						}else{
 							do{
 								$end =$this->now->add(new DateInterval("PT2H"));
@@ -66,7 +66,7 @@ class OAuthController implements Controller
 							response(200, "Token refreshed", ['token' => $token['value'], 'expire' => $end->format("Y-m-d H:i:s")]);
 						}
 					}else{
-						$this->newToken($userInfo['type'], $clientInfo['id_client'], $userInfo['id_user']);
+						$this->newToken($userInfo['type'], $clientInfo['id'], $userInfo['id']);
 					}
 				}else{
 					response(401, "Invalid users information");

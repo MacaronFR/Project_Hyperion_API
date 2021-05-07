@@ -185,6 +185,8 @@ abstract class Model{
 	public function select(mixed $value, string $column = ""): array|false{
 		if(!in_array($column, array_keys($this->column))){
 			$column = $this->id_name;
+		}else{
+			$column = $this->column[$column];
 		}
 		$sql = "SELECT";
 		foreach($this->column as $name => $item){
