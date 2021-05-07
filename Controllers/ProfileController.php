@@ -28,10 +28,10 @@ class ProfileController implements Controller{
 		if(count($args["uri_args"]) === 1){
 			$token = $this->tm->selectByToken($args["uri_args"][0]);
 			if($token !== false){
-				$then = DateTime::createFromFormat("Y-m-d H:i:s", $token['expire']);
+				$then = DateTime::createFromFormat("Y-m-d H:i:s", $token['end']);
 				if($this->now->diff($then)->invert === 0){
-					$user = $this->um->select($token['id_client']);
-					$user["addr"] = $this->am->select($user['address']);
+					$user = $this->um->select($token['client']);
+					$user["addr"] = $this->am->select($user['addr']);
 					response(200, "User info", $user);
 				}else{
 					response(401, "Invalid Credentials");

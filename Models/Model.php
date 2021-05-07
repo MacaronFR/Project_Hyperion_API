@@ -182,14 +182,17 @@ abstract class Model{
 		return $total['count'];
 	}
 
-	public function select(int $id): array|false{
+	public function select(mixed $value, string $column = ""): array|false{
+		if(!in_array($column, array_keys($this->column))){
+			$column = $this->id_name;
+		}
 		$sql = "SELECT";
 		foreach($this->column as $name => $item){
 			$sql .= " $item as $name,";
 		}
 		$sql .= " $this->id_name as id";
-		$sql .= " FROM $this->table_name WHERE $this->id_name=:id ";
-		return $this->prepared_query($sql, ["id" => $id], unique: true);
+		$sql .= " FROM $this->table_name WHERE $column=:id ";
+		return $this->prepared_query($sql, ["id" => $value], unique: true);
 	}
 	public function update(int $id, array $value): bool{
 		$sql = $this->prepare_update_query($value);
