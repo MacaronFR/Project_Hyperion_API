@@ -100,4 +100,44 @@ class SpecificationModel extends Model{
 		}
 		return (int)$res['count'];
 	}
+
+	public function selectAllModelByType(int $type, int $iteration = 0, bool $limit = true): array|false{
+		$sql = "SELECT
+					S.`value`
+				FROM
+					SPECIFICATION AS S
+					INNER JOIN
+					REFERENCE_PRODUCTS
+					INNER JOIN
+					REF_HAVE_SPEC
+					ON 
+						REFERENCE_PRODUCTS.id_product = REF_HAVE_SPEC.id_product AND
+						S.id_specification = REF_HAVE_SPEC.id_spec
+				WHERE
+					REFERENCE_PRODUCTS.type = :type AND
+					S.`name` = \"model\"";
+		if($limit){
+			$start = $iteration * $this->max_row;
+			$sql .= " LIMIT $start, $this->max_row";
+		}
+		return $this->prepared_query($sql, ['type' => $type]);
+	}
+
+	public function selectTotalModelByType(int $type): array|false{
+		$sql = "SELECT
+					COUNT(S.`value`) as count
+				FROM
+					SPECIFICATION AS S
+					INNER JOIN
+					REFERENCE_PRODUCTS
+					INNER JOIN
+					REF_HAVE_SPEC
+					ON 
+						REFERENCE_PRODUCTS.id_product = REF_HAVE_SPEC.id_product AND
+						S.id_specification = REF_HAVE_SPEC.id_spec
+				WHERE
+					REFERENCE_PRODUCTS.type = :type AND
+					S.`name` = \"model\"";
+		return $this->prepared_query($sql, ['type' => $type], unique: true);
+	}
 }

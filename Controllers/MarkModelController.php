@@ -166,6 +166,36 @@ class MarkModelController implements Controller{
 		response(200, "Models", $model);
 	}
 
+	#[NoReturn] public function type_model(array $args){
+		if(!is_numeric($args['uri_args'][0])){
+			response(400, "Bad Request");
+		}
+		$type = $this->tm->select((int)$args['uri_args'][0]);
+		if($type === false){
+			response(500, "Internal Server Error");
+		}
+		if(empty($type)){
+			response(400, "Invalid Type");
+		}
+		if(count($args['uri_args']) === 2){
+			$models = $this->sm->selectAllModelByType((int)$args['uri_args'][0], $args['uri_args'][1]);
+		}else{
+			$models = $this->sm->selectAllModelByType((int)$args['uri_args'][0], limit: false);
+		}
+		if($models === false){
+			response(500, "Internal Server Error");
+		}
+		if(count($models) === 0){
+			response(204, "No content");
+		}
+		$total = $this->sm->selectTotalModelByType($args['uri_args'][0]);
+		if($total === false){
+			response(500, "Internal Server Error");
+		}
+		$models['totalNotFiltered'] = $models['total'] = $total['count'];
+		response(200, "Mark of type " . $type['type'], $models);
+	}
+
 	/**
 	 * @inheritDoc
 	 */
@@ -182,6 +212,8 @@ class MarkModelController implements Controller{
 			$this->mark($args);
 		}elseif($args['additional'][0] === "model"){
 			$this->model($args);
+		}elseif($args['additional'][0] === "type_model"){
+			$this->type_model($args);
 		}
 	}
 
