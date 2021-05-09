@@ -3,8 +3,6 @@
 
 namespace Hyperion\API;
 
-use JetBrains\PhpStorm\ArrayShape;
-
 require_once "autoload.php";
 
 class SpecificationModel extends Model{
@@ -84,12 +82,34 @@ class SpecificationModel extends Model{
 	}
 
 	public function selectAllModel(int $iteration = 0, bool $limit = true): array|false{
-		$start = $iteration * $this->max_row;
-		$sql = "SELECT value FROM SPECIFICATION S WHERE name=\"model\"";
+		$sql = "SELECT
+					value as value,
+       				TYPES.type as type
+				FROM SPECIFICATION S
+				INNER JOIN
+				    REF_HAVE_SPEC
+				INNER JOIN
+					REFERENCE_PRODUCTS
+				INNER JOIN
+				    TYPES
+				ON 
+					REF_HAVE_SPEC.id_product = REFERENCE_PRODUCTS.id_product AND
+					REF_HAVE_SPEC.id_spec = S.id_specification AND
+					REFERENCE_PRODUCTS.type = TYPES.id_type
+				WHERE name=\"model\"";
 		if($limit){
+			$start = $iteration * $this->max_row;
 			$sql .= " LIMIT $start, $this->max_row";
 		}
-		return $this->query($sql);
+		$models = $this->query($sql);
+		if($models === false){
+			return false;
+		}
+		$result = [];
+		foreach($models as $model){
+			$result[$model['type']][] = $model['value'];
+		}
+		return $result;
 	}
 
 	public function selectTotalModel(): int|false{

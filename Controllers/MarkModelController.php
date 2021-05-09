@@ -143,26 +143,26 @@ class MarkModelController implements Controller{
 	}
 
 	#[NoReturn] public function model($args){
-		if(count($args['uri_args']) === 2){
-			if(!is_numeric($args['uri_args'][1])){
+		if(count($args['uri_args']) === 1){
+			if(!is_numeric($args['uri_args'][0])){
 				response(400, "Bad Request");
 			}
-			$model = $this->sm->selectAllModel($args['uri_args'][1]);
+			$models = $this->sm->selectAllModel($args['uri_args'][0]);
 		}else{
-			$model = $this->sm->selectAllModel(limit: false);
+			$models = $this->sm->selectAllModel(limit: false);
 		}
-		if($model === false){
+		if($models === false){
 			response(500, "Internal Server Error");
 		}
-		if(empty($model)){
+		if(empty($models)){
 			response(204, "No content");
 		}
 		$total = $this->sm->selectTotalModel();
 		if($total === false){
 			response(500, "Internal Server Error");
 		}
-		$model['total'] = $model['totalNotFiltered'] = $total;
-		response(200, "Models", $model);
+		$models['total'] = $models['totalNotFiltered'] = $total;
+		response(200, "Models", $models);
 	}
 
 	#[NoReturn] public function type_model(array $args){
