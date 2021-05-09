@@ -110,7 +110,7 @@ class ReferenceModel extends Model{
 		return $this->prepared_query($sql, ["type" => $type]);
 	}
 
-	public function selectAllModelByMark(string $mark, int $iteration = 0, $limit = false): array|false{
+	public function selectAllModelByMark(string $mark, int $iteration = 0, $limit = true): array|false{
 		$start = $iteration * $this->max_row;
 		$sql_ref_mark = "SELECT RP.id_product as id, T.type FROM REFERENCE_PRODUCTS RP
     						INNER JOIN TYPES T on RP.type = T.id_type

@@ -75,11 +75,10 @@ class MarkModelController implements Controller{
 
 	#[NoReturn] public function modelByMark(array $args){
 		if(count($args['uri_args']) === 2){
-			$iteration = $args['uri_args'][1];
+			$models = $this->rm->selectAllModelByMark($args['uri_args'][0], $args['uri_args'][1]);
 		}else{
-			$iteration = 0;
+			$models = $this->rm->selectAllModelByMark($args['uri_args'][0], limit: false);
 		}
-		$models = $this->rm->selectAllModelByMark($args['uri_args'][0], $iteration);
 		if($models === false){
 			response(500, "Internal Server Error");
 		}
