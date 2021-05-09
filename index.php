@@ -113,5 +113,3 @@ $rt->delete("/reference/*/*", ReferenceHierarchyController::class);
 if(!$rt->getRouted()){
 	response(404, "Not Found");
 }
-
-//TODO add /tye/*/model{/*} route

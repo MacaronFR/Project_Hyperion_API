@@ -221,7 +221,12 @@ class ReferenceModel extends Model{
 		if($spec === false){
 			return false;
 		}
-		return array_merge($references, $spec["spec"]);
+		$spec = $spec['spec'];
+		$references['model'] = $spec['model'];
+		$references['mark'] = $spec['mark'];
+		unset($spec['model'], $spec['mark']);
+		$references['spec'] = $spec;
+		return $references;
 	}
 
 	public function selectAllFilterWithDetail(string $search, string $order, string $sort, int $iteration = 0): array|false{
