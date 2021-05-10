@@ -101,7 +101,7 @@ class ReferenceHierarchyController implements Controller{
 		response(200, "Reference from type " . $reference[0]['type'], $reference);
 	}
 
-	#[NoReturn] private function mark_ref(array $args){
+	#[NoReturn] private function brand_ref(array $args){
 		if(count($args['uri_args']) === 2){
 			if(!is_numeric($args['uri_args'][1])){
 				response(400, "Bad Request");
@@ -110,17 +110,17 @@ class ReferenceHierarchyController implements Controller{
 		}else{
 			$iteration = 0;
 		}
-		$reference = $this->rm->selectAllByMark($args['uri_args'][0], $iteration);
+		$reference = $this->rm->selectAllByBrand($args['uri_args'][0], $iteration);
 		if($reference === false){
 			response(500, "Internal Server Error");
 		}
 		if(count($reference) === 0){
 			response(204, "No Content");
 		}
-		response(200, "Reference of mark " . $reference[0]['mark'], $reference);
+		response(200, "Reference of brand " . $reference[0]['brand'], $reference);
 	}
 
-	#[NoReturn] private function type_mark_ref(array $args){
+	#[NoReturn] private function type_brand_ref(array $args){
 		if(count($args['uri_args']) === 3){
 			if(!is_numeric($args['uri_args'][2])){
 				response(400, "Bad Request");
@@ -132,14 +132,14 @@ class ReferenceHierarchyController implements Controller{
 		if(!is_numeric($args['uri_args'][0])){
 			response(400, "Bad Request");
 		}
-		$reference = $this->rm->selectAllByTypeMark((int)$args['uri_args'][0], $args['uri_args'][1], $iteration);
+		$reference = $this->rm->selectAllByTypeBrand((int)$args['uri_args'][0], $args['uri_args'][1], $iteration);
 		if($reference === false){
 			response(500, "Internal Server Error");
 		}
 		if(empty($reference)){
 			response(204, "No content");
 		}
-		response(200, "Reference of type " . $reference[0]['type'] . ", mark " . $reference[0]['mark'], $reference);
+		response(200, "Reference of type " . $reference[0]['type'] . ", brand " . $reference[0]['brand'], $reference);
 	}
 
 	#[NoReturn] private function model_reference($args){
@@ -153,15 +153,15 @@ class ReferenceHierarchyController implements Controller{
 		response(200, "Reference of model " . $reference['model'], $reference);
 	}
 
-	#[NoReturn] public function mark_model_reference(array $args){
-		$reference = $this->rm->selectByMarkModel($args['uri_args'][0], $args['uri_args'][1]);
+	#[NoReturn] public function brand_model_reference(array $args){
+		$reference = $this->rm->selectByBrandModel($args['uri_args'][0], $args['uri_args'][1]);
 		if($reference === false){
 			response(500, "Internal Server Error");
 		}
 		if(empty($reference)){
 			response(204, "No content");
 		}
-		response(200, "Reference of mark " . $reference['mark'] . ", model " . $reference['model'], $reference);
+		response(200, "Reference of brand " . $reference['brand'] . ", model " . $reference['model'], $reference);
 	}
 
 	#[NoReturn] private function type_model_reference($args){
@@ -175,18 +175,18 @@ class ReferenceHierarchyController implements Controller{
 		response(200, "Reference of type " . $reference['type'] . ", model " . $reference['model'], $reference);
 	}
 
-	#[NoReturn] public function type_mark_model_reference(array $args){
+	#[NoReturn] public function type_brand_model_reference(array $args){
 		if(!is_numeric($args['uri_args'][0])){
 			response(400, "Bad Request");
 		}
-		$references = $this->rm->selectByTypeMarkModel($args['uri_args'][0], $args['uri_args'][1], $args['uri_args'][2]);
+		$references = $this->rm->selectByTypeBrandModel($args['uri_args'][0], $args['uri_args'][1], $args['uri_args'][2]);
 		if($references === false){
 			response(500, "Internal Server Error");
 		}
 		if(empty($references)){
 			response(204, "No Content");
 		}
-		response(200, "Reference of type " . $references['type'] . ", mark " . $references["mark"] . ", model " . $references['model'], $references);
+		response(200, "Reference of type " . $references['type'] . ", brand " . $references["brand"] . ", model " . $references['model'], $references);
 	}
 
 	/**
@@ -195,18 +195,18 @@ class ReferenceHierarchyController implements Controller{
 	#[NoReturn] public function get(array $args){
 		if($args['additional'][0] === 'type_reference'){
 			$this->type_reference($args);
-		}elseif($args['additional'][0] === 'mark_reference'){
-			$this->mark_ref($args);
-		}elseif($args['additional'][0] === 'type_mark_reference'){
-			$this->type_mark_ref($args);
+		}elseif($args['additional'][0] === 'brand_reference'){
+			$this->brand_ref($args);
+		}elseif($args['additional'][0] === 'type_brand_reference'){
+			$this->type_brand_ref($args);
 		}elseif($args['additional'][0] === 'model_reference'){
 			$this->model_reference($args);
-		}elseif($args['additional'][0] === 'mark_model_reference'){
-			$this->mark_model_reference($args);
+		}elseif($args['additional'][0] === 'brand_model_reference'){
+			$this->brand_model_reference($args);
 		}elseif($args['additional'][0] === 'type_model_reference'){
 			$this->type_model_reference($args);
-		}elseif($args['additional'][0] === 'type_mark_model_reference'){
-			$this->type_mark_model_reference($args);
+		}elseif($args['additional'][0] === 'type_brand_model_reference'){
+			$this->type_brand_model_reference($args);
 		}elseif($args['additional'][0] === 'ref'){
 			$this->ref($args);
 		}elseif($args['additional'][0] === 'ref_detail'){
@@ -221,18 +221,18 @@ class ReferenceHierarchyController implements Controller{
 		if(!checkToken($args['uri_args'][0], 3)){
 			response(403, "Forbidden");
 		}
-		if(!isset($args['post_args']['type'], $args['post_args']['mark'], $args['post_args']['model'], $args['post_args']['specs'], $args['post_args']['buying'], $args['post_args']['selling'])){
+		if(!isset($args['post_args']['type'], $args['post_args']['brand'], $args['post_args']['model'], $args['post_args']['specs'], $args['post_args']['buying'], $args['post_args']['selling'])){
 			response(400, "Bad request");
 		}
-		if(!is_numeric($args['post_args']['type']) || !is_numeric($args['post_args']['mark']) || !is_numeric($args['post_args']['selling']) || !is_numeric($args['post_args']['buying'])){
+		if(!is_numeric($args['post_args']['type']) || !is_numeric($args['post_args']['brand']) || !is_numeric($args['post_args']['selling']) || !is_numeric($args['post_args']['buying'])){
 			response(400, "Bad Request");
 		}
 		if(!is_array($args['post_args']['specs'])){
 			response(400, "Bad Request");
 		}
-		$mark = $this->sm->select($args['post_args']['mark']);
-		if($mark === false){
-			response(400, "Bad Request, Mark not found");
+		$brand = $this->sm->select($args['post_args']['brand']);
+		if($brand === false){
+			response(400, "Bad Request, Brand not found");
 		}
 		$specs = [];
 		foreach($args['post_args']['specs'] as $spec){
@@ -241,7 +241,7 @@ class ReferenceHierarchyController implements Controller{
 			}
 			$specs[] = ["name" => $spec['name'], "value" => $spec['value']];
 		}
-		$exist = $this->rm->selectByTypeMarkModel($args['post_args']['type'], $mark['value'], $args['post_args']['model']);
+		$exist = $this->rm->selectByTypeBrandModel($args['post_args']['type'], $brand['value'], $args['post_args']['model']);
 		if($exist !== false){
 			response(209, "Conflict");
 		}
@@ -259,7 +259,7 @@ class ReferenceHierarchyController implements Controller{
 		if($this->rhsm->insert(["product" => $new_ref , "spec" => $model]) === false){
 			response(500, "Internal Server Error");
 		}
-		if($this->rhsm->insert(["product" => $new_ref , "spec" => $args['post_args']['mark']]) === false){
+		if($this->rhsm->insert(["product" => $new_ref , "spec" => $args['post_args']['brand']]) === false){
 			response(500, "Internal Server Error");
 		}
 		foreach($specs as $spec){

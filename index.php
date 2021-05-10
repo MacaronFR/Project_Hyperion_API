@@ -2,7 +2,7 @@
 
 use \Hyperion\API\{OAuthController,ConnectionController,StoreController,ProfileController,CategoryController};
 use \Hyperion\API\Router;
-use \Hyperion\API\{ProductHierarchyController,ReferenceHierarchyController,MarkModelController,SpecController};
+use \Hyperion\API\{ProductHierarchyController,ReferenceHierarchyController,BrandModelController,SpecController};
 use \Hyperion\API\{TypeController};
 
 require_once "autoload.php";
@@ -52,47 +52,47 @@ $rt->delete("/type/*/*", TypeController::class);
 // /type/{user_token}
 $rt->post("/type/*", TypeController::class);
 // /category/type/{id_category}[/{page}]
-$rt->get("/category/*/type{/*}",MarkModelController::class, ["type"]);
+$rt->get("/category/*/type{/*}",BrandModelController::class, ["type"]);
 // /type/{id_type}/product[/{page}]
 $rt->get("/type/*/product{/*}", ProductHierarchyController::class, ["type_product"]);
 // /type/{id_type}/reference[/{page}]
 $rt->get("/type/*/reference{/*}", ReferenceHierarchyController::class, ["type_reference"]);
-// /mark/{mark_name}/product[/{page}]
-$rt->get("/mark/*/product{/*}", ProductHierarchyController::class, ["mark_product"]);
-// /mark/{mark_name}/reference[/{page}]
-$rt->get("/mark/*/reference{/*}", ReferenceHierarchyController::class, ["mark_reference"]);
-// /type/{id_type}/mark/{mark_name}/product[/{page}]
-$rt->get("/type/*/mark/*/product{/*}", ProductHierarchyController::class, ["type_mark_product"]);
-// /type/{id_type}/mark/{mark_name}/reference[/{page}]
-$rt->get("/type/*/mark/*/reference{/*}", ReferenceHierarchyController::class, ["type_mark_reference"]);
-// /type/{id_type}/mark[/{page}]
-$rt->get("/type/*/mark{/*}", MarkModelController::class, ["type_mark"]);
-// /type/{id_type}/mark[/{page}]
-$rt->get("/type/*/model{/*}", MarkModelController::class, ["type_model"]);
-// /mark/{mark_name}/model[/{page}]
-$rt->get("/mark/*/model{/*}", MarkModelController::class, ["mark_model"]);
-// /type/{id_type}/mark/{mark_name}/model[/{page}]
-$rt->get("/type/*/mark/*/model{/*}", MarkModelController::class, ["type_mark_model"]);
-// /mark[/{page}]
-$rt->get("/mark{/*}", MarkModelController::class, ["mark"]);
+// /brand/{brand_name}/product[/{page}]
+$rt->get("/brand/*/product{/*}", ProductHierarchyController::class, ["brand_product"]);
+// /brand/{brand_name}/reference[/{page}]
+$rt->get("/brand/*/reference{/*}", ReferenceHierarchyController::class, ["brand_reference"]);
+// /type/{id_type}/brand/{brand_name}/product[/{page}]
+$rt->get("/type/*/brand/*/product{/*}", ProductHierarchyController::class, ["type_brand_product"]);
+// /type/{id_type}/brand/{brand_name}/reference[/{page}]
+$rt->get("/type/*/brand/*/reference{/*}", ReferenceHierarchyController::class, ["type_brand_reference"]);
+// /type/{id_type}/brand[/{page}]
+$rt->get("/type/*/brand{/*}", BrandModelController::class, ["type_brand"]);
+// /type/{id_type}/brand[/{page}]
+$rt->get("/type/*/model{/*}", BrandModelController::class, ["type_model"]);
+// /brand/{brand_name}/model[/{page}]
+$rt->get("/brand/*/model{/*}", BrandModelController::class, ["brand_model"]);
+// /type/{id_type}/brand/{brand_name}/model[/{page}]
+$rt->get("/type/*/brand/*/model{/*}", BrandModelController::class, ["type_brand_model"]);
+// /brand[/{page}]
+$rt->get("/brand{/*}", BrandModelController::class, ["brand"]);
 // /model[/{page}]
-$rt->get("/model{/*}", MarkModelController::class, ["model"]);
+$rt->get("/model{/*}", BrandModelController::class, ["model"]);
 // /model/{model_name}/product[/{page}]
 $rt->get("/model/*/product{/*}", ProductHierarchyController::class, ['model_product']);
-// /mark/{mark_name}/model/{model_name}/product[/{page}]
-$rt->get("/mark/*/model/*/product{/*}", ProductHierarchyController::class, ['mark_model_product']);
+// /brand/{brand_name}/model/{model_name}/product[/{page}]
+$rt->get("/brand/*/model/*/product{/*}", ProductHierarchyController::class, ['brand_model_product']);
 // /type/{type_id}/model/{model_name}/product/[/{page}]
 $rt->get("/type/*/model/*/product{/*}", ProductHierarchyController::class, ['type_model_product']);
-// /type/{type_id}/mark/{mark_name}/model/{model_name}/product[/{page}]
-$rt->get("/type/*/mark/*/model/*/product{/*}", ProductHierarchyController::class, ['type_mark_model_product']);
+// /type/{type_id}/brand/{brand_name}/model/{model_name}/product[/{page}]
+$rt->get("/type/*/brand/*/model/*/product{/*}", ProductHierarchyController::class, ['type_brand_model_product']);
 // /model/{model_name}/reference
 $rt->get("/model/*/reference", ReferenceHierarchyController::class, ['model_reference']);
-// /mark/{mark_name}/model/{model_name}/reference
-$rt->get("/mark/*/model/*/reference", ReferenceHierarchyController::class, ['mark_model_reference']);
+// /brand/{brand_name}/model/{model_name}/reference
+$rt->get("/brand/*/model/*/reference", ReferenceHierarchyController::class, ['brand_model_reference']);
 // /type/{type_id}/model/{model_name}/reference
 $rt->get("/type/*/model/*/reference", ReferenceHierarchyController::class, ['type_model_reference']);
-// /type/{type_id}/mark/{mark_name}/model/{model_name}/reference
-$rt->get("/type/*/mark/*/model/*/reference", ReferenceHierarchyController::class, ['type_mark_model_reference']);
+// /type/{type_id}/brand/{brand_name}/model/{model_name}/reference
+$rt->get("/type/*/brand/*/model/*/reference", ReferenceHierarchyController::class, ['type_brand_model_reference']);
 // /specification[/{page}[/search/{search}[/order/{direction}/sort{column}]]]
 $rt->get("/specification{/*{/search/*{/order/*/sort/*}}}",SpecController::class);
 $rt->get("/specification/name{/*}",SpecController::class, ['name']);

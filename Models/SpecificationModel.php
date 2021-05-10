@@ -33,48 +33,48 @@ class SpecificationModel extends Model{
 		return $this->query($sql);
 	}
 
-	public function selectAllMark(int $iteration = 0, bool $limit = true): array|false{
+	public function selectAllBrand(int $iteration = 0, bool $limit = true): array|false{
 		$start = $iteration * $this->max_row;
-		$sql = "SELECT id_specification as id, value FROM SPECIFICATION WHERE name=\"mark\"";
+		$sql = "SELECT id_specification as id, value FROM SPECIFICATION WHERE name=\"brand\"";
 		if($limit){
 			$sql .= " LIMIT $start, $this->max_row";
 		}
 		return $this->query($sql);
 	}
 
-	public function selectTotalMark(): array|false{
-		$sql = "SELECT COUNT(id_specification) as count FROM SPECIFICATION WHERE name=\"mark\"";
+	public function selectTotalBrand(): array|false{
+		$sql = "SELECT COUNT(id_specification) as count FROM SPECIFICATION WHERE name=\"brand\"";
 		return $this->query($sql, unique: true);
 	}
 
-	public function selectAllModelByTypeMark(int $type, string $mark, int $iteration = 0, bool $limit = true): array|false{
+	public function selectAllModelByTypeBrand(int $type, string $brand, int $iteration = 0, bool $limit = true): array|false{
 		$start = $iteration * $this->max_row;
-		$sql_ref_mark_type = "SELECT RP.id_product as id FROM REFERENCE_PRODUCTS RP
+		$sql_ref_brand_type = "SELECT RP.id_product as id FROM REFERENCE_PRODUCTS RP
 							INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
 							INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
-						WHERE name=\"mark\" and value=:mark AND type=:type";
+						WHERE name=\"brand\" and value=:brand AND type=:type";
 		if($limit){
-			$sql_ref_mark_type .= " LIMIT $start, $this->max_row;";
+			$sql_ref_brand_type .= " LIMIT $start, $this->max_row;";
 		}
 		$sql_model = "SELECT id_specification as id, value FROM SPECIFICATION S
 							INNER JOIN REF_HAVE_SPEC RHS on S.id_specification = RHS.id_spec
 						WHERE id_product=:id AND name=\"model\";";
-		$ref_mark_type = $this->prepared_query($sql_ref_mark_type, ["type" => $type, "mark" => $mark]);
-		if($ref_mark_type === false || count($ref_mark_type) === 0){
-			return $ref_mark_type;
+		$ref_brand_type = $this->prepared_query($sql_ref_brand_type, ["type" => $type, "brand" => $brand]);
+		if($ref_brand_type === false || count($ref_brand_type) === 0){
+			return $ref_brand_type;
 		}
-		foreach($ref_mark_type as $item){
+		foreach($ref_brand_type as $item){
 			$models[] = $this->prepared_query($sql_model, ["id" => $item['id']], unique: true);
 		}
 		return $models;
 	}
 
-	public function selectTotalModelByTypeMark(int $type, string $mark): int|false{
-		$sql_ref_mark_type = "SELECT COUNT(RP.id_product) as count FROM REFERENCE_PRODUCTS RP
+	public function selectTotalModelByTypeBrand(int $type, string $brand): int|false{
+		$sql_ref_brand_type = "SELECT COUNT(RP.id_product) as count FROM REFERENCE_PRODUCTS RP
 							INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
 							INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
-						WHERE name=\"mark\" and value=:mark AND type=:type";
-		$res = $this->prepared_query($sql_ref_mark_type, ["type" => $type, "mark" => $mark], unique: true);
+						WHERE name=\"brand\" and value=:brand AND type=:type";
+		$res = $this->prepared_query($sql_ref_brand_type, ["type" => $type, "brand" => $brand], unique: true);
 		if($res === false){
 			return false;
 		}

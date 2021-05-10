@@ -34,14 +34,14 @@ class ReferenceModel extends Model{
 		return $references;
 	}
 
-	public function selectAllByMark(string $mark, int $iteration = 0): array|false{
+	public function selectAllByBrand(string $brand, int $iteration = 0): array|false{
 		$start = 500 * $iteration;
 		$sql = "SELECT RP.id_product as id, RP.buying_price as buying_price, RP.selling_price as selling_price, T.type as type FROM REFERENCE_PRODUCTS RP
     				INNER JOIN TYPES T on RP.type = T.id_type
     				INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
     				INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
-				WHERE S.name=\"mark\" AND value=:mark LIMIT $start, $this->max_row;";
-		$references = $this->prepared_query($sql, ["mark" => $mark]);
+				WHERE S.name=\"brand\" AND value=:brand LIMIT $start, $this->max_row;";
+		$references = $this->prepared_query($sql, ["brand" => $brand]);
 		if($references === false || empty($references)){
 			return $references;
 		}
@@ -55,14 +55,14 @@ class ReferenceModel extends Model{
 		return $references;
 	}
 
-	public function selectAllByTypeMark(int $type, string $mark, int $iteration = 0): array|false{
+	public function selectAllByTypeBrand(int $type, string $brand, int $iteration = 0): array|false{
 		$start = $iteration * 500;
 		$sql = "SELECT RP.id_product as id, RP.buying_price as buying_price, RP.selling_price as selling_price, T.type as type FROM REFERENCE_PRODUCTS RP
     				INNER JOIN TYPES T on RP.type = T.id_type
     				INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
     				INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
-				WHERE S.name=\"mark\" AND value=:mark AND RP.type=:type LIMIT $start, $this->max_row;";
-		$references = $this->prepared_query($sql, ["type" => $type, "mark" => $mark]);
+				WHERE S.name=\"brand\" AND value=:brand AND RP.type=:type LIMIT $start, $this->max_row;";
+		$references = $this->prepared_query($sql, ["type" => $type, "brand" => $brand]);
 		if($references === false || empty($references)){
 			return $references;
 		}
@@ -97,12 +97,12 @@ class ReferenceModel extends Model{
 		return false;
 	}
 
-	public function selectAllMarkType(int $type, int $iteration = 0, bool $limit = true): array|false{
+	public function selectAllBrandType(int $type, int $iteration = 0, bool $limit = true): array|false{
 		$sql = "SELECT S.value as value, S.id_specification as id FROM REFERENCE_PRODUCTS RP
 					INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
 					INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
 					INNER JOIN TYPES T on RP.type = T.id_type
-				WHERE S.name=\"mark\" AND id_type=:type GROUP BY S.value";
+				WHERE S.name=\"brand\" AND id_type=:type GROUP BY S.value";
 		if($limit){
 			$start = $iteration * $this->max_row;
 			$sql .= "LIMIT $start, $this->max_row";
@@ -110,36 +110,36 @@ class ReferenceModel extends Model{
 		return $this->prepared_query($sql, ["type" => $type]);
 	}
 
-	public function selectAllModelByMark(string $mark, int $iteration = 0, $limit = true): array|false{
+	public function selectAllModelByBrand(string $brand, int $iteration = 0, $limit = true): array|false{
 		$start = $iteration * $this->max_row;
-		$sql_ref_mark = "SELECT RP.id_product as id, T.type FROM REFERENCE_PRODUCTS RP
+		$sql_ref_brand = "SELECT RP.id_product as id, T.type FROM REFERENCE_PRODUCTS RP
     						INNER JOIN TYPES T on RP.type = T.id_type
 							INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
 							INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
-						WHERE name=\"mark\" and value=:mark";
+						WHERE name=\"brand\" and value=:brand";
 		if($limit){
-			$sql_ref_mark .= " LIMIT $start, $this->max_row;";
+			$sql_ref_brand .= " LIMIT $start, $this->max_row;";
 		}
 		$sql_model = 	"SELECT value FROM SPECIFICATION S
 							INNER JOIN REF_HAVE_SPEC RHS on S.id_specification = RHS.id_spec
 						WHERE id_product=:id AND name=\"model\";";
-		$ref_mark = $this->prepared_query($sql_ref_mark, ["mark" => $mark]);
-		if($ref_mark === false || count($ref_mark) === 0){
-			return $ref_mark;
+		$ref_brand = $this->prepared_query($sql_ref_brand, ["brand" => $brand]);
+		if($ref_brand === false || count($ref_brand) === 0){
+			return $ref_brand;
 		}
-		foreach($ref_mark as $item){
+		foreach($ref_brand as $item){
 			$models[$item['type']][] = $this->prepared_query($sql_model, ["id" => $item['id']], unique: true)["value"];
 		}
 		return $models;
 	}
 
-	public function selectTotalModelByMark(string $mark){
-		$sql_ref_mark = "SELECT COUNT(RP.id_product) as count FROM REFERENCE_PRODUCTS RP
+	public function selectTotalModelByBrand(string $brand){
+		$sql_ref_brand = "SELECT COUNT(RP.id_product) as count FROM REFERENCE_PRODUCTS RP
     						INNER JOIN TYPES T on RP.type = T.id_type
 							INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
 							INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
-						WHERE name=\"mark\" and value=:mark";
-		return $this->prepared_query($sql_ref_mark, ["mark" => $mark], unique: true);
+						WHERE name=\"brand\" and value=:brand";
+		return $this->prepared_query($sql_ref_brand, ["brand" => $brand], unique: true);
 	}
 
 	public function selectByModel(string $model): array|false{
@@ -159,7 +159,7 @@ class ReferenceModel extends Model{
 		return array_merge($references, $spec["spec"]);
 	}
 
-	public function selectByMarkModel(string $mark, string $model): array|false{
+	public function selectByBrandModel(string $brand, string $model): array|false{
 		$sql = "SELECT id, buying_price, selling_price, type
 				FROM (SELECT COUNT(RP.id_product) as count, RP.id_product as id, RP.selling_price as selling_price, RP.buying_price as buying_price, T.type as type
 					  FROM REFERENCE_PRODUCTS RP
@@ -167,11 +167,11 @@ class ReferenceModel extends Model{
 							INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
 							INNER JOIN TYPES T on RP.type = T.id_type
 					  WHERE (name = \"model\" AND value = :model)
-						 OR (name = \"mark\" AND value = :mark)
+						 OR (name = \"brand\" AND value = :brand)
 					  GROUP BY RP.id_product 
 					 ) S
 				WHERE count=2;";
-		$references = $this->prepared_query($sql, ['model' => $model, 'mark' => $mark], unique: true);
+		$references = $this->prepared_query($sql, ['model' => $model, 'brand' => $brand], unique: true);
 		if($references === false || empty($references)){
 			return $references;
 		}
@@ -199,7 +199,7 @@ class ReferenceModel extends Model{
 		return array_merge($references, $spec["spec"]);
 	}
 
-	public function selectByTypeMarkModel(int $type, string $mark, string $model): array|false{
+	public function selectByTypeBrandModel(int $type, string $brand, string $model): array|false{
 		$sql = "SELECT id, buying_price, selling_price, type
 				FROM (
 				    SELECT COUNT(RP.id_product) as count, RP.id_product as id, RP.selling_price as selling_price, RP.buying_price as buying_price, T.type as type
@@ -208,12 +208,12 @@ class ReferenceModel extends Model{
 						INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
 						INNER JOIN TYPES T on RP.type = T.id_type
 					WHERE ((name = \"model\" AND value = :model)
-						OR (name = \"mark\" AND value = :mark))
+						OR (name = \"brand\" AND value = :brand))
 						AND RP.type=:type
 					GROUP BY RP.id_product 
 					) S
 				WHERE count=2;";
-		$references = $this->prepared_query($sql, ['type' => $type, 'model' => $model, 'mark' => $mark], unique: true);
+		$references = $this->prepared_query($sql, ['type' => $type, 'model' => $model, 'brand' => $brand], unique: true);
 		if($references === false || empty($references)){
 			return $references;
 		}
@@ -223,8 +223,8 @@ class ReferenceModel extends Model{
 		}
 		$spec = $spec['spec'];
 		$references['model'] = $spec['model'];
-		$references['mark'] = $spec['mark'];
-		unset($spec['model'], $spec['mark']);
+		$references['brand'] = $spec['brand'];
+		unset($spec['model'], $spec['brand']);
 		$references['spec'] = $spec;
 		return $references;
 	}

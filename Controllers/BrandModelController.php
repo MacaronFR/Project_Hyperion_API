@@ -6,7 +6,7 @@ namespace Hyperion\API;
 
 use JetBrains\PhpStorm\NoReturn;
 
-class MarkModelController implements Controller{
+class BrandModelController implements Controller{
 
 	private ReferenceModel $rm;
 	private TypeModel $tm;
@@ -44,7 +44,7 @@ class MarkModelController implements Controller{
 		response(204, "No Content");
 	}
 
-	#[NoReturn] private function markByType(array $args){
+	#[NoReturn] private function brandByType(array $args){
 		if(!is_numeric($args['uri_args'][0])){
 			response(400, "Bad Request");
 		}
@@ -56,28 +56,28 @@ class MarkModelController implements Controller{
 			response(400, "Invalid Type");
 		}
 		if(count($args['uri_args']) === 2){
-			$marks = $this->rm->selectAllMarkType((int)$args['uri_args'][0], $args['uri_args'][1]);
+			$brands = $this->rm->selectAllBrandType((int)$args['uri_args'][0], $args['uri_args'][1]);
 		}else{
-			$marks = $this->rm->selectAllMarkType((int)$args['uri_args'][0], limit: false);
+			$brands = $this->rm->selectAllBrandType((int)$args['uri_args'][0], limit: false);
 		}
-		if($marks === false){
+		if($brands === false){
 			response(500, "Internal Server Error");
 		}
-		if(count($marks) === 0){
+		if(count($brands) === 0){
 			response(204, "No content");
 		}
-		foreach($marks as &$mark){
-			unset($mark['id_product']);
+		foreach($brands as &$brand){
+			unset($brand['id_product']);
 		}
-		$marks['totalNotFiltered'] = $marks['total'] = count($marks);
-		response(200, "Mark of type " . $type['type'], $marks);
+		$brands['totalNotFiltered'] = $brands['total'] = count($brands);
+		response(200, "Brand of type " . $type['type'], $brands);
 	}
 
-	#[NoReturn] public function modelByMark(array $args){
+	#[NoReturn] public function modelByBrand(array $args){
 		if(count($args['uri_args']) === 2){
-			$models = $this->rm->selectAllModelByMark($args['uri_args'][0], $args['uri_args'][1]);
+			$models = $this->rm->selectAllModelByBrand($args['uri_args'][0], $args['uri_args'][1]);
 		}else{
-			$models = $this->rm->selectAllModelByMark($args['uri_args'][0], limit: false);
+			$models = $this->rm->selectAllModelByBrand($args['uri_args'][0], limit: false);
 		}
 		if($models === false){
 			response(500, "Internal Server Error");
@@ -85,15 +85,15 @@ class MarkModelController implements Controller{
 		if(empty($models)){
 			response(204, "No Content");
 		}
-		$total = $this->rm->selectTotalModelByMark($args['uri_args'][0]);
+		$total = $this->rm->selectTotalModelByBrand($args['uri_args'][0]);
 		if($total === false){
 			response(500, "Internal Server Error");
 		}
 		$models['total'] = $models['totalNotFiltered'] = (int)$total['count'];
-		response(200, "Models of mark " . $args['uri_args'][0], $models);
+		response(200, "Models of brand " . $args['uri_args'][0], $models);
 	}
 
-	#[NoReturn] public function modelByTypeMark(array $args){
+	#[NoReturn] public function modelByTypeBrand(array $args){
 		if(!is_numeric($args['uri_args'][0])){
 			response(400, "Bad Request");
 		}
@@ -101,9 +101,9 @@ class MarkModelController implements Controller{
 			if(!is_numeric($args['uri_args'][2])){
 				response(400, "Bad Request");
 			}
-			$models = $this->sm->selectAllModelByTypeMark($args['uri_args'][0], $args['uri_args'][1], $args['uri_args'][2]);
+			$models = $this->sm->selectAllModelByTypeBrand($args['uri_args'][0], $args['uri_args'][1], $args['uri_args'][2]);
 		}else{
-			$models = $this->sm->selectAllModelByTypeMark($args['uri_args'][0], $args['uri_args'][1], limit: false);
+			$models = $this->sm->selectAllModelByTypeBrand($args['uri_args'][0], $args['uri_args'][1], limit: false);
 		}
 		if($models === false){
 			response(500, "Internal Server Error");
@@ -111,35 +111,35 @@ class MarkModelController implements Controller{
 		if(empty($models)){
 			response(204, "No Content");
 		}
-		$total = $this->sm->selectTotalModelByTypeMark($args['uri_args'][0], $args['uri_args'][1]);
+		$total = $this->sm->selectTotalModelByTypeBrand($args['uri_args'][0], $args['uri_args'][1]);
 		if($total === false){
 			response(500, "Internal Server Error");
 		}
 		$models['total'] = $models['totalNotFiltered'] = $total;
-		response(200, "Models of mark " . $args['uri_args'][1], $models);
+		response(200, "Models of brand " . $args['uri_args'][1], $models);
 	}
 
-	#[NoReturn] public function mark($args){
+	#[NoReturn] public function brand($args){
 		if(count($args['uri_args']) === 2){
 			if(!is_numeric($args['uri_args'][1])){
 				response(400, "Bad Request");
 			}
-			$mark = $this->sm->selectAllMark($args['uri_args'][1]);
+			$brand = $this->sm->selectAllBrand($args['uri_args'][1]);
 		}else{
-			$mark = $this->sm->selectAllMark(limit: false);
+			$brand = $this->sm->selectAllBrand(limit: false);
 		}
-		if($mark === false){
+		if($brand === false){
 			response(500, "Internal Server Error");
 		}
-		if(empty($mark)){
+		if(empty($brand)){
 			response(204, "No content");
 		}
-		$total = $this->sm->selectTotalMark();
+		$total = $this->sm->selectTotalBrand();
 		if($total === false){
 			response(500, "Internal Server Error");
 		}
-		$mark['totalNotFiltered'] = $mark['total'] = (int)$total['count'];
-		response(200, "Marks", $mark);
+		$brand['totalNotFiltered'] = $brand['total'] = (int)$total['count'];
+		response(200, "Brands", $brand);
 	}
 
 	#[NoReturn] public function model($args){
@@ -192,7 +192,7 @@ class MarkModelController implements Controller{
 			response(500, "Internal Server Error");
 		}
 		$models['totalNotFiltered'] = $models['total'] = $total['count'];
-		response(200, "Mark of type " . $type['type'], $models);
+		response(200, "Brand of type " . $type['type'], $models);
 	}
 
 	/**
@@ -201,14 +201,14 @@ class MarkModelController implements Controller{
 	#[NoReturn] public function get(array $args){
 		if($args['additional'][0] === 'type'){
 			$this->type($args);
-		}elseif($args['additional'][0] === "type_mark"){
-			$this->markByType($args);
-		}elseif($args['additional'][0] === "mark_model"){
-			$this->modelByMark($args);
-		}elseif($args['additional'][0] === "type_mark_model"){
-			$this->modelByTypeMark($args);
-		}elseif($args['additional'][0] === "mark"){
-			$this->mark($args);
+		}elseif($args['additional'][0] === "type_brand"){
+			$this->brandByType($args);
+		}elseif($args['additional'][0] === "brand_model"){
+			$this->modelByBrand($args);
+		}elseif($args['additional'][0] === "type_brand_model"){
+			$this->modelByTypeBrand($args);
+		}elseif($args['additional'][0] === "brand"){
+			$this->brand($args);
 		}elseif($args['additional'][0] === "model"){
 			$this->model($args);
 		}elseif($args['additional'][0] === "type_model"){

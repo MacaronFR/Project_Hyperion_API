@@ -39,7 +39,7 @@ class ProductHierarchyController implements Controller{
 	}
 
 
-	#[NoReturn] private function mark_prod(array $args){
+	#[NoReturn] private function brand_prod(array $args){
 		if(count($args['uri_args']) === 2){
 			if(!is_numeric($args['uri_args'][1])){
 				response(400, "Bad Request");
@@ -51,18 +51,18 @@ class ProductHierarchyController implements Controller{
 		if(!isset($args['uri_args'][0])){
 			response(400, "Bad Request");
 		}
-		$mark = $args['uri_args'][0];
-		$reference = $this->pm->selectAllByMark($mark, $iteration);
+		$brand = $args['uri_args'][0];
+		$reference = $this->pm->selectAllByBrand($brand, $iteration);
 		if($reference === false){
 			response(500, "Internal Server Error");
 		}
 		if(empty($reference)){
 			response(204, "No Content");
 		}
-		response(200, "Product of mark $mark", $reference);
+		response(200, "Product of brand $brand", $reference);
 	}
 
-	#[NoReturn] private function type_mark_prod($args){
+	#[NoReturn] private function type_brand_prod($args){
 		if(count($args['uri_args']) === 3){
 			if(!is_numeric($args['uri_args'][2])){
 				response(400, "Bad Request");
@@ -74,14 +74,14 @@ class ProductHierarchyController implements Controller{
 		if(!is_numeric($args['uri_args'][0])){
 			response(400, "Bad request");
 		}
-		$prod = $this->pm->selectAllByTypeMark((int)$args['uri_args'][0], $args['uri_args'][1], $iteration);
+		$prod = $this->pm->selectAllByTypeBrand((int)$args['uri_args'][0], $args['uri_args'][1], $iteration);
 		if($prod === false){
 			response(500, "Internal Server Error");
 		}
 		if(empty($prod)){
 			response(204, "No content");
 		}
-		response(200, "Product of type " . $prod[0]['type'] . ", mark " . $prod[0]['mark'], $prod);
+		response(200, "Product of type " . $prod[0]['type'] . ", brand " . $prod[0]['brand'], $prod);
 	}
 
 	#[NoReturn] private function model_prod($args){
@@ -124,7 +124,7 @@ class ProductHierarchyController implements Controller{
 		response(200, "Product of type " . $product[0]['type'] . ", model " . $product[0]['model'] . ", page $iteration", $product);
 	}
 
-	#[NoReturn] public function mark_model_prod(array $args){
+	#[NoReturn] public function brand_model_prod(array $args){
 		if(count($args['uri_args']) === 3){
 			if(!is_numeric($args['uri_args'][2])){
 				response(400, "Bad Request");
@@ -133,17 +133,17 @@ class ProductHierarchyController implements Controller{
 		}else{
 			$iteration = 0;
 		}
-		$products = $this->pm->selectAllByMarkModel($args['uri_args'][0], $args['uri_args'][1], $iteration);
+		$products = $this->pm->selectAllByBrandModel($args['uri_args'][0], $args['uri_args'][1], $iteration);
 		if($products === false){
 			response(500, "Internal Server Error");
 		}
 		if(empty($products)){
 			response(204, "No content");
 		}
-		response(200, "Product of mark , model ", $products);
+		response(200, "Product of brand , model ", $products);
 	}
 
-	#[NoReturn] public function type_mark_model_prod(array $args){
+	#[NoReturn] public function type_brand_model_prod(array $args){
 		if(count($args['uri_args']) === 4){
 			if(!is_numeric($args['uri_args'][3])){
 				response(400, "Bad Request");
@@ -155,32 +155,32 @@ class ProductHierarchyController implements Controller{
 		if(!is_numeric($args['uri_args'][0])){
 			response(400, "Bad Request");
 		}
-		$product = $this->pm->selectAllByTypeMarkModel($args['uri_args'][0], $args['uri_args'][1], $args['uri_args'][2], $iteration);
+		$product = $this->pm->selectAllByTypeBrandModel($args['uri_args'][0], $args['uri_args'][1], $args['uri_args'][2], $iteration);
 		if($product === false){
 			response(500, "Internal Server Error");
 		}
 		if(empty($product)){
 			response(204, "No Content");
 		}
-		response(200, "Product of type " . $product[0]['type'] . ", mark " . $product[0]["mark"] . ", model " . $product[0]['model'], $product);
+		response(200, "Product of type " . $product[0]['type'] . ", brand " . $product[0]["brand"] . ", model " . $product[0]['model'], $product);
 	}
 
 	#[NoReturn] public function get(array $args){
 		if(isset($args['additional'])){
 			if($args['additional'][0] === 'type_product'){
 				$this->type_product($args);
-			}elseif($args['additional'][0] === 'mark_product'){
-				$this->mark_prod($args);
-			}elseif($args['additional'][0] === 'type_mark_product'){
-				$this->type_mark_prod($args);
+			}elseif($args['additional'][0] === 'brand_product'){
+				$this->brand_prod($args);
+			}elseif($args['additional'][0] === 'type_brand_product'){
+				$this->type_brand_prod($args);
 			}elseif($args['additional'][0] === 'model_product'){
 				$this->model_prod($args);
-			}elseif($args['additional'][0] === 'mark_model_product'){
-				$this->mark_model_prod($args);
+			}elseif($args['additional'][0] === 'brand_model_product'){
+				$this->brand_model_prod($args);
 			}elseif($args['additional'][0] === 'type_model_product'){
 				$this->type_model_prod($args);
-			}elseif($args['additional'][0] === 'type_mark_model_product'){
-				$this->type_mark_model_prod($args);
+			}elseif($args['additional'][0] === 'type_brand_model_product'){
+				$this->type_brand_model_prod($args);
 			}
 		}
 	}

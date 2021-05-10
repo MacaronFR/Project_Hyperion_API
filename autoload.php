@@ -24,7 +24,7 @@ require_once "Models/UserModel.php";
 require_once "Controllers/Controller.php";
 require_once "Controllers/CategoryController.php";
 require_once "Controllers/ConnectionController.php";
-require_once "Controllers/MarkModelController.php";
+require_once "Controllers/BrandModelController.php";
 require_once "Controllers/OAuthController.php";
 require_once "Controllers/ProductHierarchyController.php";
 require_once "Controllers/ProfileController.php";
