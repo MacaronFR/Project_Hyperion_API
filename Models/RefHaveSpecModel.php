@@ -10,7 +10,8 @@ class RefHaveSpecModel extends Model{
     protected string $table_name = "REF_HAVE_SPEC";
     protected array $column = [
         "product"=>"id_product",
-        "spec"=>"id_spec"
+        "spec"=>"id_spec",
+		"value" => "value"
     ];
 	public function selectAllBySpec(int $spec, int $iteration = 0, bool $limit = true): array|false{
 		$start = $this->max_row * $iteration;
@@ -26,13 +27,12 @@ class RefHaveSpecModel extends Model{
 	}
 
 	public function selectAllFromRef(int $id_ref): array|false{
-		$sql = "SELECT id_product as product, id_spec as spec, id_ref_have_spec as id FROM REF_HAVE_SPEC WHERE id_ref_have_spec=:id";
+		$sql = "SELECT id_product as product, id_spec as spec, id_ref_have_spec as id, value as value FROM REF_HAVE_SPEC WHERE id_ref_have_spec=:id";
 		return $this->prepared_query($sql, ['id' => $id_ref]);
 	}
 
 	public function deleteFromRef(int $id_ref): bool{
 		$sql = "DELETE FROM REF_HAVE_SPEC WHERE id_product=:id";
-		var_dump($sql);
 		return $this->prepared_query($sql, ['id' => $id_ref] ,fetch: false);
 	}
 }

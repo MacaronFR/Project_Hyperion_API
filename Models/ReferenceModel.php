@@ -253,7 +253,6 @@ class ReferenceModel extends Model{
 		$sql .= "ORDER BY $sort $order ";
 		$sql .= "LIMIT $start, $this->max_row;";
 		$search = "%" . $search . "%";
-		var_dump($sql);
 		return $this->prepared_query($sql, ["search" => $search]);
 	}
 }
