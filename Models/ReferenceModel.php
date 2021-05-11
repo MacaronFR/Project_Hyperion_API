@@ -40,7 +40,7 @@ class ReferenceModel extends Model{
     				INNER JOIN TYPES T on RP.type = T.id_type
     				INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
     				INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
-				WHERE S.name=\"brand\" AND value=:brand LIMIT $start, $this->max_row;";
+				WHERE S.name=\"brand\" AND S.value=:brand LIMIT $start, $this->max_row;";
 		$references = $this->prepared_query($sql, ["brand" => $brand]);
 		if($references === false || empty($references)){
 			return $references;
@@ -61,7 +61,7 @@ class ReferenceModel extends Model{
     				INNER JOIN TYPES T on RP.type = T.id_type
     				INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
     				INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
-				WHERE S.name=\"brand\" AND value=:brand AND RP.type=:type LIMIT $start, $this->max_row;";
+				WHERE S.name=\"brand\" AND S.value=:brand AND RP.type=:type LIMIT $start, $this->max_row;";
 		$references = $this->prepared_query($sql, ["type" => $type, "brand" => $brand]);
 		if($references === false || empty($references)){
 			return $references;
@@ -116,11 +116,11 @@ class ReferenceModel extends Model{
     						INNER JOIN TYPES T on RP.type = T.id_type
 							INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
 							INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
-						WHERE name=\"brand\" and value=:brand";
+						WHERE name=\"brand\" and S.value=:brand";
 		if($limit){
 			$sql_ref_brand .= " LIMIT $start, $this->max_row;";
 		}
-		$sql_model = 	"SELECT value FROM SPECIFICATION S
+		$sql_model = 	"SELECT S.value FROM SPECIFICATION S
 							INNER JOIN REF_HAVE_SPEC RHS on S.id_specification = RHS.id_spec
 						WHERE id_product=:id AND name=\"model\";";
 		$ref_brand = $this->prepared_query($sql_ref_brand, ["brand" => $brand]);
@@ -138,7 +138,7 @@ class ReferenceModel extends Model{
     						INNER JOIN TYPES T on RP.type = T.id_type
 							INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
 							INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
-						WHERE name=\"brand\" and value=:brand";
+						WHERE name=\"brand\" and S.value=:brand";
 		return $this->prepared_query($sql_ref_brand, ["brand" => $brand], unique: true);
 	}
 
@@ -147,7 +147,7 @@ class ReferenceModel extends Model{
 					INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
 					INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
 					INNER JOIN TYPES T on RP.type = T.id_type
-				WHERE name=\"model\" AND value=:model;";
+				WHERE name=\"model\" AND S.value=:model;";
 		$references = $this->prepared_query($sql, ["model" => $model], unique: true);
 		if($references === false || empty($references)){
 			return $references;
@@ -166,8 +166,8 @@ class ReferenceModel extends Model{
 							INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
 							INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
 							INNER JOIN TYPES T on RP.type = T.id_type
-					  WHERE (name = \"model\" AND value = :model)
-						 OR (name = \"brand\" AND value = :brand)
+					  WHERE (name = \"model\" AND S.value = :model)
+						 OR (name = \"brand\" AND S.value = :brand)
 					  GROUP BY RP.id_product 
 					 ) S
 				WHERE count=2;";
@@ -187,7 +187,7 @@ class ReferenceModel extends Model{
 					INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
 					INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
 					INNER JOIN TYPES T on RP.type = T.id_type
-				WHERE name=\"model\" AND value=:model AND RP.type=:type;";
+				WHERE name=\"model\" AND S.value=:model AND RP.type=:type;";
 		$references = $this->prepared_query($sql, ["model" => $model, 'type' => $type], unique: true);
 		if($references === false || empty($references)){
 			return $references;
