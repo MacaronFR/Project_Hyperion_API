@@ -52,11 +52,11 @@ class SpecificationModel extends Model{
 		$sql_ref_brand_type = "SELECT RP.id_product as id FROM REFERENCE_PRODUCTS RP
 							INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
 							INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
-						WHERE name=\"brand\" and value=:brand AND type=:type";
+						WHERE name=\"brand\" and S.value=:brand AND type=:type";
 		if($limit){
 			$sql_ref_brand_type .= " LIMIT $start, $this->max_row;";
 		}
-		$sql_model = "SELECT id_specification as id, value FROM SPECIFICATION S
+		$sql_model = "SELECT id_specification as id, S.value FROM SPECIFICATION S
 							INNER JOIN REF_HAVE_SPEC RHS on S.id_specification = RHS.id_spec
 						WHERE id_product=:id AND name=\"model\";";
 		$ref_brand_type = $this->prepared_query($sql_ref_brand_type, ["type" => $type, "brand" => $brand]);
@@ -73,7 +73,7 @@ class SpecificationModel extends Model{
 		$sql_ref_brand_type = "SELECT COUNT(RP.id_product) as count FROM REFERENCE_PRODUCTS RP
 							INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
 							INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
-						WHERE name=\"brand\" and value=:brand AND type=:type";
+						WHERE name=\"brand\" and S.value=:brand AND type=:type";
 		$res = $this->prepared_query($sql_ref_brand_type, ["type" => $type, "brand" => $brand], unique: true);
 		if($res === false){
 			return false;
@@ -83,7 +83,7 @@ class SpecificationModel extends Model{
 
 	public function selectAllModel(int $iteration = 0, bool $limit = true): array|false{
 		$sql = "SELECT
-					value as value,
+					S.value as value,
        				TYPES.type as type
 				FROM SPECIFICATION S
 				INNER JOIN
