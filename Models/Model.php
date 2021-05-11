@@ -135,7 +135,7 @@ abstract class Model{
 	 * @return int|false Select the total row in the table
 	 */
 	public function selectTotal(): int|false{
-		$sql = "SELECT COUNT($this->id_name) as count FROM $this->table_name";
+		$sql = "SELECT COUNT($this->id_name) as count FROM $this->table_name WHERE $this->id_name<>0";
 		$res = $this->query($sql);
 		if($res !== false){
 			return (int)$res[0]['count'];
@@ -163,7 +163,7 @@ abstract class Model{
 		foreach($this->column as $item){
 			$sql .= "$item LIKE :search OR ";
 		}
-		$sql .= "$this->id_name LIKE :search ) AND $this->id_name<>0";
+		$sql .= "$this->id_name LIKE :search ) AND $this->id_name<>0 ";
 		$sql .= "ORDER BY $sort $order ";
 		$sql .= "LIMIT $start, $this->max_row;";
 		$search = "%" . $search . "%";
@@ -180,11 +180,11 @@ abstract class Model{
 				return false;
 			}
 		}
-		$sql = "SELECT COUNT($this->id_name) as count FROM $this->table_name WHERE ";
+		$sql = "SELECT COUNT($this->id_name) as count FROM $this->table_name WHERE (";
 		foreach($this->column as $item){
 			$sql .= "$item LIKE :search OR ";
 		}
-		$sql .= "$this->id_name LIKE :search ";
+		$sql .= "$this->id_name LIKE :search ) AND $this->id_name<>0 ";
 		$sql .= "ORDER BY $sort $order ";
 		$search = "%" . $search . "%";
 		$total = $this->prepared_query($sql, ["search" => $search], unique: true);
