@@ -125,7 +125,7 @@ abstract class Model{
 			$sql .= " $item as $key,";
 		}
 		$sql .= " $this->id_name as id";
-		$sql .= " FROM $this->table_name";
+		$sql .= " FROM $this->table_name WHERE $this->id_name<>0";
 		if($limit)
 			$sql .= " LIMIT $start, $this->max_row";
 		return $this->query($sql);
@@ -159,11 +159,11 @@ abstract class Model{
 			$sql .= " $item as $key,";
 		}
 		$sql .= " $this->id_name as id FROM $this->table_name ";
-		$sql .= "WHERE ";
+		$sql .= "WHERE (";
 		foreach($this->column as $item){
 			$sql .= "$item LIKE :search OR ";
 		}
-		$sql .= "$this->id_name LIKE :search ";
+		$sql .= "$this->id_name LIKE :search ) AND $this->id_name<>0";
 		$sql .= "ORDER BY $sort $order ";
 		$sql .= "LIMIT $start, $this->max_row;";
 		$search = "%" . $search . "%";
