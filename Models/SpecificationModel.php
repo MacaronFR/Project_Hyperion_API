@@ -160,4 +160,14 @@ class SpecificationModel extends Model{
 					S.`name` = \"model\"";
 		return $this->prepared_query($sql, ['type' => $type], unique: true);
 	}
+
+	public function selectBrand(string $name): array|false{
+		$sql = "SELECT $this->id_name FROM $this->table_name WHERE name=\"brand\" AND value=:value";
+		return $this->prepared_query($sql, ['value' => $name], unique: true);
+	}
+
+	public function selectModel(string $name): array|false{
+		$sql = "SELECT $this->id_name FROM $this->table_name WHERE name=\"model\" AND value=:value";
+		return $this->prepared_query($sql, ['value' => $name], unique: true);
+	}
 }

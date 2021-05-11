@@ -3,7 +3,7 @@
 use \Hyperion\API\{OAuthController,ConnectionController,StoreController,ProfileController,CategoryController};
 use \Hyperion\API\Router;
 use \Hyperion\API\{ProductHierarchyController,ReferenceHierarchyController,BrandModelController,SpecController};
-use \Hyperion\API\{TypeController};
+use Hyperion\API\{OfferController, TypeController};
 
 require_once "autoload.php";
 
@@ -110,6 +110,8 @@ $rt->get("/reference/detail{/*{/search/*{/order/*/sort/*}}}",ReferenceHierarchyC
 $rt->post('/reference/*', ReferenceHierarchyController::class);
 // /reference/{token}/{id}
 $rt->delete("/reference/*/*", ReferenceHierarchyController::class);
+// /offer/{token}
+$rt->post("/offer/*", OfferController::class);
 if(!$rt->getRouted()){
 	response(404, "Not Found");
 }
