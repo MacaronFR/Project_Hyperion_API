@@ -144,7 +144,7 @@ class OfferController implements Controller{
 					response(500, "Internal Server Error");
 				}
 			}
-			response(201, "Created");
+			response(201, "Created", ['offer' => $offer_id]);
 		}else{
 			$offer_id = $this->om->insert(['offer' => 0, 'status' => 1, 'user' => $user['user']]);
 			if($offer_id === false){
@@ -154,7 +154,7 @@ class OfferController implements Controller{
 			if($product_id === false){
 				response(500, "Internal Server Error");
 			}
-			response(201, "Created");
+			response(201, "Created", ['offer' => $offer_id]);
 		}
 	}
 	/**
