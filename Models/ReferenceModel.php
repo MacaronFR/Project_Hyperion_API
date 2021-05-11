@@ -207,8 +207,8 @@ class ReferenceModel extends Model{
 						INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
 						INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
 						INNER JOIN TYPES T on RP.type = T.id_type
-					WHERE ((name = \"model\" AND value = :model)
-						OR (name = \"brand\" AND value = :brand))
+					WHERE ((S.name = \"model\" AND S.value = :model)
+						OR (S.name = \"brand\" AND S.value = :brand))
 						AND RP.type=:type
 					GROUP BY RP.id_product 
 					) S

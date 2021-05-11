@@ -35,4 +35,9 @@ class RefHaveSpecModel extends Model{
 		$sql = "DELETE FROM REF_HAVE_SPEC WHERE id_product=:id";
 		return $this->prepared_query($sql, ['id' => $id_ref] ,fetch: false);
 	}
+
+	public function selectBySpecRef(int $spec, int $ref){
+		$sql = "SELECT $this->id_name as id, value as value FROM $this->table_name WHERE id_spec=:spec AND id_product=:product";
+		return $this->prepared_query($sql, ['spec' => $spec, 'product' => $ref], unique: true);
+	}
 }
