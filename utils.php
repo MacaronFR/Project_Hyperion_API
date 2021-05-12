@@ -61,7 +61,13 @@ function checkValidity(string $datetime): bool{
 function checkToken(string $token, int $level): bool{
 	$tm = new TokenModel();
 	$res = $tm->selectByToken($token);
-	return $res !== false && checkValidity($res['end']) && $res['scope'] < $level;
+	if($res !== false && checkValidity($res['end']) && $res['scope'] < $level){
+		$end = new DateTime();
+		$end->add(new DateInterval("PT2H"));
+		$tm->update($res['id'], ['end' => $end->format("Y-m-d H:i:s")]);
+		return true;
+	}
+	return false;
 }
 
 function API_log(string $token, string $table, string $message): bool{
