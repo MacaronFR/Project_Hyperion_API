@@ -85,3 +85,10 @@ function API_log(string $token, string $table, string $message): bool{
 	$res = $lm->insert(['action' => "Operation on $table by user $username on client ${client['name']}\n\t$message", "user" => $user['id'], "client" => $client['id']]);
 	return $res === false;
 }
+
+function replace_file_ext(string $org, string $new_ext): string{
+	$exp = explode('.', $org);
+	array_pop($exp);
+	$exp[] = $new_ext;
+	return join(".", $exp);
+}

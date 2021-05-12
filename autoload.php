@@ -13,6 +13,7 @@ require_once "Models/OffersModel.php";
 require_once "Models/PackagesModel.php";
 require_once "Models/ProductInCartModel.php";
 require_once "Models/ProductModel.php";
+require_once "Models/ProductPicturesModel.php";
 require_once "Models/ProductSpecModel.php";
 require_once "Models/ProjectModel.php";
 require_once "Models/ReferenceModel.php";

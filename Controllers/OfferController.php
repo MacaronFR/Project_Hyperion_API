@@ -19,6 +19,9 @@ class OfferController implements Controller{
 	private StateModel $stm;
 	private ProductModel $pm;
 	private TokenModel $tom;
+	private FilesModel $fm;
+	private ProductPicturesModel $ppm;
+	private array $auth_type = ['image/png' => 'png', "image/jpeg" => 'jpg'];
 
 	public function __construct(){
 		$this->cm = new CategoryModel();
@@ -31,6 +34,8 @@ class OfferController implements Controller{
 		$this->stm = new StateModel();
 		$this->pm = new ProductModel();
 		$this->tom = new TokenModel();
+		$this->fm = new  FilesModel();
+		$this->ppm = new ProductPicturesModel();
 	}
 
 	#[NoReturn] public function getOfferById(array $args){
@@ -60,6 +65,20 @@ class OfferController implements Controller{
 		if($type === false){
 			response(500, "Internal ServeR Error");
 		}
+		$pictures_id = $this->ppm->selectAllByProduct($product['id']);
+		if($pictures_id === false){
+			response(500, "Internal Server Error");
+		}
+		if(!empty($pictures_id)){
+			foreach($pictures_id as $pid){
+				$f = $this->fm->selectWithB64($pid['file']);
+				if($f === false){
+					response(500, "Internal Server Error");
+				}
+				unset($f['file_path'], $f['creator'], $f['id']);
+				$files[] = $f;
+			}
+		}
 		$res = [
 			'id_offer' => $offer['id'],
 			'offer' => $offer['offer'],
@@ -68,7 +87,8 @@ class OfferController implements Controller{
 			'id_product' => $product['id'],
 			'status' => $offer['status'],
 			'spec' => $prod_detail['spec'],
-			'type' => $type['type']
+			'type' => $type['type'],
+			'files' => $files ?? []
 		];
 		response(200, "Offer", $res);
 	}
@@ -102,13 +122,19 @@ class OfferController implements Controller{
 		if(!checkToken($args['uri_args'][0], 4)){
 			response(403, "Forbidden");
 		}
-		$tokm = new TokenModel();
-		$user = $tokm->selectByToken($args['uri_args'][0]);
-		if($user === false){
+
+		$user_token = $this->tom->selectByToken($args['uri_args'][0]);
+		if($user_token === false){
 			response(500, "Internal Server Error");
 		}
-		if(!isset($args['post_args']['cat'], $args['post_args']['type'], $args['post_args']['brand'], $args['post_args']['model'], $args['post_args']['state'])){
+		if(!isset($args['post_args']['cat'], $args['post_args']['type'], $args['post_args']['brand'], $args['post_args']['model'], $args['post_args']['state'], $args['post_args']['files']) || count($args['post_args']['files']) > 3){
 			response(400, "Bad Request");
+		}
+		foreach($args['post_args']['files'] as &$f){
+			if(!isset($f['content'], $f['type'], $f['filename']) || !in_array($f['type'], array_keys($this->auth_type))){
+				response(400, "Bad Request");
+			}
+			$f['filename'] = replace_file_ext($f['filename'], $this->auth_type[$f['type']]);
 		}
 		if($args['post_args']['cat'] !== "undefined"){
 			if(!is_numeric($args['post_args']['cat']) || $this->cm->select($args['post_args']['cat']) === false){
@@ -187,7 +213,7 @@ class OfferController implements Controller{
 				}
 			}
 			$offer = ((double)$ref['buying_price'] + $bonus) * (100 - $state['penality']) / 100;
-			$offer_id = $this->om->insert(['offer' => $offer, 'status' => 1, 'user' => $user['user']]);
+			$offer_id = $this->om->insert(['offer' => $offer, 'status' => 1, 'user' => $user_token['user']]);
 			if($offer_id === false){
 				response(500, "Internal Server Error");
 			}
@@ -200,10 +226,8 @@ class OfferController implements Controller{
 					response(500, "Internal Server Error");
 				}
 			}
-			API_log($args['uri_args'][0], "OFFER-PRODUCT-PRODUCT_HAVE_SPEC", "created offer, product and specification linked");
-			response(201, "Created", ['offer' => $offer_id]);
 		}else{
-			$offer_id = $this->om->insert(['offer' => 0, 'status' => 1, 'user' => $user['user']]);
+			$offer_id = $this->om->insert(['offer' => 0, 'status' => 1, 'user' => $user_token['user']]);
 			if($offer_id === false){
 				response(500, "Internal Server Error");
 			}
@@ -211,9 +235,22 @@ class OfferController implements Controller{
 			if($product_id === false){
 				response(500, "Internal Server Error");
 			}
-			API_log($args['uri_args'][0], "OFFER-PRODUCT-PRODUCT_HAVE_SPEC", "created offer, product and specification linked");
-			response(201, "Created", ['offer' => $offer_id]);
 		}
+		foreach($args['post_args']['files'] as $file){
+			$save_name = md5(time() . $file['filename']) . ".b64";
+			if(file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/images/offer/" . $save_name, $file['content']) === false){
+				response(500, "Internal Server Error");
+			}
+			$file_id = $this->fm->insert(['file_path' => "images/offer/" . $save_name, "file_name" => $file['filename'], 'type' => $file['type'], 'creator' => $user_token['user']]);
+			if($file_id === false){
+				response(500, "Internal Server Error");
+			}
+			if($this->ppm->insert(['file' => $file_id, 'product' => $product_id]) === false){
+				response(500, "Internal Server Error");
+			}
+		}
+		API_log($args['uri_args'][0], "OFFER-PRODUCT-PRODUCT_HAVE_SPEC", "created offer, product and specification linked");
+		response(201, "Created", ['offer' => $offer_id]);
 	}
 	/**
 	 * @inheritDoc
