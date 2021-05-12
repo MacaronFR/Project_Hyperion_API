@@ -39,7 +39,7 @@ class ProductModel extends Model{
 	}
 
 	public function selectWithDetail(int $id): array|false{
-		$sql1 = "SELECT name, value FROM PRODUCTS INNER JOIN REFERENCE_PRODUCTS RP on PRODUCTS.id_ref = RP.id_product INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification WHERE PRODUCTS.id_product=:id";
+		$sql1 = "SELECT name, S.value FROM PRODUCTS INNER JOIN REFERENCE_PRODUCTS RP on PRODUCTS.id_ref = RP.id_product INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification WHERE PRODUCTS.id_product=:id";
 		$sql2 = "SELECT name, value FROM PRODUCTS INNER JOIN PRODUCT_HAVE_SPEC PHS on PRODUCTS.id_product = PHS.id_product INNER JOIN SPECIFICATION S on PHS.id_spec = S.id_specification WHERE PRODUCTS.id_product=:id";
 		$ref_spec = $this->prepared_query($sql1, ["id" => $id]);
 		$prod_spec = $this->prepared_query($sql2, ["id" => $id]);

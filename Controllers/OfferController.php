@@ -18,6 +18,7 @@ class OfferController implements Controller{
 	private ProductSpecModel $psm;
 	private StateModel $stm;
 	private ProductModel $pm;
+	private TokenModel $tom;
 
 	public function __construct(){
 		$this->cm = new CategoryModel();
@@ -29,19 +30,74 @@ class OfferController implements Controller{
 		$this->psm = new ProductSpecModel();
 		$this->stm = new StateModel();
 		$this->pm = new ProductModel();
+		$this->tom = new TokenModel();
 	}
 
+	#[NoReturn] public function getOfferById(array $args){
+		if(!is_numeric($args['uri_args'][1])){
+			response(400, "Bad Request");
+		}
+		$offer = $this->om->select($args['uri_args'][1]);
+		if($offer === false){
+			response(500, "Internal Server Error");
+		}
+		if($offer['user'] !== $args['additional']['user'] && !checkToken($args['uri_args'][0], 3)){
+			response(403, "Forbidden");
+		}
+		$product = $this->pm->select($offer['id'], "offer");
+		if($product === false){
+			response(500, "Internal Server Error");
+		}
+		$prod_detail = $this->pm->selectWithDetail($product['id']);
+		if($prod_detail === false){
+			response(500, "Internal Server Error");
+		}
+		$reference = $this->rm->select($product['ref']);
+		if($reference === false){
+			response(500, "Internal Server Error");
+		}
+		$type = $this->tm->select($reference['type']);
+		if($type === false){
+			response(500, "Internal ServeR Error");
+		}
+		$res = [
+			'id_offer' => $offer['id'],
+			'offer' => $offer['offer'],
+			'counter_offer' => $offer['counter_offer'],
+			'state' => $product['state'],
+			'id_product' => $product['id'],
+			'status' => $offer['status'],
+			'spec' => $prod_detail['spec'],
+			'type' => $type['type']
+		];
+		response(200, "Offer", $res);
+	}
+
+
+	#[NoReturn] public function getAllOffer(){
+		response(200, "Under Construction");
+		//TODO all offer for user or admin
+	}
 	/**
 	 * @inheritDoc
 	 */
 	public function get(array $args){
-		// TODO: Implement get() method.
+		if(!checkToken($args['uri_args'][0], 4)){
+			response(403, "Forbidden");
+		}
+		$token = $this->tom->selectByToken($args['uri_args'][0]);
+		if($args['additional'][0] === 'id'){
+			$args['additional'] = $token;
+			$this->getOfferById($args);
+		}elseif($args['additional'][0] === 'search'){
+			$this->getAllOffer();
+		}
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function post(array $args){
+	#[NoReturn] public function post(array $args){
 		$undefined = false;
 		if(!checkToken($args['uri_args'][0], 4)){
 			response(403, "Forbidden");
@@ -144,6 +200,7 @@ class OfferController implements Controller{
 					response(500, "Internal Server Error");
 				}
 			}
+			API_log($args['uri_args'][0], "OFFER-PRODUCT-PRODUCT_HAVE_SPEC", "created offer, product and specification linked");
 			response(201, "Created", ['offer' => $offer_id]);
 		}else{
 			$offer_id = $this->om->insert(['offer' => 0, 'status' => 1, 'user' => $user['user']]);
@@ -154,6 +211,7 @@ class OfferController implements Controller{
 			if($product_id === false){
 				response(500, "Internal Server Error");
 			}
+			API_log($args['uri_args'][0], "OFFER-PRODUCT-PRODUCT_HAVE_SPEC", "created offer, product and specification linked");
 			response(201, "Created", ['offer' => $offer_id]);
 		}
 	}

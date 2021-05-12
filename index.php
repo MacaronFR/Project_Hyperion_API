@@ -110,6 +110,9 @@ $rt->get("/reference/detail{/*{/search/*{/order/*/sort/*}}}",ReferenceHierarchyC
 $rt->post('/reference/*', ReferenceHierarchyController::class);
 // /reference/{token}/{id}
 $rt->delete("/reference/*/*", ReferenceHierarchyController::class);
+// /offer/{token}/{id} || /offer/{token}[/{page}[/search/*[/order/*/sort/*]]]
+$rt->get("/offer/*/*", OfferController::class, ['id']);
+$rt->get("/reference{/*{/search/*{/order/*/sort/*}}}",ReferenceHierarchyController::class, ['search']);
 // /offer/{token}
 $rt->post("/offer/*", OfferController::class);
 if(!$rt->getRouted()){
