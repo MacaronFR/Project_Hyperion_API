@@ -16,6 +16,66 @@ class ProductHierarchyController implements Controller{
 		$this->pm = new ProductModel();
 	}
 
+	#[NoReturn] private function prod(array $args, bool $detail = false){
+		$page = 0;
+		if(count($args['uri_args']) >= 1){
+			if(is_numeric($args['uri_args'][0])){
+				$page = (int)$args['uri_args'][0];
+			}else{
+				response(400, "Bad Request");
+			}
+		}
+		if(count($args['uri_args']) > 1){
+			$order = $args['uri_args'][2] ?? 'ASC';
+			$order = strtoupper($order);
+			if($order !== "ASC" && $order !== "DESC"){
+				response(409, "Bad Request");
+			}
+			$search = $args['uri_args'][1];
+			$sort = $args['uri_args'][3] ?? 'id';
+			$result = $this->pm->selectAllFilter($search, $order, $sort, $page);
+			$totalFilter = $this->pm->selectTotalFilter($search, $order, $sort);
+			$total = $this->pm->selectTotal();
+		}else{
+			if(count($args['uri_args']) === 0){
+				$result = $this->pm->selectAll(limit: false);
+			}else{
+				$result = $this->pm->selectAll($page);
+			}
+			$total = $this->pm->selectTotal();
+			$totalFilter = $total;
+		}
+		if($result === false){
+			response(500, "Internal Server Error");
+		}
+		if(empty($result)){
+			response(204, "No content");
+		}
+		if($total === false || $totalFilter === false){
+			response(501, "Internal Server Error");
+		}
+		if($detail){
+			foreach($result as &$res){
+				$spec = $this->pm->selectWithDetail($res['id']);
+				if($spec === false){
+					response(500, "Internal Server Error");
+				}
+				if(!empty($spec)){
+					$res = array_merge($res, $spec['spec']);
+				}
+			}
+		}
+		$start = $page * 10 + 1;
+		if(count($args['uri_args']) === 0){
+			$end = $totalFilter;
+		}else{
+			$end = ($page + 1) * 10;
+		}
+		$result['total'] = $totalFilter;
+		$result['totalNotFiltered'] = $total;
+		response(200, "Product $start to $end", $result);
+	}
+
 	#[NoReturn] private function type_product(array $args){
 		if(count($args['uri_args']) === 2){
 			if(!is_numeric($args['uri_args'][1])){
@@ -181,6 +241,10 @@ class ProductHierarchyController implements Controller{
 				$this->type_model_prod($args);
 			}elseif($args['additional'][0] === 'type_brand_model_product'){
 				$this->type_brand_model_prod($args);
+			}elseif($args['additional'][0] === "prod"){
+				$this->prod($args);
+			}elseif($args['additional'][0] === "prod_detail"){
+				$this->prod($args, true);
 			}
 		}
 	}

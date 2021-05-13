@@ -17,6 +17,7 @@ class ProductModel extends Model{
 		"buy_d" => "buying_date",
 		"sell_d" => "selling_date"
 	];
+	protected int $max_row = 10;
 
 	public function selectAllByType(int $id_type, int $iteration = 0): array|false{
 		$start = 500 * $iteration;
