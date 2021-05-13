@@ -113,7 +113,8 @@ $rt->delete("/reference/*/*", ReferenceHierarchyController::class);
 // /product[/{page}[/search/{search}[/order/{direction}/sort{column}]]]
 $rt->get("/product{/*{/search/*{/order/*/sort/*}}}", ProductHierarchyController::class, ["prod"]);
 $rt->get("/product_detail{/*{/search/*{/order/*/sort/*}}}", ProductHierarchyController::class, ["prod_detail"]);
-
+// /product/{token}/{id}
+$rt->delete("/product/*/*", ProductHierarchyController::class);
 // /offer/{token}/{id} || /offer/{token}[/{page}[/search/*[/order/*/sort/*]]]
 $rt->get("/offer/*/*", OfferController::class, ['id']);
 $rt->get("/reference{/*{/search/*{/order/*/sort/*}}}",ReferenceHierarchyController::class, ['search']);

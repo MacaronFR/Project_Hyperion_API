@@ -11,9 +11,11 @@ require_once "autoload.php";
 // get all types
 class ProductHierarchyController implements Controller{
 	private ProductModel $pm;
+	private ProductSpecModel $psm;
 
 	public function __construct(){
 		$this->pm = new ProductModel();
+		$this->psm = new ProductSpecModel();
 	}
 
 	#[NoReturn] private function prod(array $args, bool $detail = false){
@@ -267,7 +269,29 @@ class ProductHierarchyController implements Controller{
 	 * @inheritDoc
 	 */
 	#[NoReturn] public function delete(array $args){
-		return false;
+		if(!checkToken($args['uri_args'][0], 3)){
+			response(403, "Forbidden");
+		}
+		if(!is_numeric($args['uri_args'][1])){
+			response(400, "Bad Request");
+		}
+		$product = $this->pm->select($args['uri_args'][1]);
+		if($product === false){
+			response(404, "Not Found");
+		}
+		$pspec = $this->psm->selectAllByProduct($product['id'], limit: false);
+		if($pspec === false){
+			response(500, "Internal Server Error");
+		}
+		foreach($pspec as $id){
+			if(!$this->psm->delete($id['id'])){
+				response(500, "Internal Server Error");
+			}
+		}
+		if(!$this->pm->delete($product['id'])){
+			response(500, "Internal Server Error");
+		}
+		response(204, "Product Deleted");
 	}
 
 }

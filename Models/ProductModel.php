@@ -245,8 +245,8 @@ class ProductModel extends Model{
 	}
 
 	public function selectAllFilter(string $search, string $order, string $sort, int $iteration = 0, bool $limit = true): false|array{
-		$sql = "SELECT RES.id, RES.sell_p, RES.buy_p, RES.type, brand, S2.value as model FROM
-					(SELECT PRODUCTS.id_product as id, PRODUCTS.selling_price as sell_p, PRODUCTS.buying_price as buy_p, T.type, S.value as brand, id_ref
+		$sql = "SELECT RES.id, RES.sell_p, RES.buy_p, RES.type, brand, S2.value as model, state, RES.buy_d, RES.sell_d FROM
+					(SELECT PRODUCTS.id_product as id, PRODUCTS.selling_price as sell_p, PRODUCTS.buying_price as buy_p, T.type, S.value as brand, id_ref, state, buying_date as buy_d, selling_date as sell_d
 					FROM PRODUCTS
 						INNER JOIN REFERENCE_PRODUCTS RP on PRODUCTS.id_ref = RP.id_product
 						INNER JOIN TYPES T on RP.type = T.id_type
@@ -273,7 +273,7 @@ class ProductModel extends Model{
 
 	public function selectTotalFilter(string $search, string $order, string $sort): false|int{
 		$sql = "SELECT count(RES.id) as count, S2.value as model FROM
-					(SELECT PRODUCTS.id_product as id, PRODUCTS.selling_price as sell_p, PRODUCTS.buying_price as buy_p, T.type, S.value as brand, id_ref
+					(SELECT PRODUCTS.id_product as id, PRODUCTS.selling_price as sell_p, PRODUCTS.buying_price as buy_p, T.type, S.value as brand, id_ref, state, buying_date as buy_d, selling_date as sell_d
 					FROM PRODUCTS
 						INNER JOIN REFERENCE_PRODUCTS RP on PRODUCTS.id_ref = RP.id_product
 						INNER JOIN TYPES T on RP.type = T.id_type
