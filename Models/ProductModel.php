@@ -272,8 +272,8 @@ class ProductModel extends Model{
 	}
 
 	public function selectTotalFilter(string $search, string $order, string $sort): false|int{
-		$sql = "SELECT count(RES.id_product) as count, S2.value as model FROM
-					(SELECT PRODUCTS.id_product, PRODUCTS.selling_price as sell_p, PRODUCTS.buying_price as buy_p, T.type, S.value as brand, id_ref
+		$sql = "SELECT count(RES.id) as count, S2.value as model FROM
+					(SELECT PRODUCTS.id_product as id, PRODUCTS.selling_price as sell_p, PRODUCTS.buying_price as buy_p, T.type, S.value as brand, id_ref
 					FROM PRODUCTS
 						INNER JOIN REFERENCE_PRODUCTS RP on PRODUCTS.id_ref = RP.id_product
 						INNER JOIN TYPES T on RP.type = T.id_type
@@ -283,7 +283,7 @@ class ProductModel extends Model{
 					INNER JOIN REF_HAVE_SPEC RHS2 on RES.id_ref=RHS2.id_product
 					INNER JOIn SPECIFICATION S2 on RHS2.id_spec = S2.id_specification
 				WHERE name=\"model\" AND
-				(RES.id_product LIKE :search OR
+				(RES.id LIKE :search OR
 				RES.sell_p LIKE :search OR
 				RES.buy_p LIKE :search OR
 				RES.type LIKE :search OR
