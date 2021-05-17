@@ -12,7 +12,8 @@ class OffersModel extends Model{
 		"offer" => "offer",
 		"counter_offer" => "counter_offer",
 		"status" => "status",
-		"user" => "id_user"
+		"user" => "id_user",
+		"date" => "date_creation"
 	];
 	protected int $max_row = 10;
 
