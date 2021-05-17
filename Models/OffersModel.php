@@ -14,5 +14,49 @@ class OffersModel extends Model{
 		"status" => "status",
 		"user" => "id_user"
 	];
+	protected int $max_row = 10;
 
+
+	public function selectAllPending(int $iteration = 0, bool $limit = true): false|array{
+		$sql = "SELECT ";
+		foreach($this->column as $p=>$c){
+			$sql .= "$c as $p, ";
+		}
+		$sql .= "$this->id_name as id FROM $this->table_name WHERE status<6";
+		if($limit){
+			$start = $iteration * $this->max_row;
+			$sql .= " LIMIT $start, $this->max_row";
+		}
+		return $this->query($sql);
+	}
+
+	public function selectAllPendingByUser(int $user, int $iteration = 0, bool $limit = true): false|array{
+		$sql = "SELECT ";
+		foreach($this->column as $p=>$c){
+			$sql .= "$c as $p, ";
+		}
+		$sql .= "$this->id_name as id FROM $this->table_name WHERE status<6 AND id_user=:user";
+		if($limit){
+			$start = $iteration * $this->max_row;
+			$sql .= " LIMIT $start, $this->max_row";
+		}
+		return $this->prepared_query($sql, ['user' => $user]);
+	}
+
+	public function selectTotalPending():int|false{
+		$sql = "SELECT COUNT($this->id_name) as count FROM $this->table_name WHERE status < 6";
+		$res = $this->query($sql, unique: true);
+		if($res === false){
+			return false;
+		}
+		return $res['count'];
+	}
+	public function selectTotalPendingByUser(int $user):int|false{
+		$sql = "SELECT COUNT($this->id_name) as count FROM $this->table_name WHERE status < 6 AND id_user=:user";
+		$res = $this->prepared_query($sql, ['user' => $user], unique: true);
+		if($res === false){
+			return false;
+		}
+		return $res['count'];
+	}
 }
