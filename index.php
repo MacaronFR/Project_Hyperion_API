@@ -3,7 +3,7 @@
 use \Hyperion\API\{OAuthController,ConnectionController,StoreController,ProfileController,CategoryController};
 use \Hyperion\API\Router;
 use \Hyperion\API\{ProductHierarchyController,ReferenceHierarchyController,BrandModelController,SpecController};
-use Hyperion\API\{OfferController, PendingOfferController, TypeController};
+use Hyperion\API\{OfferController, PendingOfferController, TypeController, TerminatedOfferController};
 
 require_once "autoload.php";
 
@@ -119,6 +119,9 @@ $rt->delete("/product/*/*", ProductHierarchyController::class);
 $rt->get("/offer/pending/all/*{/*}", PendingOfferController::class, ['all']);
 $rt->get("/offer/pending/*/user/*{/*}", PendingOfferController::class, ['user']);
 $rt->get("/offer/pending/*{/*}", PendingOfferController::class);
+$rt->get("/offer/terminated/all/*{/*}", TerminatedOfferController::class, ['all']);
+$rt->get("/offer/terminated/*/user/*{/*}", TerminatedOfferController::class, ['user']);
+$rt->get("/offer/terminated/*{/*}", TerminatedOfferController::class);
 $rt->get("/offer/*/*", OfferController::class, ['id']);
 //$rt->get("/reference{/*{/search/*{/order/*/sort/*}}}",ReferenceHierarchyController::class, ['search']);
 // /offer/{token}
