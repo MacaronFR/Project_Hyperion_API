@@ -181,7 +181,7 @@ class OfferController implements Controller{
 			}
 			$ref = $this->rm->selectByTypeBrandModel($args['post_args']['type'], $args['post_args']['brand'], $args['post_args']['model']);
 			if($ref === false){
-				response(500, "Internal Server Error");
+				response(501, "Internal Server Error");
 			}
 			if(empty($ref)){
 				response(404, "Reference Not Found");
@@ -198,11 +198,11 @@ class OfferController implements Controller{
 					}
 					$spec_id = $this->sm->selectIdentical(['name' => $name, "value" => $args['post_args']['spec'][$name]]);
 					if($spec_id === false){
-						response(500, "Internal Server Error");
+						response(502, "Internal Server Error");
 					}
 					$spec_value = $this->rhsm->selectBySpecRef($spec_id['id'], $ref['id']);
 					if($spec_value === false){
-						response(500, "Internal Server Error");
+						response(503, "Internal Server Error");
 					}
 					$bonus += (double)$spec_value['value'];
 					$spec[$name] = $spec_value['id'];
@@ -215,38 +215,38 @@ class OfferController implements Controller{
 			$offer = ((double)$ref['buying_price'] + $bonus) * (100 - $state['penality']) / 100;
 			$offer_id = $this->om->insert(['offer' => $offer, 'status' => 1, 'user' => $user_token['user']]);
 			if($offer_id === false){
-				response(500, "Internal Server Error");
+				response(504, "Internal Server Error");
 			}
 			$product_id = $this->pm->insert(['status' => 0, "state" => $args['post_args']['state'], 'ref' => $ref['id'], 'offer' => $offer_id]);
 			if($product_id === false){
-				response(500, "Internal Server Error");
+				response(505, "Internal Server Error");
 			}
 			foreach($spec as $s){
 				if($this->psm->insert(['product' => $product_id, 'spec' => $s]) === false){
-					response(500, "Internal Server Error");
+					response(506, "Internal Server Error");
 				}
 			}
 		}else{
 			$offer_id = $this->om->insert(['offer' => 0, 'status' => 1, 'user' => $user_token['user']]);
 			if($offer_id === false){
-				response(500, "Internal Server Error");
+				response(507, "Internal Server Error");
 			}
 			$product_id = $this->pm->insert(['status' => 0, "state" => $args['post_args']['state'], 'ref' => 0, 'offer' => $offer_id]);
 			if($product_id === false){
-				response(500, "Internal Server Error");
+				response(508, "Internal Server Error");
 			}
 		}
 		foreach($args['post_args']['files'] as $file){
 			$save_name = md5(time() . $file['filename']) . ".b64";
 			if(file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/images/offer/" . $save_name, $file['content']) === false){
-				response(500, "Internal Server Error");
+				response(509, "Internal Server Error");
 			}
 			$file_id = $this->fm->insert(['file_path' => "images/offer/" . $save_name, "file_name" => $file['filename'], 'type' => $file['type'], 'creator' => $user_token['user']]);
 			if($file_id === false){
-				response(500, "Internal Server Error");
+				response(510, "Internal Server Error");
 			}
 			if($this->ppm->insert(['file' => $file_id, 'product' => $product_id]) === false){
-				response(500, "Internal Server Error");
+				response(511, "Internal Server Error");
 			}
 		}
 		API_log($args['uri_args'][0], "OFFER-PRODUCT-PRODUCT_HAVE_SPEC", "created offer, product and specification linked");
