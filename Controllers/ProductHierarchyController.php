@@ -12,10 +12,14 @@ require_once "autoload.php";
 class ProductHierarchyController implements Controller{
 	private ProductModel $pm;
 	private ProductSpecModel $psm;
+	private FilesModel $fm;
+	private ProductPicturesModel $ppm;
 
 	public function __construct(){
 		$this->pm = new ProductModel();
 		$this->psm = new ProductSpecModel();
+		$this->fm = new FilesModel();
+		$this->ppm = new ProductPicturesModel();
 	}
 
 	#[NoReturn] private function prod(array $args, bool $detail = false){
@@ -285,6 +289,15 @@ class ProductHierarchyController implements Controller{
 		}
 		foreach($pspec as $id){
 			if(!$this->psm->delete($id['id'])){
+				response(500, "Internal Server Error");
+			}
+		}
+		$pictures = $this->ppm->selectAllByProduct($args['uri_args'][1]);
+		foreach($pictures as $p){
+			if($this->ppm->delete($p['id']) === false){
+				response(500, "Internal Server Error");
+			}
+			if($this->fm->delete($p['file']) === false){
 				response(500, "Internal Server Error");
 			}
 		}
