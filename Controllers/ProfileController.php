@@ -30,7 +30,7 @@ class ProfileController implements Controller{
 			if($token !== false){
 				$then = DateTime::createFromFormat("Y-m-d H:i:s", $token['end']);
 				if($this->now->diff($then)->invert === 0){
-					$user = $this->um->select($token['client']);
+					$user = $this->um->select($token['user']);
 					$user["addr"] = $this->am->select($user['addr']);
 					response(200, "User info", $user);
 				}else{
