@@ -122,7 +122,24 @@ class ProfileController implements Controller{
 	/**
 	 * @inheritDoc
 	 */
-	#[NoReturn] public function delete(array $args){
-		var_dump($this->am->insert(["zip" => 77830, "address" => "nik", "city" => "pamfou", "country" => "NIKMAND", "region" => "saisap"]));
+	 public function delete(array $args){
+		if(checkToken($args['uri_args'][0],3)){
+			$user =  $this->um->select($args['uri_args'][1]);
+			if($user){
+				$this->um->delete($args['uri_args'][1]);
+				response(204,"User Deleted");
+			}
+
+		}else{
+			if(checkToken($args['uri_args'][0],1))
+			$user =  $this->um->select($args['uri_args'][0]);
+			if($user){
+				$token = $this->tm->update(-1,$args['uri_args'][0]);
+				if($token){
+					response(200,"USER Deleted");
+				}
+			}
+		}
+
 	}
 }
