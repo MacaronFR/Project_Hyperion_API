@@ -19,9 +19,9 @@ class ProjectController implements Controller{
 	 * @inheritDoc
 	 */
 	public function get(array $args){
-		if($args['additionnal'][0] === 'popular'){
+		if($args['additional'][0] === 'popular'){
 			$this->getPopular($args);
-		}elseif($args['additionnal'][0] === "latest"){
+		}elseif($args['additional'][0] === "latest"){
 			$this->getLast($args);
 		}else{
 			$this->getAll($args);
