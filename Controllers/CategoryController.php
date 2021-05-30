@@ -8,9 +8,11 @@ use JetBrains\PhpStorm\NoReturn;
 
 class CategoryController implements Controller{
 	private CategoryModel $cm;
+	private TypeModel $tm;
 
 	public function __construct(){
 		$this->cm = new CategoryModel();
+		$this->tm = new TypeModel();
 	}
 
 	/**
@@ -137,8 +139,7 @@ class CategoryController implements Controller{
 		if(empty($cat)){
 			response(404, "Not found");
 		}
-		$tm = new TypeModel();
-		$types = $tm->selectByCategory($args['uri_args'][1]);
+		$types = $this->tm->selectByCategory($args['uri_args'][1]);
 		if($types === false){
 			response(500, "Internal Server Error");
 		}

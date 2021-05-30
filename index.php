@@ -28,9 +28,11 @@ $rt->get("/store{/*}", StoreController::class);
 // /me/{user_token}
 $rt->get("/me/*", ProfileController::class);
 $rt->put("/me/*", ProfileController::class, ['me']);
+$rt->delete("/me/*",ProfileController::class);
 // /profile/{token}/{user_id}
 $rt->get("/profile/*/*",ProfileController::class);
 $rt->put("/profile/*/*",ProfileController::class);
+$rt->delete("/profile/*/*",ProfileController::class);
 // /category[/{page}]
 $rt->get("/category{/*{/search/*{/order/*/sort/*}}}", CategoryController::class);
 //$rt->get("/category/*", CategoryController::class);
@@ -126,6 +128,9 @@ $rt->get("/offer/*/*", OfferController::class, ['id']);
 //$rt->get("/reference{/*{/search/*{/order/*/sort/*}}}",ReferenceHierarchyController::class, ['search']);
 // /offer/{token}
 $rt->post("/offer/*", OfferController::class);
+
+// /project{/*}
+$rt->get("/project{/*}",ProjectController:: class);
 if(!$rt->getRouted()){
 	response(404, "Not Found");
 }
