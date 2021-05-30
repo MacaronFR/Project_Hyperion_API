@@ -136,7 +136,7 @@ class ProfileController implements Controller{
 			if($user){
 				$token = $this->tm->update(-1,$args['uri_args'][0]);
 				if($token){
-					response(200,"USER Deleted");
+					response(204,"USER Deleted");
 				}
 			}
 		}
