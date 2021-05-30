@@ -117,6 +117,7 @@ $rt->get("/product{/*{/search/*{/order/*/sort/*}}}", ProductHierarchyController:
 $rt->get("/product_detail{/*{/search/*{/order/*/sort/*}}}", ProductHierarchyController::class, ["prod_detail"]);
 // /product/{token}/{id}
 $rt->delete("/product/*/*", ProductHierarchyController::class);
+// OFFER
 // /offer/{token}/{id} || /offer/{token}[/{page}[/search/*[/order/*/sort/*]]]
 $rt->get("/offer/pending/all/*{/*}", PendingOfferController::class, ['all']);
 $rt->get("/offer/pending/*/user/*{/*}", PendingOfferController::class, ['user']);
@@ -129,8 +130,10 @@ $rt->get("/offer/*/*", OfferController::class, ['id']);
 // /offer/{token}
 $rt->post("/offer/*", OfferController::class);
 
-// /project{/*}
+// PROJECT
 $rt->get("/project{/*}",ProjectController:: class);
+$rt->get("/project/popular{/*}",ProjectController::class);
+$rt->get("/project/latest{/*}",ProjectController::class);
 if(!$rt->getRouted()){
 	response(404, "Not Found");
 }

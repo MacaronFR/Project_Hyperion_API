@@ -12,7 +12,9 @@ class ProjectModel extends Model{
         "name"=>"name",
         "description"=>"description",
         "start"=>"start",
-        "duration"=>"duration"
+        "duration"=>"duration",
+	    "logo"=>"logo",
+		"valid"=>"valid"
     ];
 	protected int $max_row = 10;
 

@@ -8,37 +8,53 @@ use JetBrains\PhpStorm\NoReturn;
 
 class ProjectController implements Controller{
 	private ProjectModel $pm;
+	private FilesModel $fm;
 
 	public function __construct(){
 		$this->pm = new ProjectModel();
+		$this->fm = new FilesModel();
 	}
 
 	/**
 	 * @inheritDoc
 	 */
 	public function get(array $args){
+		if($args['additionnal'][0] === 'popular'){
+			$this->getPopular($args);
+		}elseif($args['additionnal'][0] === "latest"){
+			$this->getLast($args);
+		}else{
+			$this->getAll($args);
+		}
+	}
+	public function getAll(array $args){
 		if(count($args["uri_args"]) === 0){
 			$project = $this->pm->selectAll(limit:false);
 			if($project){
-				response(200,"All Projects");
+				$files = $this->fm->selectWithB64($project['logo']);
+				//$files = file_get_contents($files['file_name'],$files['file_path']);
+				response(200,"All Projects,$files");
 			}else{
 				response(204,"No Content");
 			}
 		}elseif(count($args['uri_args']) === 1){
 			if(is_numeric($args['uri_args'][0])){
 				$row = (int)$args['uri_args'][0];
+				$project = $this->pm->selectAll($row);
+				if($project){
+					$files = $this->fm->selectWithB64($project['logo']);
+					$files = file_get_contents($files['file_name'],$files['file_path']);
+					$start = $row * 10 + 1;
+					$end = ($row + 1) * 10;
+					response(200,"Project $start to $end, $project,$files");
+				}else{
+					response(204,"No Content");
+				}
 			}else{
 				response(400,"Bad Request");
 			}
 		}
-		$project = $this->pm->selectAll($row);
-		if($project){
-			$start = $row * 10 + 1;
-			$end = ($row + 1) * 10;
-			response(200,"Project $start to $end, $project");
-		}else{
-			response(204,"No Content");
-		}
+
 	}
 
 	public function getPopular(array $args){
@@ -52,16 +68,19 @@ class ProjectController implements Controller{
 	}elseif(count($args['uri_args']) === 1){
 			if(is_numeric($args['uri_args'][0])){
 				$row = (int)$args['uri_args'][0];
+				$project = $this->pm->selectPopular($row);
+				if($project){
+					$files = $this->fm->selectWithB64($project['logo']);
+					//$files = file_get_contents($files['file_name'],$files['file_path']);
+					response(200,"Most Popular Project,$files");
+				}else{
+					response(204,"No Content");
+				}
 			}else{
 				response(400,"Bad Request");
 			}
 		}
-		$project = $this->pm->selectPopular($row);
-		if($project){
-			response(200,"Most Popular Project");
-		}else{
-			response(204,"No Content");
-		}
+
 	}
 	public function getLast(array $args){
 		if(count($args["uri_args"]) === 0){
@@ -71,23 +90,23 @@ class ProjectController implements Controller{
 			}else{
 				response(204, "No Content");
 			}
-		}elseif(count($args['uri_args']) === 1){
-			$row = (int)$args['uri_args'][0];
 		}else{
-			response(400,"Bad Request");
+			$search = $args['uri_args'][1];
+			$order = strtoupper($args['uri_args'][2] ?? "ASC");
+			if($order !== "ASC" && $order !== "DESC"){
+				response(409,"Bad Request");
+			}
+			$sort = $args['uri_args'][3] ?? "id";
+			$project = $this->pm->selectAllFilter($search,$order,$sort);
+			if($project){
+				$files = $this->fm->selectWithB64($project['logo']);
+				//$files = file_get_contents($files['file_name'],$files['file_path']);
+				response(200,"Last Project,$files");
+			}else{
+				response(204,"No Content");
+			}
 		}
-		$search = $args['uri_args'][1];
-		$order = strtoupper($args['uri_args'][2] ?? "ASC");
-		if($order !== "ASC" && $order !== "DESC"){
-			response(409,"Bad Request");
-		}
-		$sort = $args['uri_args'][3] ?? "id";
-		$project = $this->pm->selectAllFilter($search,$order,$sort);
-		if($project){
-			response(200,"Last Project");
-		}else{
-			response(204,"No Content");
-		}
+
 	}
 
 	/**
