@@ -307,7 +307,7 @@ class ReferenceHierarchyController implements Controller{
 			response(500, "Internal Server Error");
 		}
 		if(!empty($prod)){
-			response(209, "Conflict");
+			response(409, "Conflict");
 		}
 		$have_spec = $this->rhsm->selectAllFromRef($args['uri_args'][1]);
 		if($have_spec === false){
