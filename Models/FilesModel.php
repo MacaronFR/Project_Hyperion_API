@@ -15,7 +15,7 @@ class FilesModel extends Model{
 		"creator" => "creator"
 	];
 
-	public function selectWithB64(mixed $value, string $column = ""){
+	public function selectWithB64(mixed $value, string $column = ""): array|false{
 		$file = $this->select($value, $column);
 		if($file === false){
 			return false;

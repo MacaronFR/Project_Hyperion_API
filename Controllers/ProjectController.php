@@ -19,94 +19,65 @@ class ProjectController implements Controller{
 	 * @inheritDoc
 	 */
 	public function get(array $args){
-		if($args['additionnal'][0] === 'popular'){
+		if($args['additional'][0] === 'popular'){
 			$this->getPopular($args);
-		}elseif($args['additionnal'][0] === "latest"){
+		}elseif($args['additional'][0] === "latest"){
 			$this->getLast($args);
 		}else{
 			$this->getAll($args);
 		}
 	}
-	public function getAll(array $args){
+
+	#[NoReturn] public function getAll(array $args){
 		if(count($args["uri_args"]) === 0){
-			$project = $this->pm->selectAll(limit:false);
-			if($project){
-				$files = $this->fm->selectWithB64($project['logo']);
-				//$files = file_get_contents($files['file_name'],$files['file_path']);
-				response(200,"All Projects,$files");
-			}else{
-				response(204,"No Content");
-			}
+			$projects = $this->pm->selectAllValid(limit: false);
 		}elseif(count($args['uri_args']) === 1){
-			if(is_numeric($args['uri_args'][0])){
-				$row = (int)$args['uri_args'][0];
-				$project = $this->pm->selectAll($row);
-				if($project){
-					$files = $this->fm->selectWithB64($project['logo']);
-					$files = file_get_contents($files['file_name'],$files['file_path']);
-					$start = $row * 10 + 1;
-					$end = ($row + 1) * 10;
-					response(200,"Project $start to $end, $project,$files");
-				}else{
-					response(204,"No Content");
-				}
-			}else{
-				response(400,"Bad Request");
+			if(!is_numeric($args['uri_args'][0])){
+				response(400, "Bad Request");
 			}
+			$projects = $this->pm->selectAllValid($args['uri_args'][0]);
 		}
-
+		$this->processProject($projects);
+		response(200, "Projects", $projects);
 	}
 
-	public function getPopular(array $args){
+	#[NoReturn] public function getPopular(array $args){
 		if(count($args["uri_args"]) === 0){
-		$project = $this->pm->selectPopular(limit:false);
-		if($project){
-			response(200,"All Projects");
-		}else{
-			response(204,"No Content");
-		}
-	}elseif(count($args['uri_args']) === 1){
-			if(is_numeric($args['uri_args'][0])){
-				$row = (int)$args['uri_args'][0];
-				$project = $this->pm->selectPopular($row);
-				if($project){
-					$files = $this->fm->selectWithB64($project['logo']);
-					//$files = file_get_contents($files['file_name'],$files['file_path']);
-					response(200,"Most Popular Project,$files");
-				}else{
-					response(204,"No Content");
-				}
-			}else{
-				response(400,"Bad Request");
+			$projects = $this->pm->selectPopular(limit: false);
+		}elseif(count($args['uri_args']) === 1){
+			if(!is_numeric($args['uri_args'][0])){
+				response(400, "Bad Request");
 			}
+			$projects = $this->pm->selectPopular($args['uri_args'][0]);
 		}
-
+		$this->processProject($projects);
+		response(200, "Popular Project", $projects);
 	}
-	public function getLast(array $args){
-		if(count($args["uri_args"]) === 0){
-			$project = $this->pm->selectPopular(limit: false);
-			if($project){
-				response(200, "All Projects");
-			}else{
-				response(204, "No Content");
-			}
-		}else{
-			$search = $args['uri_args'][1];
-			$order = strtoupper($args['uri_args'][2] ?? "ASC");
-			if($order !== "ASC" && $order !== "DESC"){
-				response(409,"Bad Request");
-			}
-			$sort = $args['uri_args'][3] ?? "id";
-			$project = $this->pm->selectAllFilter($search,$order,$sort);
-			if($project){
-				$files = $this->fm->selectWithB64($project['logo']);
-				//$files = file_get_contents($files['file_name'],$files['file_path']);
-				response(200,"Last Project,$files");
-			}else{
-				response(204,"No Content");
-			}
-		}
 
+	#[NoReturn] public function getLast(array $args){
+		if(count($args["uri_args"]) === 0){
+			$projects = $this->pm->selectAllValidLast(limit: false);
+		}else{
+			$projects = $this->pm->selectAllValidLast($args['uri_args'][0]);
+		}
+		$this->processProject($projects);
+		response(200, "Latest Project", $projects);
+	}
+
+	private function processProject(array|false &$projects){
+		if($projects === false){
+			response(500, "Internal Server Error");
+		}
+		if(empty($projects)){
+			response(204, "No Content");
+		}
+		foreach($projects as &$p){
+			$files = $this->fm->selectWithB64($p['logo']);
+			if($files === false){
+				response(500, "Internal Server Error");
+			}
+			$p['logo'] = ['file_name' => $files['file_name'], 'content' => $files['content']];
+		}
 	}
 
 	/**

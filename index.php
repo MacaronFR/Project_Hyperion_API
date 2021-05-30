@@ -1,9 +1,9 @@
 <?php
 
-use \Hyperion\API\{OAuthController,ConnectionController,StoreController,ProfileController,CategoryController};
-use \Hyperion\API\Router;
-use \Hyperion\API\{ProductHierarchyController,ReferenceHierarchyController,BrandModelController,SpecController};
-use Hyperion\API\{OfferController, PendingOfferController, TypeController, TerminatedOfferController};
+use Hyperion\API\{OAuthController,ConnectionController,StoreController,ProfileController,CategoryController};
+use Hyperion\API\Router;
+use Hyperion\API\{ProductHierarchyController,ReferenceHierarchyController,BrandModelController,SpecController};
+use Hyperion\API\{OfferController, PendingOfferController, ProjectController, TypeController, TerminatedOfferController};
 
 require_once "autoload.php";
 
@@ -131,9 +131,9 @@ $rt->get("/offer/*/*", OfferController::class, ['id']);
 $rt->post("/offer/*", OfferController::class);
 
 // PROJECT
-$rt->get("/project{/*}",ProjectController:: class);
-$rt->get("/project/popular{/*}",ProjectController::class);
-$rt->get("/project/latest{/*}",ProjectController::class);
+$rt->get("/project/popular{/*}",ProjectController::class, ['popular']);
+$rt->get("/project/latest{/*}",ProjectController::class, ['latest']);
+$rt->get("/project{/*}",ProjectController:: class, ['all']);
 if(!$rt->getRouted()){
 	response(404, "Not Found");
 }
