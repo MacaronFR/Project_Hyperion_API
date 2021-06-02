@@ -36,7 +36,7 @@ class ProjectModel extends Model{
 		foreach($this->column as $p=>$c){
 			$sql .= "$c as $p, ";
 		}
-		$sql .= "$this->table_name.$this->id_name as id FROM $this->table_name, SUM(CONTRIBUTE.`value`) AS contribution LEFT JOIN CONTRIBUTE ON $this->table_name.$this->id_name = CONTRIBUTE.id_project WHERE valid=1 AND DATEDIFF(DATE_ADD(start, INTERVAL duration DAY), DATE(NOW())) >= 0";
+		$sql .= "$this->table_name.$this->id_name as id, SUM(CONTRIBUTE.`value`) AS contribution FROM $this->table_name LEFT JOIN CONTRIBUTE ON $this->table_name.$this->id_name = CONTRIBUTE.id_project WHERE valid=1 AND DATEDIFF(DATE_ADD(start, INTERVAL duration DAY), DATE(NOW())) >= 0 GROUP BY $this->table_name.$this->id_name";
 		if($limit){
 			$start = $iteration * $this->max_row;
 			$sql .= " LIMIT $start, $this->max_row";
@@ -49,7 +49,7 @@ class ProjectModel extends Model{
 		foreach($this->column as $p=>$c){
 			$sql .= "$c as $p, ";
 		}
-		$sql .= "$this->table_name.$this->id_name as id, SUM(CONTRIBUTE.`value`) AS contribution FROM $this->table_name LEFT JOIN CONTRIBUTE ON $this->table_name.$this->id_name = CONTRIBUTE.id_project WHERE valid=1 AND DATEDIFF(DATE_ADD(start, INTERVAL duration DAY), DATE(NOW())) >= 0 ORDER BY start DESC";
+		$sql .= "$this->table_name.$this->id_name as id, SUM(CONTRIBUTE.`value`) AS contribution FROM $this->table_name LEFT JOIN CONTRIBUTE ON $this->table_name.$this->id_name = CONTRIBUTE.id_project WHERE valid=1 AND DATEDIFF(DATE_ADD(start, INTERVAL duration DAY), DATE(NOW())) >= 0 GROUP BY $this->table_name.$this->id_name ORDER BY start DESC";
 		if($limit){
 			$start = $iteration * $this->max_row;
 			$sql .= " LIMIT $start, $this->max_row";
