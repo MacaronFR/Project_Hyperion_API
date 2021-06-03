@@ -37,7 +37,7 @@ class ProjectController implements Controller{
 			}
 			$projects = $this->pm->selectAllValid($args['uri_args'][0]);
 		}
-		$this->processProject($projects);
+		$this->processProject($projects, !(isset($args['additional'][1]) && $args['additional'][1] === 'nologo'));
 		response(200, "Projects", $projects);
 	}
 
@@ -50,7 +50,7 @@ class ProjectController implements Controller{
 			}
 			$projects = $this->pm->selectPopular($args['uri_args'][0]);
 		}
-		$this->processProject($projects);
+		$this->processProject($projects, !(isset($args['additional'][1]) && $args['additional'][1] === 'nologo'));
 		response(200, "Popular Project", $projects);
 	}
 
@@ -60,23 +60,25 @@ class ProjectController implements Controller{
 		}else{
 			$projects = $this->pm->selectAllValidLast($args['uri_args'][0]);
 		}
-		$this->processProject($projects);
+		$this->processProject($projects, !(isset($args['additional'][1]) && $args['additional'][1] === 'nologo'));
 		response(200, "Latest Project", $projects);
 	}
 
-	private function processProject(array|false &$projects){
+	private function processProject(array|false &$projects, bool $logo){
 		if($projects === false){
 			response(500, "Internal Server Error");
 		}
 		if(empty($projects)){
 			response(204, "No Content");
 		}
-		foreach($projects as &$p){
-			$files = $this->fm->selectWithB64($p['logo']);
-			if($files === false){
-				response(500, "Internal Server Error");
+		if($logo){
+			foreach($projects as &$p){
+				$files = $this->fm->selectWithB64($p['logo']);
+				if($files === false){
+					response(500, "Internal Server Error");
+				}
+				$p['logo'] = ['file_name' => $files['file_name'], 'content' => $files['content']];
 			}
-			$p['logo'] = ['file_name' => $files['file_name'], 'content' => $files['content']];
 		}
 	}
 
