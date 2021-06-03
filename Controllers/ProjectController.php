@@ -76,7 +76,7 @@ class ProjectController implements Controller{
 			response(404, "Not Found");
 		}
 		$logo = $this->logoRetrieve($project['logo']);
-		response(200, "Project Logo", [$logo['content'], $project['logo']]);
+		response(200, "Project Logo", ['content' => $logo['content'], 'id' => $project['logo']]);
 	}
 
 	private function processProject(array|false &$projects, bool $logo){
