@@ -4,6 +4,7 @@
 namespace Hyperion\API;
 
 
+use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\NoReturn;
 
 class ProjectController implements Controller{
@@ -23,8 +24,10 @@ class ProjectController implements Controller{
 			$this->getPopular($args);
 		}elseif($args['additional'][0] === "latest"){
 			$this->getLast($args);
-		}else{
+		}elseif($args['additional'][0] === "all"){
 			$this->getAll($args);
+		}elseif($args['additional'][0] === "logo"){
+			$this->getLogo($args);
 		}
 	}
 
@@ -64,6 +67,18 @@ class ProjectController implements Controller{
 		response(200, "Latest Project", $projects);
 	}
 
+	#[NoReturn] private function getLogo(array $args){
+		if(!is_numeric($args['uri_args'][0])){
+			response(400, "Bad Request");
+		}
+		$project = $this->pm->select($args['uri_args'][0]);
+		if($project === false){
+			response(404, "Not Found");
+		}
+		$logo = $this->logoRetrieve($project['logo']);
+		response(200, "Project Logo", [$logo['content'], $project['logo']]);
+	}
+
 	private function processProject(array|false &$projects, bool $logo){
 		if($projects === false){
 			response(500, "Internal Server Error");
@@ -73,13 +88,17 @@ class ProjectController implements Controller{
 		}
 		if($logo){
 			foreach($projects as &$p){
-				$files = $this->fm->selectWithB64($p['logo']);
-				if($files === false){
-					response(500, "Internal Server Error");
-				}
-				$p['logo'] = ['file_name' => $files['file_name'], 'content' => $files['content']];
+				$p['logo'] = $this->logoRetrieve($p['logo']);
 			}
 		}
+	}
+
+	#[ArrayShape(['file_name' => "string", 'content' => "string"])] private function logoRetrieve(int $id): array{
+		$files = $this->fm->selectWithB64($id);
+		if($files === false){
+			response(500, "Internal Server Error");
+		}
+		return ['file_name' => $files['file_name'], 'content' => $files['content']];
 	}
 
 	/**

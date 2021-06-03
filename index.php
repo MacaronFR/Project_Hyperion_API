@@ -135,6 +135,8 @@ $rt->get("/project/nologo/popular{/*}",ProjectController::class, ['popular', 'no
 $rt->get("/project/nologo/latest{/*}",ProjectController::class, ['latest', 'nologo']);
 $rt->get("/project/nologo{/*}",ProjectController:: class, ['all', 'nologo']);
 
+$rt->get("/project/logo/*", ProjectController::class, ['logo']);
+
 $rt->get("/project/popular{/*}",ProjectController::class, ['popular']);
 $rt->get("/project/latest{/*}",ProjectController::class, ['latest']);
 $rt->get("/project{/*}",ProjectController:: class, ['all']);
