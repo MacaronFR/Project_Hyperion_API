@@ -37,7 +37,6 @@ class ContributeController implements Controller{
 				if($user){
 					$project = $this->pjm->select($args['post_args']["project"]);
 					if($project){
-						var_dump($user);
 						if($args["post_args"]["amount"] > $user["gc"]){
 							response(403,"Not enought Green Coins");
 						}else{
