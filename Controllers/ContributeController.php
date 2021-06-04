@@ -32,10 +32,12 @@ class ContributeController implements Controller{
 	public function post(array $args){
 		if(checkToken($args['uri_args'][0],1)){
 			if(is_numeric($args["post_args"]["amount"]) && is_numeric($args['post_args']['project'])){
-				$user = $this->tm->selectByToken($args['uri_args'][0]);
+				$token = $this->tm->selectByToken($args['uri_args'][0]);
+				$user = $this->um->select($token['user']);
 				if($user){
 					$project = $this->pjm->select($args['post_args']["project"]);
 					if($project){
+						var_dump($user);
 						if($args["post_args"]["amount"] > $user["gc"]){
 							response(403,"Not enought Green Coins");
 						}else{
