@@ -4,6 +4,7 @@
 namespace Hyperion\API;
 
 
+use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\NoReturn;
 
 class ProjectController implements Controller{
@@ -23,8 +24,10 @@ class ProjectController implements Controller{
 			$this->getPopular($args);
 		}elseif($args['additional'][0] === "latest"){
 			$this->getLast($args);
-		}else{
+		}elseif($args['additional'][0] === "all"){
 			$this->getAll($args);
+		}elseif($args['additional'][0] === "logo"){
+			$this->getLogo($args);
 		}
 	}
 
@@ -37,7 +40,7 @@ class ProjectController implements Controller{
 			}
 			$projects = $this->pm->selectAllValid($args['uri_args'][0]);
 		}
-		$this->processProject($projects);
+		$this->processProject($projects, !(isset($args['additional'][1]) && $args['additional'][1] === 'nologo'));
 		response(200, "Projects", $projects);
 	}
 
@@ -50,7 +53,7 @@ class ProjectController implements Controller{
 			}
 			$projects = $this->pm->selectPopular($args['uri_args'][0]);
 		}
-		$this->processProject($projects);
+		$this->processProject($projects, !(isset($args['additional'][1]) && $args['additional'][1] === 'nologo'));
 		response(200, "Popular Project", $projects);
 	}
 
@@ -60,24 +63,42 @@ class ProjectController implements Controller{
 		}else{
 			$projects = $this->pm->selectAllValidLast($args['uri_args'][0]);
 		}
-		$this->processProject($projects);
+		$this->processProject($projects, !(isset($args['additional'][1]) && $args['additional'][1] === 'nologo'));
 		response(200, "Latest Project", $projects);
 	}
 
-	private function processProject(array|false &$projects){
+	#[NoReturn] private function getLogo(array $args){
+		if(!is_numeric($args['uri_args'][0])){
+			response(400, "Bad Request");
+		}
+		$project = $this->pm->select($args['uri_args'][0]);
+		if($project === false){
+			response(404, "Not Found");
+		}
+		$logo = $this->logoRetrieve($project['logo']);
+		response(200, "Project Logo", ['content' => $logo['content'], 'id' => $project['logo']]);
+	}
+
+	private function processProject(array|false &$projects, bool $logo){
 		if($projects === false){
 			response(500, "Internal Server Error");
 		}
 		if(empty($projects)){
 			response(204, "No Content");
 		}
-		foreach($projects as &$p){
-			$files = $this->fm->selectWithB64($p['logo']);
-			if($files === false){
-				response(500, "Internal Server Error");
+		if($logo){
+			foreach($projects as &$p){
+				$p['logo'] = $this->logoRetrieve($p['logo']);
 			}
-			$p['logo'] = ['file_name' => $files['file_name'], 'content' => $files['content']];
 		}
+	}
+
+	#[ArrayShape(['file_name' => "string", 'content' => "string"])] private function logoRetrieve(int $id): array{
+		$files = $this->fm->selectWithB64($id);
+		if($files === false){
+			response(500, "Internal Server Error");
+		}
+		return ['file_name' => $files['file_name'], 'content' => $files['content']];
 	}
 
 	/**

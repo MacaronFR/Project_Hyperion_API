@@ -4,7 +4,6 @@ use Hyperion\API\{OAuthController,ConnectionController,StoreController,ProfileCo
 use Hyperion\API\Router;
 use Hyperion\API\{ProductHierarchyController,ReferenceHierarchyController,BrandModelController,SpecController};
 use Hyperion\API\{OfferController, PendingOfferController, ProjectController, TypeController, TerminatedOfferController};
-use Hyperion\API\ContributeController;
 
 require_once "autoload.php";
 
@@ -132,12 +131,15 @@ $rt->get("/offer/*/*", OfferController::class, ['id']);
 $rt->post("/offer/*", OfferController::class);
 
 // PROJECT
-$rt->get("/project{/*}",ProjectController:: class);
-$rt->get("/project/popular{/*}",ProjectController::class);
-$rt->get("/project/latest{/*}",ProjectController::class);
+$rt->get("/project/nologo/popular{/*}",ProjectController::class, ['popular', 'nologo']);
+$rt->get("/project/nologo/latest{/*}",ProjectController::class, ['latest', 'nologo']);
+$rt->get("/project/nologo{/*}",ProjectController:: class, ['all', 'nologo']);
 
-// CONTRIBUTION
-$rt->post("/project/contribute{/*}",ContributeController:: class);
+$rt->get("/project/logo/*", ProjectController::class, ['logo']);
+
+$rt->get("/project/popular{/*}",ProjectController::class, ['popular']);
+$rt->get("/project/latest{/*}",ProjectController::class, ['latest']);
+$rt->get("/project{/*}",ProjectController:: class, ['all']);
 if(!$rt->getRouted()){
 	response(404, "Not Found");
 }
