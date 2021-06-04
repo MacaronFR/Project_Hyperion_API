@@ -5,6 +5,7 @@ require_once "Models/AddressModel.php";
 require_once "Models/CartModel.php";
 require_once "Models/CategoryModel.php";
 require_once "Models/ClientModel.php";
+require_once "Models/ContributeModel.php";
 require_once "Models/DepositModel.php";
 require_once "Models/FilesModel.php";
 require_once "Models/InvoiceModel.php";
