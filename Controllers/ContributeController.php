@@ -30,39 +30,39 @@ class ContributeController implements Controller{
 	 * @inheritDoc
 	 */
 	#[NoReturn] public function post(array $args){
-		if(checkToken($args['uri_args'][0],1)){
-			if(is_numeric($args["post_args"]["amount"]) && is_numeric($args['post_args']['project'])){
-				$token = $this->tm->selectByToken($args['uri_args'][0]);
-				$user = $this->um->select($token['user']);
-				if($user){
-					$project = $this->pjm->select($args['post_args']["project"]);
-					if($project){
-						if($args["post_args"]["amount"] > $user["gc"]){
-							response(403,"Not enough Green Coins");
-						}else{
-							$value = ["value"=>$args["post_args"]["amount"],
-								"project"=>$args["post_args"]["project"],
-								"user"=>$user["id"]];
-							if($this->cm->insert($value)){
-								$new_gc = ["gc"=>$user['gc']-$args['post_args']['amount']];
-								$this->um->update($user['id'],$new_gc);
-								response(200,"OK");
-							}else{
-								response(500,"Internal Server Error");
-							}
-						}
-					}else{
-						response(404,"Not Found");
-					}
-				}else{
-					response(404,"Not Found");
-				}
-			}else{
-				response(403,"Forbidden");
-			}
-		}else{
-			response(403,"Forbidden");
+		if(!checkToken($args['uri_args'][0], 5)){
+			response(403, "Forbidden");
 		}
+
+		if(!is_numeric($args["post_args"]["amount"]) || !is_numeric($args['post_args']['project'])){
+			response(400, "Bad Request");
+		}
+
+		$token = $this->tm->selectByToken($args['uri_args'][0]);
+		$user = $this->um->select($token['user']);
+		if($user === false){
+			response(500, "Internal Server Error");
+		}
+
+		$project = $this->pjm->select($args['post_args']["project"]);
+		if($project === false){
+			response(404, "Not Found");
+		}
+
+		if($args["post_args"]["amount"] > $user["gc"]){
+			response(403, "Not enough Green Coins");
+		}
+
+		$value = ["value" => $args["post_args"]["amount"],
+			"project" => $args["post_args"]["project"],
+			"user" => $user["id"]];
+		if($this->cm->insert($value)){
+			$new_gc = ["gc" => $user['gc'] - $args['post_args']['amount']];
+			$this->um->update($user['id'], $new_gc);
+			response(200, "OK");
+		}
+
+		response(500, "Internal Server Error");
 	}
 
 	/**
