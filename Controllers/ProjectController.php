@@ -34,11 +34,26 @@ class ProjectController implements Controller{
 	#[NoReturn] public function getAll(array $args){
 		if(count($args["uri_args"]) === 0){
 			$projects = $this->pm->selectAllValid(limit: false);
-		}elseif(count($args['uri_args']) === 1){
+		}elseif(count($args['uri_args']) >= 1){
 			if(!is_numeric($args['uri_args'][0])){
 				response(400, "Bad Request");
 			}
-			$projects = $this->pm->selectAllValid($args['uri_args'][0]);
+			if(count($args['uri_args']) > 1){
+				$order = match($args['uri_args'][2]){@
+					'DESC' => 'DESC',
+					default => 'ASC'
+				};
+				$sort = match ($args['uri_args'][3]){
+					'contribution' => 'contribution',
+					'name' => 'name',
+					'RNA' => 'RNA',
+					default => 'id'
+				};
+				$search = $args['uri_args'][1];
+				$projects = $this->pm->selectAllValidFilter($search, $order, $sort, $args['uri_args'][0]);
+			}else{
+				$projects = $this->pm->selectAllValid($args['uri_args'][0]);
+			}
 		}
 		$this->processProject($projects, !(isset($args['additional'][1]) && $args['additional'][1] === 'nologo'));
 		response(200, "Projects", $projects);

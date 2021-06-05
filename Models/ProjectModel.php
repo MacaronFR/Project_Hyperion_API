@@ -14,7 +14,8 @@ class ProjectModel extends Model{
         "start"=>"start",
         "duration"=>"duration",
 	    "logo"=>"logo",
-		"valid"=>"valid"
+		"valid"=>"valid",
+		"RNA" => "RNA"
     ];
 	protected int $max_row = 10;
 
@@ -55,6 +56,21 @@ class ProjectModel extends Model{
 			$sql .= " LIMIT $start, $this->max_row";
 		}
 		return $this->query($sql);
+	}
+
+	public function selectAllValidFilter(string $search, string $order, string $sort, int $iteration = 0): array|false{
+		$start = $this->max_row * $iteration;
+		$sql = "SELECT ";
+		foreach($this->column as $p=>$c){
+			$sql .= "$c as $p, ";
+		}
+		$sql .= "$this->table_name.$this->id_name as id, SUM(CONTRIBUTE.`value`) AS contribution FROM $this->table_name LEFT JOIN CONTRIBUTE ON $this->table_name.$this->id_name = CONTRIBUTE.id_project WHERE valid=1 AND DATEDIFF(DATE_ADD(start, INTERVAL duration DAY), DATE(NOW())) >= 0 ";
+		$sql .= "AND (name LIKE :search OR description LIKE :search OR RNA LIKE :search) ";
+		$sql .="GROUP BY $this->table_name.$this->id_name ";
+		$sql .= "ORDER BY $sort $order ";
+		$sql .= "LIMIT $start, $this->max_row;";
+		$search = "%" . $search . "%";
+		return $this->prepared_query($sql, ["search" => $search]);
 	}
 
 }
