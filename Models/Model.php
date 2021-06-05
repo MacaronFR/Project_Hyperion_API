@@ -8,8 +8,6 @@ use PDOException;
 abstract class Model{
 	/** @var PDO $bdd PDO object to database */
 	protected PDO $bdd;
-	protected const INSERT = 1;
-	protected const UPDATE = 2;
 	protected string $table_name;
 	protected string $id_name;
 	protected array $column;
@@ -25,7 +23,7 @@ abstract class Model{
 		$user = $db["user"];
 		$passwd = $db["passwd"];
 		$port = $db["port"];
-		$this->bdd = new PDO("mysql:dbname=${dbname};host=${host}:${port}", $user, $passwd);
+		$this->bdd = new PDO("mysql:dbname=$dbname;host=$host:$port", $user, $passwd);
 		$this->bdd->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	}
 
