@@ -28,9 +28,11 @@ abstract class Model{
 		$this->bdd = new PDO("mysql:dbname=${dbname};host=${host}:${port}", $user, $passwd);
 		$this->bdd->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	}
+
 	/**
 	 * Query to Database
 	 * @param string $statement Statement to query
+	 * @param bool $unique
 	 * @return false|array
 	 */
 	protected function query(string $statement, bool $unique = false): false|array{
