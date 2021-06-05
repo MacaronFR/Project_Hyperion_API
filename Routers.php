@@ -53,6 +53,9 @@ class Router{
 		$regex = "/^" . $regex . "$/";
 		$regex = str_replace("\{", "(?:", $regex);
 		$regex = str_replace("\}", ")?", $regex);
+		if($regex[strlen($regex) - 3] === '_' && $regex[strlen($regex) - 4] !== '\\'){
+			$regex = substr_replace($regex, "(.+)", strlen($regex) - 3, 1);
+		}
 		return $regex;
 	}
 
