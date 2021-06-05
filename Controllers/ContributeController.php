@@ -29,7 +29,7 @@ class ContributeController implements Controller{
 	/**
 	 * @inheritDoc
 	 */
-	public function post(array $args){
+	#[NoReturn] public function post(array $args){
 		if(checkToken($args['uri_args'][0],1)){
 			if(is_numeric($args["post_args"]["amount"]) && is_numeric($args['post_args']['project'])){
 				$token = $this->tm->selectByToken($args['uri_args'][0]);
@@ -38,7 +38,7 @@ class ContributeController implements Controller{
 					$project = $this->pjm->select($args['post_args']["project"]);
 					if($project){
 						if($args["post_args"]["amount"] > $user["gc"]){
-							response(403,"Not enought Green Coins");
+							response(403,"Not enough Green Coins");
 						}else{
 							$value = ["value"=>$args["post_args"]["amount"],
 								"project"=>$args["post_args"]["project"],
