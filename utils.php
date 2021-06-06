@@ -21,6 +21,16 @@ function parse_put(){
 	}
 }
 
+function getUser(TokenModel $tm, string $token, UserModel $um): array | false{
+	$token = $tm->selectByToken($token);
+	$user = $um->select($token['user']);
+	if(!$user){
+		response(404,"Not Found");
+	}else{
+		return $user;
+	}
+}
+
 function parse_body(): array| false{
 	$body = file_get_contents("php://input");
 	try{

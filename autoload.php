@@ -29,6 +29,7 @@ require_once "Controllers/BrandModelController.php";
 require_once "Controllers/CategoryController.php";
 require_once "Controllers/ConnectionController.php";
 require_once "Controllers/ContributeController.php";
+require_once "Controllers/InvoiceController.php";
 require_once "Controllers/OAuthController.php";
 require_once "Controllers/OfferController.php";
 require_once "Controllers/PendingOfferController.php";
