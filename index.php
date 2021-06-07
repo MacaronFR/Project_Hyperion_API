@@ -103,9 +103,13 @@ $rt->get("/brand/*/model/*/reference", ReferenceHierarchyController::class, ['br
 $rt->get("/type/*/model/*/reference", ReferenceHierarchyController::class, ['type_model_reference']);
 // /type/{type_id}/brand/{brand_name}/model/{model_name}/reference
 $rt->get("/type/*/brand/*/model/*/reference", ReferenceHierarchyController::class, ['type_brand_model_reference']);
+
+$rt->get("/specification/name",SpecController::class, ['name']);
+$rt->get("/specification/type/*/brand/*", SpecController::class, ['type', 'brand']);
+$rt->get("/specification/type/*", SpecController::class, ['type']);
+$rt->get("/specification/brand/*", SpecController::class, ['brand']);
 // /specification[/{page}[/search/{search}[/order/{direction}/sort{column}]]]
-$rt->get("/specification{/*{/search/*{/order/*/sort/*}}}",SpecController::class);
-$rt->get("/specification/name{/*}",SpecController::class, ['name']);
+$rt->get("/specification{/*{/search/*{/order/*/sort/*}}}",SpecController::class, ['all']);
 // /specification/{token}/{id}
 $rt->put("/specification/*/*",SpecController::class);
 // /specification/{token}/{id}

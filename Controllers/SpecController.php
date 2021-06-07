@@ -10,17 +10,100 @@ require_once "autoload.php";
 
 
 class SpecController implements Controller{
-	private TokenModel $tm;
+	private TypeModel $tm;
 	private SpecificationModel $sm;
 	private RefHaveSpecModel $rm;
 
 	public function __construct(){
-		$this->tm = new TokenModel();
+		$this->tm = new TypeModel();
 		$this->sm = new SpecificationModel();
 		$this->rm = new RefHaveSpecModel();
 	}
 
 	#[NoReturn] public function get(array $args){
+		if($args['additional'][0] === 'all'){
+			$this->getAllFilter($args);
+		}elseif($args['additional'][0] === 'type'){
+			if(count($args['additional']) === 2){
+				$this->getSpecTypeBrand($args);
+			}else{
+				$this->getSpecType($args);
+			}
+		}elseif($args['additional'][0] === 'brand'){
+			$this->getSpecBrand($args);
+		}
+	}
+
+	#[NoReturn] public function getSpecType(array $args){
+		if(!is_numeric($args['uri_args'][0])){
+			response(400, "Bad Request");
+		}
+		$type = $this->tm->select($args['uri_args'][0]);
+		if($type === false){
+			response(404, "Type Not Found");
+		}
+		$specs = $this->sm->selectAllProdSpecByType($args['uri_args'][0]);
+		if($specs === false){
+			response(500, "Internal Server Error");
+		}
+		if(empty($specs)){
+			response(204, "No Content");
+		}
+		$res = [];
+		foreach($specs as $spec){
+			$res[$spec['name']][] = $spec['value'];
+		}
+		response(200, "OK", $res);
+	}
+
+	#[NoReturn] public function getSpecTypeBrand(array $args){
+		if(!is_numeric($args['uri_args'][0])){
+			response(400, "Bad Request");
+		}
+		$type = $this->tm->select($args['uri_args'][0]);
+		if($type === false){
+			response(404, "Type Not Found");
+		}
+		$brand = $this->sm->selectBrand($args['uri_args'][1]);
+		if($brand === false){
+			response(404, "Brand Not Found");
+		}
+		$specs = $this->sm->selectAllProdSpecByTypeBrand($args['uri_args'][0], $args['uri_args'][1]);
+		if($specs === false){
+			response(500, "Internal Server Error");
+		}
+		if(empty($specs)){
+			response(204, "No Content");
+		}
+		$res = [];
+		foreach($specs as $spec){
+			$res[$spec['name']][] = $spec['value'];
+		}
+		unset($res['brand']);
+		response(200, "OK", $res);
+	}
+
+	#[NoReturn] public function getSpecBrand(array $args){
+		$brand = $this->sm->selectBrand($args['uri_args'][0]);
+		if($brand === false){
+			response(404, "Brand Not Found");
+		}
+		$specs = $this->sm->selectAllProdSpecByBrand($args['uri_args'][0]);
+		if($specs === false){
+			response(500, "Internal Server Error");
+		}
+		if(empty($specs)){
+			response(204, "No Content");
+		}
+		$res = [];
+		foreach($specs as $spec){
+			$res[$spec['name']][] = $spec['value'];
+		}
+		unset($res['brand']);
+		response(200, "OK", $res);
+	}
+
+	#[NoReturn] public function getAllFilter(array $args){
 		$page = 0;
 		if(count($args['uri_args']) >= 1){
 			if(is_numeric($args['uri_args'][0])){

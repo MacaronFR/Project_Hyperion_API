@@ -170,4 +170,47 @@ class SpecificationModel extends Model{
 		$sql = "SELECT $this->id_name FROM $this->table_name WHERE name=\"model\" AND value=:value";
 		return $this->prepared_query($sql, ['value' => $name], unique: true);
 	}
+
+	public function selectAllProdSpecByType(int $type): array|false{
+		$sql = "SELECT SPECIFICATION.`name`, SPECIFICATION.`value` 
+				FROM PRODUCTS
+				    INNER JOIN SPECIFICATION INNER JOIN REFERENCE_PRODUCTS ON PRODUCTS.id_ref = REFERENCE_PRODUCTS.id_product
+				    INNER JOIN REF_HAVE_SPEC ON REFERENCE_PRODUCTS.id_product = REF_HAVE_SPEC.id_product AND SPECIFICATION.id_specification = REF_HAVE_SPEC.id_spec
+				WHERE REFERENCE_PRODUCTS.type = :type
+				GROUP BY SPECIFICATION.`name`, SPECIFICATION.`value`";
+		return $this->prepared_query($sql, ['type' => $type]);
+	}
+
+	public function selectAllProdSpecByBrand(string $brand): array|false{
+		$sql = "SELECT SPECIFICATION.`name`, SPECIFICATION.`value`
+				FROM (	SELECT PRODUCTS.id_ref 
+						FROM	SPECIFICATION
+        					INNER JOIN REF_HAVE_SPEC ON SPECIFICATION.id_specification = REF_HAVE_SPEC.id_spec
+        					INNER JOIN PRODUCTS ON PRODUCTS.id_ref = REF_HAVE_SPEC.id_product 
+    					WHERE SPECIFICATION.`name` = \"brand\" AND SPECIFICATION.`value` = :brand 
+    				 ) RES				    
+					INNER JOIN REF_HAVE_SPEC ON REF_HAVE_SPEC.id_product = RES.id_ref
+    				INNER JOIN SPECIFICATION ON REF_HAVE_SPEC.id_spec = SPECIFICATION.id_specification 
+				GROUP BY `name`, SPECIFICATION.`value`";
+		return $this->prepared_query($sql, ['brand' => $brand]);
+	}
+
+	public function selectAllProdSpecByTypeBrand(int $type, string $brand, int $iteration = 0, bool $limit = true): array|false{
+		$sql = "SELECT SPECIFICATION.`name`, SPECIFICATION.`value`
+				FROM (	SELECT PRODUCTS.id_ref 
+						FROM	SPECIFICATION
+        					INNER JOIN REF_HAVE_SPEC ON SPECIFICATION.id_specification = REF_HAVE_SPEC.id_spec
+						    INNER JOIN REFERENCE_PRODUCTS RP on REF_HAVE_SPEC.id_product = RP.id_product
+        					INNER JOIN PRODUCTS ON PRODUCTS.id_ref = RP.id_product 
+    					WHERE SPECIFICATION.`name` = \"brand\" AND SPECIFICATION.`value` = :brand AND RP.type = :type
+    				 ) RES				    
+					INNER JOIN REF_HAVE_SPEC ON REF_HAVE_SPEC.id_product = RES.id_ref
+    				INNER JOIN SPECIFICATION ON REF_HAVE_SPEC.id_spec = SPECIFICATION.id_specification 
+				GROUP BY `name`, SPECIFICATION.`value`";
+		if($limit){
+			$start = $iteration * $this->max_row;
+			$sql .= " LIMIT $start, $this->max_row";
+		}
+		return $this->prepared_query($sql, ['brand' => $brand, 'type' => $type]);
+	}
 }
