@@ -213,7 +213,38 @@ class BrandModelController implements Controller{
 			$this->model($args);
 		}elseif($args['additional'][0] === "type_model"){
 			$this->type_model($args);
+		}elseif($args['additional'][0] === 'brandcat'){
+			$this->brandByCat($args);
 		}
+	}
+
+	#[NoReturn] private function brandByCat(array $args){
+		if(!is_numeric($args['uri_args'][0])){
+			response(400, "Bad Request");
+		}
+		$category = $this->cm->select((int)$args['uri_args'][0]);
+		if($category === false){
+			response(500, "Internal Server Error");
+		}
+		if(empty($category)){
+			response(400, "Invalid Brand");
+		}
+		if(count($args['uri_args']) === 2){
+			$brands = $this->rm->selectAllBrandType((int)$args['uri_args'][0], $args['uri_args'][1]);
+		}else{
+			$brands = $this->rm->selectAllBrandType((int)$args['uri_args'][0], limit: false);
+		}
+		if($brands === false){
+			response(500, "Internal Server Error");
+		}
+		if(count($brands) === 0){
+			response(204, "No content");
+		}
+		foreach($brands as &$brand){
+			unset($brand['id_product']);
+		}
+		$brands['totalNotFiltered'] = $brands['total'] = count($brands);
+		response(200, "Brand of category " . $category['name'], $brands);
 	}
 
 	/**

@@ -60,6 +60,8 @@ $rt->delete("/type/*/*", TypeController::class);
 $rt->post("/type/*", TypeController::class);
 // /category/type/{id_category}[/{page}]
 $rt->get("/category/*/type{/*}",BrandModelController::class, ["type"]);
+// /category/brand/{id_category}[/{page}]
+$rt->get("/category/*/brand{/*}",BrandModelController::class, ["brandcat"]);
 // /type/{id_type}/product[/{page}]
 $rt->get("/type/*/product{/*}", ProductHierarchyController::class, ["type_product"]);
 // /type/{id_type}/reference[/{page}]
