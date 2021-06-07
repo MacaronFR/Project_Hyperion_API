@@ -35,7 +35,6 @@ $rt->get("/store{/*}", StoreController::class);
 $rt->get("/me/*", ProfileController::class);
 $rt->put("/me/*", ProfileController::class, ['me']);
 $rt->delete("/me/*",ProfileController::class);
-$rt->get("/me/invoice/*", InvoiceController::class);
 // /profile/{token}/{user_id}
 $rt->get("/profile/*/*",ProfileController::class);
 $rt->put("/profile/*/*",ProfileController::class);
@@ -62,8 +61,6 @@ $rt->delete("/type/*/*", TypeController::class);
 $rt->post("/type/*", TypeController::class);
 // /category/type/{id_category}[/{page}]
 $rt->get("/category/*/type{/*}",BrandModelController::class, ["type"]);
-// /category/brand/{id_category}[/{page}]
-$rt->get("/category/*/brand{/*}",BrandModelController::class, ["brandcat"]);
 // /type/{id_type}/product[/{page}]
 $rt->get("/type/*/product{/*}", ProductHierarchyController::class, ["type_product"]);
 // /type/{id_type}/reference[/{page}]
@@ -153,6 +150,10 @@ $rt->get("/project{/*{/search/*{/order/*/sort/*}}}",ProjectController:: class, [
 
 // CONTRIBUTION
 $rt->post("/project/contribute/*", ContributeController::class);
+
+//
+$rt->get("/invoice/me/*",InvoiceController::class);
+$rt->get("/invoice/all/*",InvoiceController::class);
 if(!$rt->getRouted()){
 	response(404, "Not Found");
 }
