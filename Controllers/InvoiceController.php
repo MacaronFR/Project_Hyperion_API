@@ -22,28 +22,33 @@ class InvoiceController implements Controller{
 	 */
 	public function get(array $args){
 		if(checkToken($args['uri_args'][0],3)){
-			$user = getUser($this->tm,$args['uri_args'][0],$this->um);
-			if($user){
-				if($this->im->selectAll(limit:false)){
-					response(200,"All Invoices of every users");
-				}else{
-					response(404,"Not Found");
-				}
-			}
+			$this->getAdmin();
 		}else{
 			if(checkToken($args['uri_args'][0],5)){
-				$user = getUser($this->tm,$args['uri_args'][0],$this->um);
-				if($user){
-					if($this->im->select($user['id_user'], "id_user")){
-						response(200, "All of your Invoices are belong to us");
-					}else{
-						response(404, "Not Found");
-					}
-				}else{
-					response(404, 'Not Found');
-				}
+				$this->getUserInvoice($args);
 			}
 		}
+	}
+	private function getAdmin(){
+		if($this->im->selectAll(limit:false)){
+			response(200,"All Invoices of every users");
+		}else{
+			response(404,"Not Found");
+		}
+	}
+
+	 private function getUserInvoice(array $args){
+		$user = getUser($this->tm,$args['uri_args'][0],$this->um);
+		if($user){
+			if($this->im->select($user['id_user'], "id_user")){
+				response(200, "All of your Invoices are belong to us");
+			}else{
+				response(404, "Not Found");
+			}
+		}else{
+			response(404, 'Not Found');
+		}
+
 	}
 
 	/**
