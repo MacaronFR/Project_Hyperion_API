@@ -174,6 +174,5 @@ $rt->get("/shop/cat/*/*{/filter/_}", ShopController::class, ['cat']);
 $rt->get("/product/picture/*{/*}", PictureController::class);
 
 if(!$rt->getRouted()){
-	echo "NIK";
 	response(404, "Not Found");
 }
