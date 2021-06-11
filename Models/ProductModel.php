@@ -371,7 +371,6 @@ class ProductModel extends Model{
 		$sql .= " FROM SHOP_FILTER SH WHERE " . $sub_where;
 		$sql .= " GROUP BY SH.id, SH.`name`, SH.`value`) RES " . (!empty($filter) ? "WHERE " . $where: "");
 		$sql .= " GROUP BY id) TOTAL_RES";
-		echo $sql;
 		return $this->prepared_query($sql, $param, unique: true);
 	}
 }
