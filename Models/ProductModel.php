@@ -294,4 +294,44 @@ class ProductModel extends Model{
 		$total = $this->prepared_query($sql, ['search' => $search], unique: true);
 		return $total['count'] ?? false;
 	}
+
+	public function selectShop(int $cat = -1, int $type = -1, string $brand = "", array $filter = [], string $order = "id", string $sort = "DESC", $iteration = 0): array|false{
+		$start = $iteration * $this->max_row;
+		$sql = "SELECT id, type, selling_price FROM (SELECT *, COUNT( SH.id ) AS count";
+		$sub_sel = "";
+		$sub_where = "";
+		$where = "";
+		$param = [];
+		$delimiter = true;
+		if($brand !== ""){
+			$filter[] = ['brand', $brand];
+		}
+		if($cat !== -1){
+			$sub_where .= "category = $cat" . ((!empty($filter) && $type === -1)?" AND ":"") . ($type !==-1?" AND ":"");
+		}
+		if($type !== -1){
+			$sub_where .= "type = $type" . (empty($filter)?"":" AND (");
+		}
+		if(!empty($filter)){
+			$sub_sel .= ",";
+		}
+		for($i = 0; $i < count($filter); ++$i){
+			if($i === count($filter) - 1){
+				$delimiter = false;
+			}
+			$sub_sel .= "(SELECT COUNT(id) FROM SHOP_FILTER WHERE SHOP_FILTER.id = SH.id AND `name`=:name$i) as total$i" . ($delimiter?',':'');
+			$sub_where .= "(`name` = :name$i AND `value` = :value$i)" . ($delimiter?" OR":"");
+			$where .= "((count = 2 OR total$i = 1) and `name`=:name$i)" . ($delimiter?" OR":"");
+			$param["name$i"] = $filter[$i][0];
+			$param["value$i"] = $filter[$i][1];
+		}
+		if($type !== -1 && !empty($filter)){
+			$sub_where .= ")";
+		}
+		$sql .= $sub_sel;
+		$sql .= " FROM SHOP_FILTER SH WHERE " . $sub_where;
+		$sql .= " GROUP BY SH.id, SH.`name`, SH.`value`) RES " . (!empty($filter) ? "WHERE " . $where: "");
+		$sql .= " GROUP BY id ORDER BY $order $sort LIMIT $start, $this->max_row";
+		return $this->prepared_query($sql, $param);
+	}
 }

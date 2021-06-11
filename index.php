@@ -9,7 +9,7 @@ use Hyperion\API\{ContributeController,
 	PendingOfferController,
 	ProjectController,
 	TypeController,
-	TerminatedOfferController};
+	TerminatedOfferController, ShopController};
 
 require_once "autoload.php";
 
@@ -160,6 +160,17 @@ $rt->post("/project/contribute/*", ContributeController::class);
 //
 $rt->get("/invoice/me/*",InvoiceController::class);
 $rt->get("/invoice/all/*",InvoiceController::class);
+
+//Shop
+$rt->get("/shop{/*}", ShopController::class, ['main']);
+$rt->get("/shop/cat/*/type/*/brand/*/*{/filter/_}", ShopController::class, ['cat', 'type', 'brand']);
+$rt->get("/shop/cat/*/brand/*/*{/filter/_}", ShopController::class, ['cat', 'brand']);
+$rt->get("/shop/cat/*/type/*/*{/filter/_}", ShopController::class, ['cat', 'type']);
+$rt->get("/shop/type/*/brand/*/*{/filter/_}", ShopController::class, ['type', 'brand']);
+$rt->get("/shop/type/*/*{/filter/_}", ShopController::class, ['type']);
+$rt->get("/shop/brand/*/*{/filter/_}", ShopController::class, ['brand']);
+$rt->get("/shop/cat/*/*{/filter/_}", ShopController::class, ['cat']);
+
 if(!$rt->getRouted()){
 	response(404, "Not Found");
 }
