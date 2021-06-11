@@ -120,6 +120,11 @@ class ShopController implements Controller{
 		}
 		$products = $this->pm->selectShop($args['uri_args'][0], $type, $brand, $filter, iteration: $iteration);
 		$this->processProduct($products);
+		$total = $this->pm->selectShopTotal($args['uri_args'][0], $type, $brand, $filter);
+		if($total === false){
+			response(500, "Internal Server Error");
+		}
+		$products['total'] = $total;
 		response(200, "Shop", $products);
 	}
 
@@ -154,6 +159,11 @@ class ShopController implements Controller{
 		}
 		$products = $this->pm->selectShop(type: $args['uri_args'][0], brand: $brand, filter: $filter, iteration: $iteration);
 		$this->processProduct($products);
+		$total = $this->pm->selectShopTotal(type: $args['uri_args'][0], brand: $brand, filter: $filter);
+		if($total === false){
+			response(500, "Internal Server Error");
+		}
+		$products['total'] = $total;
 		response(200, "Shop", $products);
 	}
 
@@ -166,6 +176,11 @@ class ShopController implements Controller{
 		}
 		$products = $this->pm->selectShop(brand: $args['uri_args'][0], filter: $filter, iteration: $args['uri_args'][1]);
 		$this->processProduct($products);
+		$total = $this->pm->selectShopTotal(brand: $args['uri_args'][0], filter: $filter);
+		if($total === false){
+			response(500, "Internal Server Error");
+		}
+		$products['total'] = $total;
 		response(200, "Shop", $products);
 	}
 
