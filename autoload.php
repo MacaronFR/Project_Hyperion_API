@@ -33,6 +33,7 @@ require_once "Controllers/InvoiceController.php";
 require_once "Controllers/OAuthController.php";
 require_once "Controllers/OfferController.php";
 require_once "Controllers/PendingOfferController.php";
+require_once "Controllers/PictureController.php";
 require_once "Controllers/ProductHierarchyController.php";
 require_once "Controllers/ProjectController.php";
 require_once "Controllers/ProfileController.php";
