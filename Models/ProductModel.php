@@ -297,7 +297,7 @@ class ProductModel extends Model{
 
 	public function selectShop(int $cat = -1, int $type = -1, string $brand = "", array $filter = [], string $order = "id", string $sort = "DESC", $iteration = 0): array|false{
 		$start = $iteration * $this->max_row;
-		$sql = "SELECT id, type, selling_price FROM (SELECT *, COUNT( SH.id ) AS count";
+		$sql = "SELECT id, type, selling_price as sell_p, state FROM (SELECT *, COUNT( SH.id ) AS count";
 		$sub_sel = "";
 		$sub_where = "";
 		$where = "";
