@@ -124,7 +124,7 @@ class ShopController implements Controller{
 		if($total === false){
 			response(500, "Internal Server Error");
 		}
-		$products['total'] = $total;
+		$products['total'] = (int)$total['total'];
 		response(200, "Shop", $products);
 	}
 
@@ -163,7 +163,7 @@ class ShopController implements Controller{
 		if($total === false){
 			response(500, "Internal Server Error");
 		}
-		$products['total'] = $total;
+		$products['total'] = (int)$total['total'];
 		response(200, "Shop", $products);
 	}
 
@@ -180,7 +180,7 @@ class ShopController implements Controller{
 		if($total === false){
 			response(500, "Internal Server Error");
 		}
-		$products['total'] = $total;
+		$products['total'] = $total['total'];
 		response(200, "Shop", $products);
 	}
 

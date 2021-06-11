@@ -336,7 +336,7 @@ class ProductModel extends Model{
 	}
 
 	public function selectShopTotal(int $cat = -1, int $type = -1, string $brand = "", array $filter = [], string $order = "id", string $sort = "DESC"): array|false{
-		$sql = "SELECT COUNT(id) FROM (SELECT *, COUNT( SH.id ) AS count";
+		$sql = "SELECT COUNT(id) as total FROM (SELECT id FROM (SELECT *, COUNT( SH.id ) AS count";
 		$sub_sel = "";
 		$sub_where = "";
 		$where = "";
@@ -370,7 +370,8 @@ class ProductModel extends Model{
 		$sql .= $sub_sel;
 		$sql .= " FROM SHOP_FILTER SH WHERE " . $sub_where;
 		$sql .= " GROUP BY SH.id, SH.`name`, SH.`value`) RES " . (!empty($filter) ? "WHERE " . $where: "");
-		$sql .= " GROUP BY id";
+		$sql .= " GROUP BY id) TOTAL_RES";
+		echo $sql;
 		return $this->prepared_query($sql, $param, unique: true);
 	}
 }
