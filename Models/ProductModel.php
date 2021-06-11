@@ -296,12 +296,13 @@ class ProductModel extends Model{
 	}
 
 	public function selectShop(int $cat = -1, int $type = -1, string $brand = "", array $filter = [], string $order = "id", string $sort = "DESC", $iteration = 0): array|false{
+		$nfilter = count($filter);
 		$start = $iteration * $this->max_row;
 		$sql = "SELECT id, type, selling_price as sell_p, state FROM (SELECT *, COUNT( SH.id ) AS count";
 		$sub_sel = "";
 		$sub_where = "";
 		$where = "";
-		$param = [];
+		$param = ['nFilter' => $nfilter];
 		$delimiter = true;
 		if($brand !== ""){
 			$filter[] = ['brand', $brand];
@@ -331,7 +332,7 @@ class ProductModel extends Model{
 		$sql .= $sub_sel;
 		$sql .= " FROM SHOP_FILTER SH WHERE " . $sub_where;
 		$sql .= " GROUP BY SH.id, SH.`name`, SH.`value`) RES " . (!empty($filter) ? "WHERE " . $where: "");
-		$sql .= " GROUP BY id ORDER BY $order $sort LIMIT $start, $this->max_row";
+		$sql .= " GROUP BY id HAVING COUNT(id)=:nFilter ORDER BY $order $sort LIMIT $start, $this->max_row";
 		return $this->prepared_query($sql, $param);
 	}
 
