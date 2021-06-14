@@ -212,7 +212,7 @@ class ShopController implements Controller{
 			response(500, "Internal Server Error");
 		}
 		if(empty($products)){
-//			response(204, "No Content");
+			response(204, "No Content");
 		}
 		foreach($products as &$p){
 			$detail = $this->pm->selectWithDetail($p['id']);
