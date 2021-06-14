@@ -13,7 +13,8 @@ class OffersModel extends Model{
 		"counter_offer" => "counter_offer",
 		"status" => "status",
 		"user" => "id_user",
-		"date" => "date_creation"
+		"date" => "date_creation",
+		"expert" => "id_expert"
 	];
 	protected int $max_row = 10;
 
