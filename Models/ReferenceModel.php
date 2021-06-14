@@ -77,19 +77,19 @@ class ReferenceModel extends Model{
 	}
 
 	public function selectWithDetail(int $id): array|false{
-		$sql1 = "SELECT S.* FROM REFERENCE_PRODUCTS RP INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification WHERE RP.id_product=:id";
+		$sql1 = "SELECT S.*, RHS.value as bonus FROM REFERENCE_PRODUCTS RP INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification WHERE RP.id_product=:id";
 		$ref_spec = $this->prepared_query($sql1, ["id" => $id]);
 		$ref = [];
 		if($ref_spec !== false){
 			foreach($ref_spec as $spec){
 				if(isset($ref['spec'][$spec['name']])){
 					if(is_array($ref['spec'][$spec['name']])){
-						$ref['spec'][$spec['name']][] = $spec["value"];
+						$ref['spec'][$spec['name']][] = [$spec["value"], $spec['bonus']];
 					}else{
-						$ref['spec'][$spec['name']] = [$ref['spec'][$spec['name']], $spec["value"]];
+						$ref['spec'][$spec['name']] = [$ref['spec'][$spec['name']], [$spec["value"], $spec['bonus']]];
 					}
 				}else{
-					$ref["spec"][$spec["name"]] = $spec["value"];
+					$ref["spec"][$spec["name"]] = [[$spec["value"], $spec['bonus']]];
 				}
 			}
 			return $ref;
@@ -200,9 +200,7 @@ class ReferenceModel extends Model{
 	}
 
 	public function selectByTypeBrandModel(int $type, string $brand, string $model): array|false{
-		$sql = "SELECT id, buying_price, selling_price, type
-				FROM (
-				    SELECT COUNT(RP.id_product) as count, RP.id_product as id, RP.selling_price as selling_price, RP.buying_price as buying_price, T.type as type
+		$sql = " SELECT COUNT(RP.id_product) as count, RP.id_product as id, RP.selling_price as selling_price, RP.buying_price as buying_price, T.type as type
 					FROM REFERENCE_PRODUCTS RP 
 						INNER JOIN REF_HAVE_SPEC RHS on RP.id_product = RHS.id_product
 						INNER JOIN SPECIFICATION S on RHS.id_spec = S.id_specification
@@ -210,9 +208,7 @@ class ReferenceModel extends Model{
 					WHERE ((S.name = \"model\" AND S.value = :model)
 						OR (S.name = \"brand\" AND S.value = :brand))
 						AND RP.type=:type
-					GROUP BY RP.id_product 
-					) S
-				WHERE count=2;";
+					GROUP BY RP.id_product HAVING COUNT(RP.id_product) = 2;";
 		$references = $this->prepared_query($sql, ['type' => $type, 'model' => $model, 'brand' => $brand], unique: true);
 		if($references === false || empty($references)){
 			return $references;
@@ -222,8 +218,8 @@ class ReferenceModel extends Model{
 			return false;
 		}
 		$spec = $spec['spec'];
-		$references['model'] = $spec['model'];
-		$references['brand'] = $spec['brand'];
+		$references['model'] = $spec['model'][0][0];
+		$references['brand'] = $spec['brand'][0][0];
 		unset($spec['model'], $spec['brand']);
 		$references['spec'] = $spec;
 		return $references;

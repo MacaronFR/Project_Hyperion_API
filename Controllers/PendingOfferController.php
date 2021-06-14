@@ -96,8 +96,8 @@ class PendingOfferController implements Controller{
 			}
 			$p['type'] = $type['type'];
 			$p['state'] = $product['state'];
-			$p['brand'] = $spec['spec']['brand'];
-			$p['model'] = $spec['spec']['model'];
+			$p['brand'] = $spec['spec']['brand'][0][0];
+			$p['model'] = $spec['spec']['model'][0][0];
 		}
 		$pending['total'] = $pending['totalNotFiltered'] = $total;
 		response(200, "OK", $pending);
