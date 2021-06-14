@@ -205,7 +205,7 @@ class OfferController implements Controller{
 						response(503, "Internal Server Error");
 					}
 					$bonus += (double)$spec_value['value'];
-					$spec[$name] = $spec_value['id'];
+					$spec[$name] = $spec_id['id'];
 				}else{
 					if($args['post_args']['spec'][$name] !== $value){
 						response(400, "Bad Value for Spec $name");
