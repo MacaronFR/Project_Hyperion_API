@@ -4,12 +4,16 @@ use Hyperion\API\{OAuthController,ConnectionController,StoreController,ProfileCo
 use Hyperion\API\Router;
 use Hyperion\API\{ProductHierarchyController,ReferenceHierarchyController,BrandModelController,SpecController};
 use Hyperion\API\{ContributeController,
+	ExpertOfferController,
 	InvoiceController,
 	OfferController,
 	PendingOfferController,
 	ProjectController,
 	TypeController,
-	TerminatedOfferController, ShopController, PictureController, StateController};
+	TerminatedOfferController,
+	ShopController,
+	PictureController,
+	StateController};
 
 require_once "autoload.php";
 
@@ -174,6 +178,10 @@ $rt->get("/shop/cat/*/*{/filter/_}", ShopController::class, ['cat']);
 $rt->get("/product/picture/*{/*}", PictureController::class);
 
 $rt->get("/state", StateController::class);
+
+$rt->get("/expert/offer/*{/*{/search/*{/order/*/sort/*}}}", ExpertOfferController::class);
+$rt->get("/expert/offer/pending/*{/*{/search/*{/order/*/sort/*}}}", ExpertOfferController::class, ['pending']);
+$rt->get("/expert/offer/history/*{/*{/search/*{/order/*/sort/*}}}", ExpertOfferController::class, ['history']);
 
 if(!$rt->getRouted()){
 	response(404, "Not Found");

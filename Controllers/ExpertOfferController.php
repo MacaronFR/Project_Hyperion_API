@@ -1,0 +1,141 @@
+<?php
+
+
+namespace Hyperion\API;
+
+
+use JetBrains\PhpStorm\NoReturn;
+
+class ExpertOfferController implements Controller{
+
+	private OffersModel $om;
+	private ProductModel $pm;
+	private ReferenceModel $rm;
+	private TypeModel $tm;
+
+	public function __construct(){
+		$this->om = new OffersModel();
+		$this->pm = new ProductModel();
+		$this->rm = new ReferenceModel();
+		$this->tm = new TypeModel();
+	}
+
+	private function checkParameter($count, $order, $sort):bool{
+		if(!is_numeric($count)){
+			return false;
+		}
+		if($order !== "DESC" && $order !== "ASC"){
+			return false;
+		}
+		if(!isset($this->om->column["$sort"]) && $sort !== "id"){
+			return false;
+		}
+		return true;
+	}
+
+	private function getDetail(&$offers){
+		if($offers === false){
+			response(500, "Internal Server Error");
+		}
+		if(empty($offers)){
+			response(204, "No Content");
+		}
+		foreach($offers as &$o){
+			$prod = $this->pm->select($o['id'], "offer");
+			if($prod === false){
+				response(500, "Internal Server Error");
+			}
+			$ref = $this->rm->select($prod['ref']);
+			if($ref === false){
+				response(500, "Internal Server Error");
+			}
+			$type = $this->tm->select($ref['type']);
+			if($type === false){
+				response(500, "Internal Server Error");
+			}
+			$prod = $this->pm->selectWithDetail($prod['id']);
+			if($prod === false){
+				response(500, "Internal Server Error");
+			}
+			$o['brand'] = $prod['spec']['brand'];
+			$o['model'] = $prod['spec']['model'];
+			$o['type'] = $type['type'];
+		}
+	}
+
+	#[NoReturn] private function getAll(array $args){
+		$count = $args['uri_args'][1] ?? 0;
+		$search = $args['uri_args'][2] ?? "";
+		$order = strtoupper($args['uri_args'][3] ?? "ASC");
+		$sort = $args['uri_args'][4] ?? "id";
+		if(!$this->checkParameter($count,$order, $sort)){
+			response(400, "Bad Request");
+		}
+		$offers = $this->om->selectAllFilterNotStarted($search, $order, $sort, $count);
+		$this->getDetail($offers);
+		$total = $this->om->selectTotalFilterNotStarted($search, $order, $sort);
+		$totalNotFiltered = $this->om->selectTotalNotStarted();
+		if($totalNotFiltered === false || $total === false){
+			response(500, 'Internal Server Error');
+		}
+		$offers['total'] = $total;
+		$offers['totalNotFiltered'] = $totalNotFiltered;
+		response(200, "Offer Not Started", $offers);
+	}
+
+	#[NoReturn] public function getActive($args){
+		$expert = getUser(new TokenModel(), $args['uri_args'][0], new UserModel());
+		$count = $args['uri_args'][1] ?? 0;
+		$search = $args['uri_args'][2] ?? "";
+		$order = strtoupper($args['uri_args'][3] ?? "ASC");
+		$sort = $args['uri_args'][4] ?? "id";
+		if(!$this->checkParameter($count, $order, $sort)){
+			response(400, "Bad Request");
+		}
+		$offers = $this->om->selectAllFilterActive($search, $order, $sort, $expert['id'], $count);
+		$this->getDetail($offers);
+		$total = $this->om->selectTotalFilterActive($search, $order, $sort, $expert['id']);
+		$totalNotFiltered = $this->om->selectTotalActive($expert['id']);
+		if($totalNotFiltered === false || $total === false){
+			response(500, 'Internal Server Error');
+		}
+		$offers['total'] = $total;
+		$offers['totalNotFiltered'] = $totalNotFiltered;
+		response(200, "Offer Not Started", $offers);
+	}
+
+	/**
+	 * @param array $args
+	 */
+	#[NoReturn] public function get(array $args){
+		if(!checkToken($args['uri_args'][0], 3)){
+			response(403, "Forbidden");
+		}
+		if(!isset($args['additional'])){
+			$this->getAll($args);
+		}elseif($args['additional'][0] === "pending"){
+			$this->getActive($args);
+		}
+	}
+
+	/**
+	 * @param array $args
+	 */
+	public function post(array $args){
+		// TODO: Implement post() method.
+	}
+
+	/**
+	 * @param array $args
+	 */
+	public function put(array $args){
+		// TODO: Implement put() method.
+	}
+
+	/**
+	 * @param array $args
+	 */
+	public function delete(array $args){
+		// TODO: Implement delete() method.
+	}
+}

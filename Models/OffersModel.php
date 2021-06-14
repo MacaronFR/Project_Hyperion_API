@@ -8,7 +8,7 @@ require_once "autoload.php";
 class OffersModel extends Model{
 	protected string $id_name = "id_offer";
 	protected string $table_name = "OFFERS";
-	protected array $column = [
+	public array $column = [
 		"offer" => "offer",
 		"counter_offer" => "counter_offer",
 		"status" => "status",
@@ -102,5 +102,117 @@ class OffersModel extends Model{
 			return false;
 		}
 		return $res['count'];
+	}
+
+	public function selectAllFilterNotStarted(string $search, string $order, string $sort, int $iteration = 0): array|false{
+		if($sort === 'id'){
+			$sort = $this->id_name;
+		}else{
+			if(key_exists($sort, $this->column)){
+				$sort = $this->column[$sort];
+			}else{
+				return false;
+			}
+		}
+		$start = $this->max_row * $iteration;
+		$sql = "SELECT";
+		foreach($this->column as $key => $item){
+			$sql .= " $item as $key,";
+		}
+		$sql .= " $this->id_name as id FROM $this->table_name ";
+		$sql .= "WHERE (";
+		foreach($this->column as $item){
+			$sql .= "$item LIKE :search OR ";
+		}
+		$sql .= "$this->id_name LIKE :search ) AND $this->id_name<>0 AND status=2 ";
+		$sql .= "ORDER BY $sort $order ";
+		$sql .= "LIMIT $start, $this->max_row;";
+		$search = "%$search%";
+		return $this->prepared_query($sql, ["search" => $search]);
+	}
+
+	public function selectTotalFilterNotStarted(string $search, string $order, string $sort): int|false{
+		if($sort === 'id'){
+			$sort = $this->id_name;
+		}else{
+			if(key_exists($sort, $this->column)){
+				$sort = $this->column[$sort];
+			}else{
+				return false;
+			}
+		}
+		$sql = "SELECT COUNT($this->id_name) as count FROM $this->table_name WHERE (";
+		foreach($this->column as $item){
+			$sql .= "$item LIKE :search OR ";
+		}
+		$sql .= "$this->id_name LIKE :search ) AND $this->id_name<>0 AND status=2 ";
+		$sql .= "ORDER BY $sort $order ";
+		$search = "%" . $search . "%";
+		$total = $this->prepared_query($sql, ["search" => $search], unique: true);
+		if($total === false){
+			return $total;
+		}
+		return $total['count'];
+	}
+	public function selectTotalNotStarted(): int|false{
+		$sql = "SELECT COUNT(id_offer) as count FROM OFFERS WHERE status=2";
+		$res = $this->query($sql, unique: true);
+		return $res['count'] ?? false;
+	}
+
+	public function selectAllFilterActive(string $search, string $order, string $sort, int $expert, int $iteration = 0): array|false{
+		if($sort === 'id'){
+			$sort = $this->id_name;
+		}else{
+			if(key_exists($sort, $this->column)){
+				$sort = $this->column[$sort];
+			}else{
+				return false;
+			}
+		}
+		$start = $this->max_row * $iteration;
+		$sql = "SELECT";
+		foreach($this->column as $key => $item){
+			$sql .= " $item as $key,";
+		}
+		$sql .= " $this->id_name as id FROM $this->table_name ";
+		$sql .= "WHERE (";
+		foreach($this->column as $item){
+			$sql .= "$item LIKE :search OR ";
+		}
+		$sql .= "$this->id_name LIKE :search ) AND $this->id_name<>0 AND status=3 AND id_expert=:id ";
+		$sql .= "ORDER BY $sort $order ";
+		$sql .= "LIMIT $start, $this->max_row;";
+		$search = "%$search%";
+		return $this->prepared_query($sql, ["search" => $search, 'id' => $expert]);
+	}
+
+	public function selectTotalFilterActive(string $search, string $order, string $sort, int $expert): int|false{
+		if($sort === 'id'){
+			$sort = $this->id_name;
+		}else{
+			if(key_exists($sort, $this->column)){
+				$sort = $this->column[$sort];
+			}else{
+				return false;
+			}
+		}
+		$sql = "SELECT COUNT($this->id_name) as count FROM $this->table_name WHERE (";
+		foreach($this->column as $item){
+			$sql .= "$item LIKE :search OR ";
+		}
+		$sql .= "$this->id_name LIKE :search ) AND $this->id_name<>0 AND status=3 AND id_expert=:id ";
+		$sql .= "ORDER BY $sort $order ";
+		$search = "%" . $search . "%";
+		$total = $this->prepared_query($sql, ["search" => $search, 'id' => $expert], unique: true);
+		if($total === false){
+			return $total;
+		}
+		return $total['count'];
+	}
+	public function selectTotalActive(int $expert): int|false{
+		$sql = "SELECT COUNT(id_offer) as count FROM OFFERS WHERE status=3 AND id_expert=:id";
+		$res = $this->prepared_query($sql, ['id' => $expert], unique: true);
+		return $res['count'] ?? false;
 	}
 }
