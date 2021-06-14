@@ -302,7 +302,7 @@ class ProductModel extends Model{
 		$sub_sel = "";
 		$sub_where = "";
 		$where = "";
-		$param = ['nFilter' => $nfilter];
+		$param = [];
 		$delimiter = true;
 		if($brand !== ""){
 			$filter[] = ['brand', $brand];
@@ -332,7 +332,12 @@ class ProductModel extends Model{
 		$sql .= $sub_sel;
 		$sql .= " FROM SHOP_FILTER SH WHERE " . $sub_where;
 		$sql .= " GROUP BY SH.id, SH.`name`, SH.`value`) RES " . (!empty($filter) ? "WHERE " . $where: "");
-		$sql .= " GROUP BY id HAVING COUNT(id)=:nFilter ORDER BY $order $sort LIMIT $start, $this->max_row";
+		$sql .= " GROUP BY id";
+		if($nfilter !== 0){
+			$sql .= " HAVING COUNT(id)=:nFilter";
+			$param['nFilter'] = $nfilter;
+		}
+		$sql .= " ORDER BY $order $sort LIMIT $start, $this->max_row";
 		return $this->prepared_query($sql, $param);
 	}
 
