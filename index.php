@@ -9,7 +9,7 @@ use Hyperion\API\{ContributeController,
 	PendingOfferController,
 	ProjectController,
 	TypeController,
-	TerminatedOfferController, ShopController, PictureController};
+	TerminatedOfferController, ShopController, PictureController, StateController};
 
 require_once "autoload.php";
 
@@ -172,6 +172,8 @@ $rt->get("/shop/brand/*/*{/filter/_}", ShopController::class, ['brand']);
 $rt->get("/shop/cat/*/*{/filter/_}", ShopController::class, ['cat']);
 
 $rt->get("/product/picture/*{/*}", PictureController::class);
+
+$rt->get("/state", StateController::class);
 
 if(!$rt->getRouted()){
 	response(404, "Not Found");
