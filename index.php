@@ -182,6 +182,7 @@ $rt->get("/state", StateController::class);
 $rt->get("/expert/offer/*{/*{/search/*{/order/*/sort/*}}}", ExpertOfferController::class);
 $rt->get("/expert/offer/pending/*{/*{/search/*{/order/*/sort/*}}}", ExpertOfferController::class, ['pending']);
 $rt->get("/expert/offer/history/*{/*{/search/*{/order/*/sort/*}}}", ExpertOfferController::class, ['history']);
+$rt->post("/expert/offer/*/*",ExpertOfferController::class);
 
 if(!$rt->getRouted()){
 	response(404, "Not Found");
