@@ -32,7 +32,7 @@ class ShopProductController implements Controller{
 		if($spec === false){
 			response(500, "Internal Server Error");
 		}
-		$product['spec'] = $spec['spec'];
+		$product = array_merge($product, $spec['spec']);
 		response(200, "Product", $product);
 	}
 
