@@ -106,6 +106,27 @@ class ExpertOfferController implements Controller{
 		response(200, "Offer Not Started", $offers);
 	}
 
+	#[NoReturn] public function getHistory(array $args){
+		$expert = getUser(new TokenModel(), $args['uri_args'][0], new UserModel());
+		$count = $args['uri_args'][1] ?? 0;
+		$search = $args['uri_args'][2] ?? "";
+		$order = strtoupper($args['uri_args'][3] ?? "ASC");
+		$sort = $args['uri_args'][4] ?? "id";
+		if(!$this->checkParameter($count, $order, $sort)){
+			response(400, "Bad Request");
+		}
+		$offers = $this->om->selectAllFilterOld($search, $order, $sort, $expert['id'], $count);
+		$this->getDetail($offers);
+		$total = $this->om->selectTotalFilterOld($search, $order, $sort, $expert['id']);
+		$totalNotFiltered = $this->om->selectTotalOld($expert['id']);
+		if($totalNotFiltered === false || $total === false){
+			response(500, 'Internal Server Error');
+		}
+		$offers['total'] = $total;
+		$offers['totalNotFiltered'] = $totalNotFiltered;
+		response(200, "Offer Not Started", $offers);
+	}
+
 	/**
 	 * @param array $args
 	 */
@@ -117,13 +138,15 @@ class ExpertOfferController implements Controller{
 			$this->getAll($args);
 		}elseif($args['additional'][0] === "pending"){
 			$this->getActive($args);
+		}elseif($args['additional'][0] === "history"){
+			$this->getHistory($args);
 		}
 	}
 
 	/**
 	 * @param array $args
 	 */
-	public function post(array $args){
+	#[NoReturn] public function post(array $args){
 		if(checkToken($args['uri_args'][0],3)){
 			$expert = getUser(new TokenModel(), $args['uri_args'][0],$this->um);
 			if(!is_numeric($args['uri_args'][1])){

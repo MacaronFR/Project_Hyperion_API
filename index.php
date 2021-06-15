@@ -179,9 +179,9 @@ $rt->get("/product/picture/*{/*}", PictureController::class);
 
 $rt->get("/state", StateController::class);
 
-$rt->get("/expert/offer/*{/*{/search/*{/order/*/sort/*}}}", ExpertOfferController::class);
 $rt->get("/expert/offer/pending/*{/*{/search/*{/order/*/sort/*}}}", ExpertOfferController::class, ['pending']);
 $rt->get("/expert/offer/history/*{/*{/search/*{/order/*/sort/*}}}", ExpertOfferController::class, ['history']);
+$rt->get("/expert/offer/*{/*{/search/*{/order/*/sort/*}}}", ExpertOfferController::class);
 $rt->post("/expert/offer/*/*",ExpertOfferController::class);
 
 if(!$rt->getRouted()){
