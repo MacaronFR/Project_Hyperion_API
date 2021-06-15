@@ -40,8 +40,9 @@ class InvoiceController implements Controller{
 	 private function getUserInvoice(array $args){
 		$user = getUser($this->tm,$args['uri_args'][0],$this->um);
 		if($user){
-			if($this->im->select($user['id_user'], "id_user")){
-				response(200, "All of your Invoices are belong to us");
+			$invoice = $this->im->select($user['id_user'], "id_user");
+			if($invoice === true){
+				response(200, "All of your Invoices are belong to us",$invoice);
 			}else{
 				response(404, "Not Found");
 			}
