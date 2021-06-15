@@ -199,6 +199,13 @@ class ShopController implements Controller{
 		if(empty($prod)){
 			response(204, "No content");
 		}
+		foreach($prod as &$p){
+			$spec = $this->pm->selectWithDetail($p['id']);
+			if($spec === false){
+				response(500, "Internal Server Error");
+			}
+			$p = array_merge($p, $spec['spec']);
+		}
 		$total = $this->pm->selectShopTotal();
 		if($total === false){
 			response(500, "Internal Server Error");
