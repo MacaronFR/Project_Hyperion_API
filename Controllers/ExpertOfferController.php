@@ -126,14 +126,14 @@ class ExpertOfferController implements Controller{
 	public function post(array $args){
 		if(checkToken($args['uri_args'][0],3)){
 			$expert = getUser(new TokenModel(), $args['uri_args'][0],$this->um);
-			if(!is_numeric(['uri_args'][1])){
+			if(!is_numeric($args['uri_args'][1])){
 				response(400,'Bad Request');
 			}
 			$offer = $this->om->select($args['uri_args'][1]);
 			if($offer === false){
 				response(404,"Not Found");
 			}
-			if($offer['status'] !== 2){
+			if((int)$offer['status'] !== 2){
 				response(400,'Bad Request');
 			}
 			if($this->om->update($offer['id'],['expert'=>$expert['id'],'status'=>3])){
