@@ -295,7 +295,7 @@ class ProductModel extends Model{
 		return $total['count'] ?? false;
 	}
 
-	public function selectShop(int $cat = -1, int $type = -1, string $brand = "", array $filter = [], string $order = "id", string $sort = "DESC", $iteration = 0): array|false{
+	public function selectShop(int $cat = -1, int $type = -1, string $brand = "", array $filter = [], string $order = "id", string $sort = "DESC", $iteration = 0, $limit = true): array|false{
 		$nfilter = count($filter);
 		$start = $iteration * $this->max_row;
 		$sql = "SELECT id, type, selling_price as sell_p, state FROM (SELECT *, COUNT( SH.id ) AS count";
@@ -337,7 +337,10 @@ class ProductModel extends Model{
 			$sql .= " HAVING COUNT(id)=:nFilter";
 			$param['nFilter'] = $nfilter;
 		}
-		$sql .= " ORDER BY $order $sort LIMIT $start, $this->max_row";
+		$sql .= " ORDER BY $order $sort";
+		if($limit){
+			$sql .= " LIMIT $start, $this->max_row";
+		}
 		return $this->prepared_query($sql, $param);
 	}
 

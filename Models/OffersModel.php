@@ -258,7 +258,7 @@ class OffersModel extends Model{
 		foreach($this->column as $item){
 			$sql .= "$item LIKE :search OR ";
 		}
-		$sql .= "$this->id_name LIKE :search ) AND $this->id_name<>0 AND status=3 AND id_expert=:id ";
+		$sql .= "$this->id_name LIKE :search ) AND $this->id_name<>0 AND status>4 AND id_expert=:id ";
 		$sql .= "ORDER BY $sort $order ";
 		$search = "%" . $search . "%";
 		$total = $this->prepared_query($sql, ["search" => $search, 'id' => $expert], unique: true);
@@ -268,7 +268,7 @@ class OffersModel extends Model{
 		return $total['count'];
 	}
 	public function selectTotalOld(int $expert): int|false{
-		$sql = "SELECT COUNT(id_offer) as count FROM OFFERS WHERE status=3 AND id_expert=:id";
+		$sql = "SELECT COUNT(id_offer) as count FROM OFFERS WHERE status>4 AND id_expert=:id";
 		$res = $this->prepared_query($sql, ['id' => $expert], unique: true);
 		return $res['count'] ?? false;
 	}

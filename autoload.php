@@ -40,6 +40,7 @@ require_once "Controllers/ProjectController.php";
 require_once "Controllers/ProfileController.php";
 require_once "Controllers/ReferenceHierarchyController.php";
 require_once "Controllers/ShopController.php";
+require_once "Controllers/ShopProductController.php";
 require_once "Controllers/SpecController.php";
 require_once "Controllers/StateController.php";
 require_once "Controllers/StoreController.php";

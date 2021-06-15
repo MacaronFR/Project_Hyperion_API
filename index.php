@@ -9,6 +9,7 @@ use Hyperion\API\{ContributeController,
 	OfferController,
 	PendingOfferController,
 	ProjectController,
+	ShopProductController,
 	TypeController,
 	TerminatedOfferController,
 	ShopController,
@@ -174,14 +175,15 @@ $rt->get("/shop/type/*/brand/*/*{/filter/_}", ShopController::class, ['type', 'b
 $rt->get("/shop/type/*/*{/filter/_}", ShopController::class, ['type']);
 $rt->get("/shop/brand/*/*{/filter/_}", ShopController::class, ['brand']);
 $rt->get("/shop/cat/*/*{/filter/_}", ShopController::class, ['cat']);
+$rt->get("/shop/product/*", ShopProductController::class);
 
 $rt->get("/product/picture/*{/*}", PictureController::class);
 
 $rt->get("/state", StateController::class);
 
-$rt->get("/expert/offer/*{/*{/search/*{/order/*/sort/*}}}", ExpertOfferController::class);
 $rt->get("/expert/offer/pending/*{/*{/search/*{/order/*/sort/*}}}", ExpertOfferController::class, ['pending']);
 $rt->get("/expert/offer/history/*{/*{/search/*{/order/*/sort/*}}}", ExpertOfferController::class, ['history']);
+$rt->get("/expert/offer/*{/*{/search/*{/order/*/sort/*}}}", ExpertOfferController::class);
 $rt->post("/expert/offer/*/*",ExpertOfferController::class);
 $rt->put("/expert/offer/counter_offer/*",ExpertOfferController::class);
 
