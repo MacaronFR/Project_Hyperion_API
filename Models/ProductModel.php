@@ -295,7 +295,7 @@ class ProductModel extends Model{
 		return $total['count'] ?? false;
 	}
 
-	public function selectShop(int $cat = -1, int $type = -1, string $brand = "", array $filter = [], string $order = "id", string $sort = "DESC", $iteration = 0): array|false{
+	public function selectShop(int $cat = -1, int $type = -1, string $brand = "", array $filter = [], string $order = "id", string $sort = "DESC", $iteration = 0, $limit = true): array|false{
 		$nfilter = count($filter);
 		$start = $iteration * $this->max_row;
 		$sql = "SELECT id, type, selling_price as sell_p, state FROM (SELECT *, COUNT( SH.id ) AS count";
@@ -337,7 +337,10 @@ class ProductModel extends Model{
 			$sql .= " HAVING COUNT(id)=:nFilter";
 			$param['nFilter'] = $nfilter;
 		}
-		$sql .= " ORDER BY $order $sort LIMIT $start, $this->max_row";
+		$sql .= " ORDER BY $order $sort";
+		if($limit){
+			$sql .= " LIMIT $start, $this->max_row";
+		}
 		return $this->prepared_query($sql, $param);
 	}
 
@@ -378,41 +381,5 @@ class ProductModel extends Model{
 		$sql .= " GROUP BY SH.id, SH.`name`, SH.`value`) RES " . (!empty($filter) ? "WHERE " . $where: "");
 		$sql .= " GROUP BY id) TOTAL_RES";
 		return $this->prepared_query($sql, $param, unique: true);
-	}
-
-	public function selectAllFilterShop(string $search, string $order, string $sort, int $iteration = 0): array|false{
-		if($sort === 'id'){
-			$sort = $this->id_name;
-		}else{
-			if(key_exists($sort, $this->column)){
-				$sort = $this->column[$sort];
-			}else{
-				return false;
-			}
-		}
-		$start = $this->max_row * $iteration;
-		$sql = "SELECT";
-		foreach($this->column as $key => $item){
-			$sql .= " $item as $key,";
-		}
-		$sql .= " $this->id_name as id FROM $this->table_name ";
-		$sql .= "WHERE status=2 (";
-		foreach($this->column as $item){
-			$sql .= "$item LIKE :search OR ";
-		}
-		$sql .= "$this->id_name LIKE :search ) AND $this->id_name<>0 ";
-		$sql .= "ORDER BY $sort $order ";
-		$sql .= "LIMIT $start, $this->max_row;";
-		$search = "%" . $search . "%";
-		return $this->prepared_query($sql, ["search" => $search]);
-	}
-
-	public function selectTotalShop(): int|false{
-		$sql = "SELECT COUNT($this->id_name) as count FROM $this->table_name WHERE $this->id_name<>0 AND status=2";
-		$res = $this->query($sql);
-		if($res !== false){
-			return (int)$res[0]['count'];
-		}
-		return false;
 	}
 }
