@@ -12,12 +12,14 @@ class ExpertOfferController implements Controller{
 	private ProductModel $pm;
 	private ReferenceModel $rm;
 	private TypeModel $tm;
+	private UserModel $um;
 
 	public function __construct(){
 		$this->om = new OffersModel();
 		$this->pm = new ProductModel();
 		$this->rm = new ReferenceModel();
 		$this->tm = new TypeModel();
+		$this->um = new UserModel();
 	}
 
 	private function checkParameter($count, $order, $sort):bool{
@@ -122,8 +124,29 @@ class ExpertOfferController implements Controller{
 	 * @param array $args
 	 */
 	public function post(array $args){
-		// TODO: Implement post() method.
+		if(checkToken($args['uri_args'][0],3)){
+			$expert = getUser($this->tm,$args['uri_args'][0],$this->um);
+			if(!is_numeric(['uri_args'][1])){
+				response(400,'Bad Request');
+			}
+			$offer = $this->om->select($args['uri_args'][1]);
+			if($offer === false){
+				response(404,"Not Found");
+			}
+			if($offer['status'] !== 2){
+				response(400,'Bad Request');
+			}
+			if($this->om->update($offer['id'],['expert'=>$expert['id'],'status'=>3])){
+				response(200,"Offer Updated");
+			}else{
+				response(500,"Bah c'est le serveur qui plante");
+			}
+		}else{
+			response(403,"Forbidden");
+		}
 	}
+
+
 
 	/**
 	 * @param array $args
