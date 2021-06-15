@@ -203,7 +203,7 @@ class ShopController implements Controller{
 		if($total === false){
 			response(500, "Internal Server Error");
 		}
-		$prod['total'] = $prod['totalNotFiltered'] = $total;
+		$prod['total'] = $prod['totalNotFiltered'] = $total['total'];
 		response(200, "OK", $prod);
 	}
 
