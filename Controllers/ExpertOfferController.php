@@ -13,6 +13,7 @@ class ExpertOfferController implements Controller{
 	private ReferenceModel $rm;
 	private TypeModel $tm;
 	private UserModel $um;
+	private TokenModel $tkm;
 
 	public function __construct(){
 		$this->om = new OffersModel();
@@ -20,6 +21,7 @@ class ExpertOfferController implements Controller{
 		$this->rm = new ReferenceModel();
 		$this->tm = new TypeModel();
 		$this->um = new UserModel();
+		$this->tkm = new TokenModel();
 	}
 
 	private function checkParameter($count, $order, $sort):bool{
@@ -125,7 +127,7 @@ class ExpertOfferController implements Controller{
 	 */
 	public function post(array $args){
 		if(checkToken($args['uri_args'][0],3)){
-			$expert = getUser(new TokenModel(), $args['uri_args'][0],$this->um);
+			$expert = getUser($this->tkm, $args['uri_args'][0],$this->um);
 			if(!is_numeric($args['uri_args'][1])){
 				response(400,'Bad Request');
 			}
@@ -145,14 +147,37 @@ class ExpertOfferController implements Controller{
 			response(403,"Forbidden");
 		}
 	}
-
-
-
 	/**
 	 * @param array $args
 	 */
 	public function put(array $args){
-		// TODO: Implement put() method.
+		if(checkToken($args['uri_args'],3)){
+			$expert = getUser($this->tkm,$args['uri_args'][0],$this->um);
+			if(!isset($args['post_args']['counter_offer'],$args['post_args']['id'])){
+				response(400,"Bad Request");
+			}
+			if(!is_numeric($args['post_args']['id']) || !is_numeric($args['post_args']['counter_offer'])){
+				response(400,"Bad Request");
+			}
+			$offer = $this->om->select($args['post_args']['id']);
+			if($offer !== false){
+				response(404,"Not Found");
+			}
+			if((int)$offer['status'] !== 3){
+				response(400,"Bad Request");
+			}
+			if($offer['expert'] !== $expert['id']){
+				response(401,"Unauthorized");
+			}
+
+			if($this->om->update($offer['id'],['counter_offer'=>$args['post_args']['counter_offer'],'status'=>4])){
+				response(200,"Offer Updated");
+			}else{
+				response(500,"Bah c'est le serveur qui plante");
+			}
+		}else{
+			response(403,"For Bidden");
+		}
 	}
 
 	/**
