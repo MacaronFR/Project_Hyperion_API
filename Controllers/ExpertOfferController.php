@@ -125,7 +125,7 @@ class ExpertOfferController implements Controller{
 	 */
 	public function post(array $args){
 		if(checkToken($args['uri_args'][0],3)){
-			$expert = getUser($this->tm,$args['uri_args'][0],$this->um);
+			$expert = getUser(new TokenModel(), $args['uri_args'][0],$this->um);
 			if(!is_numeric(['uri_args'][1])){
 				response(400,'Bad Request');
 			}
