@@ -3,7 +3,8 @@
 use Hyperion\API\{OAuthController,ConnectionController,StoreController,ProfileController,CategoryController};
 use Hyperion\API\Router;
 use Hyperion\API\{ProductHierarchyController,ReferenceHierarchyController,BrandModelController,SpecController};
-use Hyperion\API\{ContributeController,
+use Hyperion\API\{ActionsController,
+	ContributeController,
 	ExpertOfferController,
 	InvoiceController,
 	OfferController,
@@ -143,6 +144,7 @@ $rt->get("/offer/terminated/all/*{/*}", TerminatedOfferController::class, ['all'
 $rt->get("/offer/terminated/*/user/*{/*}", TerminatedOfferController::class, ['user']);
 $rt->get("/offer/terminated/*{/*}", TerminatedOfferController::class);
 $rt->get("/offer/*/*", OfferController::class, ['id']);
+$rt->post("/offer/actions/*",TerminatedOfferController::class);
 //$rt->get("/reference{/*{/search/*{/order/*/sort/*}}}",ReferenceHierarchyController::class, ['search']);
 // /offer/{token}
 $rt->post("/offer/*", OfferController::class);
@@ -162,7 +164,7 @@ $rt->get("/project{/*{/search/*{/order/*/sort/*}}}",ProjectController:: class, [
 // CONTRIBUTION
 $rt->post("/project/contribute/*", ContributeController::class);
 
-//
+//INVOICE
 $rt->get("/invoice/me/*",InvoiceController::class);
 $rt->get("/invoice/all/*",InvoiceController::class);
 
@@ -186,6 +188,8 @@ $rt->get("/expert/offer/history/*{/*{/search/*{/order/*/sort/*}}}", ExpertOfferC
 $rt->get("/expert/offer/*{/*{/search/*{/order/*/sort/*}}}", ExpertOfferController::class);
 $rt->post("/expert/offer/*/*",ExpertOfferController::class);
 $rt->put("/expert/offer/counter_offer/*",ExpertOfferController::class);
+
+
 
 if(!$rt->getRouted()){
 	response(404, "Not Found");
