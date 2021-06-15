@@ -189,9 +189,9 @@ class ShopController implements Controller{
 			if(!is_numeric($args['uri_args'][0])){
 				response(400, "Bad Request");
 			}
-			$prod = $this->pm->selectShop(order: "buy_d", iteration: $args['uri_args'][0]);
+			$prod = $this->pm->selectShop(iteration: $args['uri_args'][0]);
 		}else{
-			$prod = $this->pm->selectShop(order: "buy_d", limit: false);
+			$prod = $this->pm->selectShop( limit: false);
 		}
 		if($prod === false){
 			response(500, "Internal Server Error");

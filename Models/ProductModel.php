@@ -330,7 +330,7 @@ class ProductModel extends Model{
 			$sub_where .= ")";
 		}
 		$sql .= $sub_sel;
-		$sql .= " FROM SHOP_FILTER SH WHERE " . $sub_where;
+		$sql .= " FROM SHOP_FILTER SH " . ($sub_where === ""?"":"WHERE " . $sub_where);
 		$sql .= " GROUP BY SH.id, SH.`name`, SH.`value`) RES " . (!empty($filter) ? "WHERE " . $where: "");
 		$sql .= " GROUP BY id";
 		if($nfilter !== 0){
@@ -377,7 +377,7 @@ class ProductModel extends Model{
 			$sub_where .= ")";
 		}
 		$sql .= $sub_sel;
-		$sql .= " FROM SHOP_FILTER SH WHERE " . $sub_where;
+		$sql .= " FROM SHOP_FILTER SH " . ($sub_where === ""?"":"WHERE " . $sub_where);
 		$sql .= " GROUP BY SH.id, SH.`name`, SH.`value`) RES " . (!empty($filter) ? "WHERE " . $where: "");
 		$sql .= " GROUP BY id) TOTAL_RES";
 		return $this->prepared_query($sql, $param, unique: true);
