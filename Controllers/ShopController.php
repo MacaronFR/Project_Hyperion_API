@@ -189,9 +189,9 @@ class ShopController implements Controller{
 			if(!is_numeric($args['uri_args'][0])){
 				response(400, "Bad Request");
 			}
-			$prod = $this->pm->selectAllFilter("", "DESC", "buy_d", $args['uri_args'][0]);
+			$prod = $this->pm->selectAllFilterShop("", "DESC", "buy_d", $args['uri_args'][0]);
 		}else{
-			$prod = $this->pm->selectAllFilter("", "DESC", "buy_d", limit: false);
+			$prod = $this->pm->selectAllFilterShop("", "DESC", "buy_d", limit: false);
 		}
 		if($prod === false){
 			response(500, "Internal Server Error");
@@ -199,7 +199,7 @@ class ShopController implements Controller{
 		if(empty($prod)){
 			response(204, "No content");
 		}
-		$total = $this->pm->selectTotal();
+		$total = $this->pm->selectTotalShop();
 		if($total === false){
 			response(500, "Internal Server Error");
 		}

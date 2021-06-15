@@ -9,6 +9,7 @@ use Hyperion\API\{ContributeController,
 	OfferController,
 	PendingOfferController,
 	ProjectController,
+	ShopProductController,
 	TypeController,
 	TerminatedOfferController,
 	ShopController,
@@ -174,6 +175,7 @@ $rt->get("/shop/type/*/brand/*/*{/filter/_}", ShopController::class, ['type', 'b
 $rt->get("/shop/type/*/*{/filter/_}", ShopController::class, ['type']);
 $rt->get("/shop/brand/*/*{/filter/_}", ShopController::class, ['brand']);
 $rt->get("/shop/cat/*/*{/filter/_}", ShopController::class, ['cat']);
+$rt->get("/shop/product/*", ShopProductController::class);
 
 $rt->get("/product/picture/*{/*}", PictureController::class);
 
