@@ -3,6 +3,8 @@
 use Hyperion\API\{OAuthController,ConnectionController,StoreController,ProfileController,CategoryController};
 use Hyperion\API\Router;
 use Hyperion\API\{ProductHierarchyController,ReferenceHierarchyController,BrandModelController,SpecController};
+use Hyperion\API\{ActionsController,
+	ContributeController,
 use Hyperion\API\{CartController,
 	ContributeController,
 	ExpertOfferController,
@@ -187,15 +189,6 @@ $rt->get("/expert/offer/history/*{/*{/search/*{/order/*/sort/*}}}", ExpertOfferC
 $rt->get("/expert/offer/*{/*{/search/*{/order/*/sort/*}}}", ExpertOfferController::class);
 $rt->post("/expert/offer/*/*",ExpertOfferController::class);
 $rt->put("/expert/offer/counter_offer/*",ExpertOfferController::class);
-
-$rt->post("/cart/*", CartController::class);
-$rt->post("/cart/product/*", CartController::class, ['add_prod']);
-$rt->get("/cart/*", CartController::class);
-
-$rt->put("/cart/command/*", CartController::class);
-
-$rt->delete("/cart/*", CartController::class);
-$rt->delete("/cart/product/*/*", CartController::class, ['prod']);
 
 if(!$rt->getRouted()){
 	response(404, "Not Found");

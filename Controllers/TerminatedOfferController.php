@@ -12,12 +12,14 @@ class TerminatedOfferController implements Controller{
 	private ReferenceModel $rm;
 	private TypeModel $tm;
 	private TokenModel $tom;
+	private UserModel $um;
 	public function __construct(){
 		$this->om = new OffersModel();
 		$this->pm = new ProductModel();
 		$this->rm = new ReferenceModel();
 		$this->tm = new TypeModel();
 		$this->tom = new TokenModel();
+		$this->um = new UserModel();
 	}
 
 	#[NoReturn] public function getUserTerminated(array $args){
@@ -119,7 +121,35 @@ class TerminatedOfferController implements Controller{
 	 * @inheritDoc
 	 */
 	public function post(array $args){
-		// TODO: Implement post() method.
+		if(checkToken($args['uri_args'][0],5)){
+			$user = getUser($this->tom,$args['uri_args'][0],$this->um);
+			if(!isset($args['post_args']['id'])){
+				response(400,'Bad Request');
+			}
+			if(!is_numeric($args['post_args']['id'])){
+				response(400,"Bad Request");
+			}
+			$offer = $this->om->select($args['post_args']['id']);
+			if($offer === false){
+				response(404,"Not Found");
+			}
+			if((int)$offer['status'] !== 4){
+				response(400,"Bad Request");
+			}
+			if($offer['user'] !== $user['id']){
+				response(401,'Unauthorized');
+			}
+			if((int)$args['post_args']['action'] !== 5 && (int)$args['post_args']['action'] !== 6){
+				response(400,'Bad Request');
+			}
+			if($this->om->update($offer['id'],['status'=>$args['post_args']['action']])){
+				response(200,'Offer Updated');
+			}else{
+				response(500,'Bah c\'est le serveur qui répond pas... logique');
+			}
+		}else{
+			response(403,'Forbidden');
+		}
 	}
 
 	/**
