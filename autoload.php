@@ -26,6 +26,7 @@ require_once "Models/TypeModel.php";
 require_once "Models/UserModel.php";
 require_once "Controllers/Controller.php";
 require_once "Controllers/BrandModelController.php";
+require_once "Controllers/CartController.php";
 require_once "Controllers/CategoryController.php";
 require_once "Controllers/ConnectionController.php";
 require_once "Controllers/ContributeController.php";
