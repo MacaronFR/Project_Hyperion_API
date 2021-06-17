@@ -10,45 +10,66 @@ class InvoiceController implements Controller{
 	private InvoiceModel $im;
 	private UserModel $um;
 	private TokenModel $tm;
+	private FilesModel $fm;
 
 	public function __construct(){
 		$this->im = new InvoiceModel();
 		$this->um = new UserModel();
 		$this->tm = new TokenModel();
+		$this->fm = new FilesModel();
 	}
 
 	/**
 	 * @inheritDoc
 	 */
 	public function get(array $args){
-		if(checkToken($args['uri_args'][0],3)){
+		if($args['additional'][0] === "admin"){
 			$this->getAdmin();
-		}else{
-			if(checkToken($args['uri_args'][0],5)){
-				$this->getUserInvoice($args);
-			}
-		}
-	}
-	private function getAdmin(){
-		if($this->im->selectAll(limit:false)){
-			response(200,"All Invoices of every users");
-		}else{
-			response(404,"Not Found");
+		}elseif($args['additional'][0] === "me"){
+			$this->getUserInvoice($args);
+		}elseif($args['additional'][0] === "one"){
+			$this->getOne($args);
 		}
 	}
 
-	 private function getUserInvoice(array $args){
-		$user = getUser($this->tm,$args['uri_args'][0],$this->um);
-		if($user){
-			$invoice = $this->im->select($user['id_user'], "id_user");
-			if($invoice === true){
-				response(200, "All of your Invoices are belong to us",$invoice);
-			}else{
-				response(404, "Not Found");
-			}
-		}else{
-			response(404, 'Not Found');
+	#[NoReturn] private function getOne(array $args){
+		if(!is_numeric($args['uri_args'][1])){
+			response(400, "Bad Request");
 		}
+		$invoice = $this->im->select($args['uri_args'][1]);
+		if($invoice === false){
+			response(404, "Invoice Not Found");
+		}
+		if(!checkToken($args['uri_args'][0], 3)){
+			$user = getUser($this->tm, $args['uri_args'][0], $this->um);
+			if($user['id'] !== $invoice['user']){
+				response(401, "Unauthorized");
+			}
+		}
+		$file = $this->fm->selectWithB64($invoice['file']);
+		if($file === false){
+			response(500, "Internal Server Error");
+		}
+		unset($file['creator'], $file['file_path']);
+		$invoice['file'] = $file;
+		response(200, "Invoice", $invoice);
+	}
+
+	#[NoReturn] private function getAdmin(){
+		if($this->im->selectAll(limit: false)){
+			response(200, "All Invoices of every users");
+		}else{
+			response(404, "Not Found");
+		}
+	}
+
+	#[NoReturn] private function getUserInvoice(array $args){
+		$user = getUser($this->tm, $args['uri_args'][0], $this->um);
+		$invoice = $this->im->select($user['id_user'], "user");
+		if($invoice === false){
+			response(404, "Not Found");
+		}
+		response(200, "Invoices", $invoice);
 
 	}
 

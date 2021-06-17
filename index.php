@@ -164,8 +164,9 @@ $rt->get("/project{/*{/search/*{/order/*/sort/*}}}",ProjectController:: class, [
 $rt->post("/project/contribute/*", ContributeController::class);
 
 //
-$rt->get("/invoice/me/*",InvoiceController::class);
-$rt->get("/invoice/all/*",InvoiceController::class);
+$rt->get("/invoice/me/*",InvoiceController::class, ['me']);
+$rt->get("/invoice/all/*",InvoiceController::class, ['all']);
+$rt->get("/invoice/*/*", InvoiceController::class, ['one']);
 
 //Shop
 $rt->get("/shop{/*}", ShopController::class, ['main']);
