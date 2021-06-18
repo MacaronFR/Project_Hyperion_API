@@ -192,6 +192,7 @@ $rt->put("/expert/offer/counter_offer/*",ExpertOfferController::class);
 $rt->post("/cart/*", CartController::class);
 $rt->post("/cart/product/*", CartController::class, ['add_prod']);
 $rt->get("/cart/product/*", CartController::class, ['product']);
+$rt->get("/cart/active/*", CartController::class, ['active']);
 $rt->get("/cart/*/*", CartController::class);
 $rt->put("/cart/command/*", CartController::class);
 $rt->delete("/cart/*", CartController::class);

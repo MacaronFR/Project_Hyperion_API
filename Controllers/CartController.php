@@ -32,7 +32,18 @@ class CartController implements Controller{
 			$this->getCart($args);
 		}elseif($args['additional'][0] === "product"){
 			$this->getCartProduct($args);
+		}elseif($args['additional'][0] === "active"){
+			$this->getCartActive($args);
 		}
+	}
+
+	#[NoReturn] public function getCartActive(array $args){
+		$user = getUser($this->tm, $args['uri_args'][0], $this->um);
+		$cart = $this->cm->selectByUser($user['id'], true);
+		if($cart === false){
+			response(404, "Not Found");
+		}
+		response(200, "Cart", $cart);
 	}
 
 	#[NoReturn] public function getCart(array $args){
