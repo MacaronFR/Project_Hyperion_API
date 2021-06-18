@@ -23,6 +23,9 @@ function parse_put(){
 
 function getUser(TokenModel $tm, string $token, UserModel $um): array | false{
 	$token = $tm->selectByToken($token);
+	if($token === false){
+		response(404, "Not Found");
+	}
 	$user = $um->select($token['user']);
 	if(!$user){
 		response(404,"Not Found");

@@ -27,7 +27,30 @@ class CartController implements Controller{
 	/**
 	 * @inheritDoc
 	 */
-	public function get(array $args){
+	#[NoReturn] public function get(array $args){
+		if(!isset($args['additional'])){
+			$this->getCart($args);
+		}elseif($args['additional'][0] === "product"){
+			$this->getCartProduct($args);
+		}
+	}
+
+	#[NoReturn] public function getCart(array $args){
+		if(!is_numeric($args['uri_args'][1])){
+			response(400, "Bad Request");
+		}
+		$user = getUser($this->tm, $args['uri_args'][0], $this->um);
+		$cart = $this->cm->select($args['uri_args'][1]);
+		if($cart === false){
+			response(404, "Not Found");
+		}
+		if($user['id'] !== $cart['user']){
+			response(401, "Unauthorized");
+		}
+		response(200, "Cart", $cart);
+	}
+
+	#[NoReturn] public function getCartProduct(array $args){
 		$user = getUser($this->tm, $args['uri_args'][0], $this->um);
 		$cart = $this->cm->selectByUser($user['id'], true);
 		if($cart === false){
