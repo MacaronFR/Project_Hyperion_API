@@ -94,7 +94,7 @@ class InvoiceController implements Controller{
 		if($invoice === false){
 			response(404, "Not Found");
 		}
-		response(200, "Invoices", $invoice);
+		response(200, " All of your Invoices are belong to us ", $invoice); // c'est un easter egg
 
 	}
 

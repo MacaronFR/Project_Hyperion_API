@@ -159,6 +159,8 @@ $rt->get("/project/logo/*", ProjectController::class, ['logo']);
 $rt->get("/project/popular{/*}",ProjectController::class, ['popular']);
 $rt->get("/project/latest{/*}",ProjectController::class, ['latest']);
 $rt->get("/project{/*{/search/*{/order/*/sort/*}}}",ProjectController:: class, ['all']);
+$rt->get("/project/invalid{/*{/search/*{/order/*/sort/*}}}",ProjectController:: class, ['invalid']);
+$rt->post("/project/*",ProjectController::class);
 
 // CONTRIBUTION
 $rt->post("/project/contribute/*", ContributeController::class);

@@ -28,12 +28,43 @@ class ProjectController implements Controller{
 			$this->getAll($args);
 		}elseif($args['additional'][0] === "logo"){
 			$this->getLogo($args);
+		}elseif($args['additional'][0] === "invalid"){
+			$this->getInvalid($args);
 		}
 	}
 
+	public function getInvalid(array $args){
+		if(count($args["uri_args"]) === 0){
+			$invalid = $this->pm->selectAllProject(limit:false,valid: 0);
+		}elseif(count($args['uri_args']) >= 1){
+			if(!is_numeric($args['uri_args'][0])){
+				response(400,"Bad Request");
+			}
+			if(count($args['uri_args']) > 1){
+				$order = match($args['uri_args'][2]){@
+					'DESC' => 'DESC',
+					default => 'ASC'
+				};
+				$sort = match ($args['uri_args'][3]){
+					'contribution' => 'contribution',
+					'name' => 'name',
+					'RNA' => 'RNA',
+					default => 'id'
+				};
+				$search = $args['uri_args'][1];
+				$projects = $this->pm->selectAllProjectFilter($search, $order, $sort, $args['uri_args'][0],0);
+			}else{
+				$projects = $this->pm->selectAllProject($args['uri_args'][0], valid:0);
+			}
+		}
+		$this->processProject($invalid, !(isset($args['additional'][1]) && $args['additional'][1] === 'nologo'));
+		response(200, "Projects", $projects);
+		}
+
+
 	#[NoReturn] public function getAll(array $args){
 		if(count($args["uri_args"]) === 0){
-			$projects = $this->pm->selectAllValid(limit: false);
+			$projects = $this->pm->selectAllProject(limit: false);
 		}elseif(count($args['uri_args']) >= 1){
 			if(!is_numeric($args['uri_args'][0])){
 				response(400, "Bad Request");
@@ -52,7 +83,7 @@ class ProjectController implements Controller{
 				$search = $args['uri_args'][1];
 				$projects = $this->pm->selectAllValidFilter($search, $order, $sort, $args['uri_args'][0]);
 			}else{
-				$projects = $this->pm->selectAllValid($args['uri_args'][0]);
+				$projects = $this->pm->selectAllProject($args['uri_args'][0]);
 			}
 		}
 		$this->processProject($projects, !(isset($args['additional'][1]) && $args['additional'][1] === 'nologo'));
@@ -120,7 +151,17 @@ class ProjectController implements Controller{
 	 * @inheritDoc
 	 */
 	public function post(array $args){
-		// TODO: Implement post() method.
+		if(!is_numeric($args['post_args']['id'])){
+			response(400,"Bad Request");
+		}else{
+			$project = $this->pm->select($args['post_args']['id']);
+			if($project !== false){
+				response(400,"Project Already exist");
+			}else{
+				if($this->pm->checkProject($args['post_args']['rna']));
+				$this->pm->insert($args['post_args']);
+			}
+		}
 	}
 
 	/**
