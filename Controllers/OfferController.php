@@ -89,6 +89,7 @@ class OfferController implements Controller{
 			'status' => $offer['status'],
 			'spec' => $prod_detail['spec'],
 			'type' => $type['type'],
+			'type_id' => $type['id'],
 			'files' => $files ?? []
 		];
 		response(200, "Offer", $res);
