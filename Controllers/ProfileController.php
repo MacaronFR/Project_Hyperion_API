@@ -69,6 +69,9 @@ class ProfileController implements Controller{
 				}
 				$search = $args['uri_args'][2];
 				$sort = $args['uri_args'][4] ?? 'id';
+				if($sort !== "id" && $sort !== "name" && $sort !== "fname" && $sort !== "mail" && $sort !== "type"){
+					response(400, "Baq Request");
+				}
 				$users = $this->um->selectAllFilter($search, $order, $sort, $args['uri_args'][1]);
 				$totalFilter = $this->um->selectTotalFilter($search, $order, $sort);
 				$total = $this->um->selectTotal();
