@@ -37,9 +37,6 @@ function getUser(TokenModel $tm, string $token, UserModel $um): array | false{
 function parse_body(): array| false{
 	$body = file_get_contents("php://input");
 	try{
-		var_dump($body);
-		var_dump(json_decode($body, true, flags: JSON_THROW_ON_ERROR));
-		echo json_last_error_msg();
 		return json_decode($body, true, flags: JSON_THROW_ON_ERROR);
 	}catch(JsonException){
 		return false;
