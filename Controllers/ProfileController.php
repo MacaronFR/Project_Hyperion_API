@@ -61,8 +61,26 @@ class ProfileController implements Controller{
 			if(!is_numeric($args['uri_args'][1])){
 				response(400, "Bad Request");
 			}
-			$users = $this->um->selectAll((int)$args['uri_args'][1]);
+			if(count($args['uri_args']) > 2){
+				$order = $args['uri_args'][3] ?? 'ASC';
+				$order = strtoupper($order);
+				if($order !== "ASC" && $order !== "DESC"){
+					response(400, "Bad Request");
+				}
+				$search = $args['uri_args'][2];
+				$sort = $args['uri_args'][4] ?? 'id';
+				$users = $this->um->selectAllFilter($search, $order, $sort, $args['uri_args'][1]);
+				$totalFilter = $this->um->selectTotalFilter($search, $order, $sort);
+				$total = $this->um->selectTotal();
+			}else{
+				$total = $totalFilter = $this->um->selectTotal();
+				$users = $this->um->selectAll((int)$args['uri_args'][1]);
+			}
 		}else{
+			$total = $totalFilter = $this->um->selectTotal();
+			if($total === false){
+				response(502, "Internal Server Error");
+			}
 			$users = $this->um->selectAll(limit: false);
 		}
 		if($users === false){
@@ -79,18 +97,16 @@ class ProfileController implements Controller{
 		if(empty($users)){
 			response(204, "No Users");
 		}
-		$total = $this->um->selectTotal();
-		if($total === false){
-			response(502, "Internal Server Error");
-		}
-		$users['total'] = $users['totalNotFiltered'] = $total;
+		$users['total'] = $totalFilter;
+		$users['totalNotFiltered'] = $total;
 		response(200, "Users", $users);
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	#[NoReturn] public function post(array $args){
+	#[
+		NoReturn] public function post(array $args){
 		return false;
 	}
 
@@ -166,21 +182,21 @@ class ProfileController implements Controller{
 	/**
 	 * @inheritDoc
 	 */
-	 public function delete(array $args){
-		if(checkToken($args['uri_args'][0],3)){
-			$user =  $this->um->select($args['uri_args'][1]);
+	public function delete(array $args){
+		if(checkToken($args['uri_args'][0], 3)){
+			$user = $this->um->select($args['uri_args'][1]);
 			if($user){
 				$this->um->delete($args['uri_args'][1]);
-				response(204,"User Deleted");
+				response(204, "User Deleted");
 			}
 
 		}else{
-			if(checkToken($args['uri_args'][0],1))
-			$user =  $this->um->select($args['uri_args'][0]);
+			if(checkToken($args['uri_args'][0], 1))
+				$user = $this->um->select($args['uri_args'][0]);
 			if($user){
-				$token = $this->tm->update(-1,$args['uri_args'][0]);
+				$token = $this->tm->update(-1, $args['uri_args'][0]);
 				if($token){
-					response(204,"USER Deleted");
+					response(204, "USER Deleted");
 				}
 			}
 		}
