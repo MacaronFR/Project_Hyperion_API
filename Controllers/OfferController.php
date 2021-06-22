@@ -194,8 +194,8 @@ class OfferController implements Controller{
 				if(!isset($args['post_args']['spec'][$name])){
 					response(400, "Missing spec");
 				}
-				if(is_array($value)){
-					if(!in_array($args['post_args']['spec'][$name], $value)){
+				if(count($value) !== 1){
+					if(!$this->foundInSpecList($value, $args['post_args']['spec'][$name])){
 						response(400, "Bad Value for Spec $name");
 					}
 					$spec_id = $this->sm->selectIdentical(['name' => $name, "value" => $args['post_args']['spec'][$name]]);
@@ -209,7 +209,7 @@ class OfferController implements Controller{
 					$bonus += (double)$spec_value['value'];
 					$spec[$name] = $spec_id['id'];
 				}else{
-					if($args['post_args']['spec'][$name] !== $value){
+					if($args['post_args']['spec'][$name] !== $value[0][0]){
 						response(400, "Bad Value for Spec $name");
 					}
 				}
@@ -255,6 +255,16 @@ class OfferController implements Controller{
 		API_log($args['uri_args'][0], "OFFER-PRODUCT-PRODUCT_HAVE_SPEC", "created offer, product and specification linked");
 		response(201, "Created", ['offer' => $offer_id]);
 	}
+
+	private function foundInSpecList($array, $value){
+		for($i = 0; $i < count($array); ++$i){
+			if($array[$i][0] === $value){
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * @inheritDoc
 	 */
