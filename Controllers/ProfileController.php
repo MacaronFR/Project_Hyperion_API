@@ -80,6 +80,7 @@ class ProfileController implements Controller{
 		if(isset($args['put_args']['type']) && (int)$args['put_args']['type'] > $token_info['scope']){
 			response(403, "Forbidden");
 		}
+		var_dump($args);
 		if(isset($args['additional'])){
 			unset($args['put_args']['id'], $args['put_args']['gc'], $args['put_args']['type'], $args['put_args']['llog'], $args['put_args']['ac_creation'], $args['put_args']['mail']);
 		}
@@ -114,8 +115,10 @@ class ProfileController implements Controller{
 			if($this->um->update($user_info['id'], $user_update)){
 				response(200, "Profile Updated");
 			}else{
-				response(204, "No update");
+				//response(204, "No update");
 			}
+		}else{
+			response(400, "Bad Request");
 		}
 	}
 
