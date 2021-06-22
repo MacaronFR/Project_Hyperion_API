@@ -41,6 +41,8 @@ $rt->get("/store{/*}", StoreController::class);
 $rt->get("/me/*", ProfileController::class);
 $rt->put("/me/*", ProfileController::class, ['me']);
 $rt->delete("/me/*",ProfileController::class);
+
+$rt->get("/users/*{/*}", ProfileController::class, ['users']);
 // /profile/{token}/{user_id}
 $rt->get("/profile/*/*",ProfileController::class);
 $rt->put("/profile/*/*",ProfileController::class);

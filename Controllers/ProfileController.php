@@ -5,6 +5,7 @@ namespace Hyperion\API;
 
 
 use DateTime;
+use JetBrains\PhpStorm\Internal\PhpStormStubsElementAvailable;
 use JetBrains\PhpStorm\NoReturn;
 
 class ProfileController implements Controller{
@@ -25,6 +26,14 @@ class ProfileController implements Controller{
 	 * @inheritDoc
 	 */
 	#[NoReturn] public function get(array $args){
+		if(!isset($args['additional'])){
+			$this->getProfile($args);
+		}elseif($args['additional'][0] === "users"){
+			$this->getUsers($args);
+		}
+	}
+
+	#[NoReturn] private function getProfile(array $args){
 		if(count($args["uri_args"]) === 1){
 			$token = $this->tm->selectByToken($args["uri_args"][0]);
 			if($token !== false){
@@ -42,6 +51,40 @@ class ProfileController implements Controller{
 		}else{
 			response(400, "Bad request");
 		}
+	}
+
+	#[NoReturn] private function getUsers(array $args){
+		if(!checkToken($args['uri_args'][0], 3)){
+			response(401, "Unauthorized");
+		}
+		if(isset($args['uri_args'][1])){
+			if(!is_numeric($args['uri_args'][1])){
+				response(400, "Bad Request");
+			}
+			$users = $this->um->selectAll((int)$args['uri_args'][1]);
+		}else{
+			$users = $this->um->selectAll(limit: false);
+		}
+		if($users === false){
+			response(500, "Internal Server Error");
+		}
+		foreach($users as &$u){
+			if($u['addr'] !== null){
+				$u['addr'] = $this->am->select($u['addr']);
+				if($u['addr'] === false){
+					response(501, "Internal Server Error");
+				}
+			}
+		}
+		if(empty($users)){
+			response(204, "No Users");
+		}
+		$total = $this->um->selectTotal();
+		if($total === false){
+			response(502, "Internal Server Error");
+		}
+		$users['total'] = $users['totalNotFiltered'] = $total;
+		response(200, "Users", $users);
 	}
 
 	/**
