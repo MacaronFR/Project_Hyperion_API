@@ -81,7 +81,7 @@ class ProjectController implements Controller{
 					default => 'id'
 				};
 				$search = $args['uri_args'][1];
-				$projects = $this->pm->selectAllValidFilter($search, $order, $sort, $args['uri_args'][0]);
+				$projects = $this->pm->selectAllProjectFilter($search, $order, $sort, $args['uri_args'][0]);
 			}else{
 				$projects = $this->pm->selectAllProject($args['uri_args'][0]);
 			}
