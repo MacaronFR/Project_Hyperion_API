@@ -51,29 +51,29 @@ class OfferController implements Controller{
 		}
 		$product = $this->pm->select($offer['id'], "offer");
 		if($product === false){
-			response(500, "Internal Server Error");
+			response(501, "Internal Server Error");
 		}
 		$prod_detail = $this->pm->selectWithDetail($product['id']);
 		if($prod_detail === false){
-			response(500, "Internal Server Error");
+			response(502, "Internal Server Error");
 		}
 		$reference = $this->rm->select($product['ref']);
 		if($reference === false){
-			response(500, "Internal Server Error");
+			response(503, "Internal Server Error");
 		}
 		$type = $this->tm->select($reference['type']);
 		if($type === false){
-			response(500, "Internal ServeR Error");
+			response(504, "Internal Server Error");
 		}
 		$pictures_id = $this->ppm->selectAllByProduct($product['id']);
 		if($pictures_id === false){
-			response(500, "Internal Server Error");
+			response(505, "Internal Server Error");
 		}
 		if(!empty($pictures_id)){
 			foreach($pictures_id as $pid){
 				$f = $this->fm->selectWithB64($pid['file']);
 				if($f === false){
-					response(500, "Internal Server Error");
+					response(506, "Internal Server Error");
 				}
 				unset($f['file_path'], $f['creator'], $f['id']);
 				$files[] = $f;
@@ -81,6 +81,7 @@ class OfferController implements Controller{
 		}
 		$res = [
 			'id_offer' => $offer['id'],
+			'category' => $type['category'],
 			'offer' => $offer['offer'],
 			'counter_offer' => $offer['counter_offer'],
 			'state' => $product['state'],
