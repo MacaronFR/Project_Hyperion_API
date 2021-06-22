@@ -72,7 +72,7 @@ class PendingOfferController implements Controller{
 
 	#[NoReturn] public function getPending(array|false $pending, int $total){
 		if($pending === false){
-			response(500, "Internal Server Error");
+			response(501, "Internal Server Error");
 		}
 		if(empty($pending)){
 			response(204, "No content");
@@ -80,19 +80,19 @@ class PendingOfferController implements Controller{
 		foreach($pending as &$p){
 			$product = $this->pm->select($p['id'], "offer");
 			if($product === false){
-				response(500, "Internal Server Error");
+				response(502, "Internal Server Error");
 			}
 			$ref = $this->rm->select($product['ref']);
 			if($ref === false){
-				response(500, "Internal Server Error");
+				response(503, "Internal Server Error");
 			}
 			$spec = $this->rm->selectWithDetail($ref['id']);
 			if($spec === false){
-				response(500, "Internal Server Error");
+				response(504, "Internal Server Error");
 			}
 			$type = $this->tm->select($ref['type']);
 			if($type === false){
-				response(500, "Internal Server Error");
+				response(505, "Internal Server Error");
 			}
 			$p['type'] = $type['type'];
 			$p['state'] = $product['state'];
