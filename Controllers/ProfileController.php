@@ -49,7 +49,6 @@ class ProfileController implements Controller{
 	 */
 	#[NoReturn] public function post(array $args){
 		return false;
-
 	}
 
 	/**
@@ -82,7 +81,7 @@ class ProfileController implements Controller{
 			response(403, "Forbidden");
 		}
 		if(isset($args['additional'])){
-			unset($args['put_args']['id'], $args['put_args']['gc'], $args['put_args']['type'], $args['put_args']['llog'], $args['put_args']['ac_creation']);
+			unset($args['put_args']['id'], $args['put_args']['gc'], $args['put_args']['type'], $args['put_args']['llog'], $args['put_args']['ac_creation'], $args['put_args']['mail']);
 		}
 		$address_keys = ["address", "zip", "city", "country", "region"];
 		if(isset($args['put_args']['addr']) && is_array($args['put_args']['addr'])){
@@ -110,6 +109,7 @@ class ProfileController implements Controller{
 			}
 		}
 		$user_update = array_intersect_key($args['put_args'], $user_info);
+		var_dump($user_update);
 		if(!empty($user_update)){
 			if($this->um->update($user_info['id'], $user_update)){
 				response(200, "Profile Updated");
