@@ -80,7 +80,6 @@ class ProfileController implements Controller{
 		if(isset($args['put_args']['type']) && (int)$args['put_args']['type'] > $token_info['scope']){
 			response(403, "Forbidden");
 		}
-		var_dump($args);
 		if(isset($args['additional'])){
 			unset($args['put_args']['id'], $args['put_args']['gc'], $args['put_args']['type'], $args['put_args']['llog'], $args['put_args']['ac_creation'], $args['put_args']['mail']);
 		}
@@ -110,9 +109,7 @@ class ProfileController implements Controller{
 			}
 		}
 		$user_update = array_intersect_key($args['put_args'], $user_info);
-		var_dump($user_update, $user_info, $args['put_args']);
 		if(!empty($user_update)){
-			var_dump("ici");
 			if($this->um->update($user_info['id'], $user_update)){
 				response(200, "Profile Updated");
 			}else{
