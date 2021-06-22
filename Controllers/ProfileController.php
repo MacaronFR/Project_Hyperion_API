@@ -109,7 +109,7 @@ class ProfileController implements Controller{
 			}
 		}
 		$user_update = array_intersect_key($args['put_args'], $user_info);
-		var_dump($user_update, $user_info);
+		var_dump($user_update, $user_info, $args['put_args']);
 		if(!empty($user_update)){
 			if($this->um->update($user_info['id'], $user_update)){
 				response(200, "Profile Updated");
