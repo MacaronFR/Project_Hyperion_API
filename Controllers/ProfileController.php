@@ -116,7 +116,7 @@ class ProfileController implements Controller{
 			if($this->um->update($user_info['id'], $user_update)){
 				response(200, "Profile Updated");
 			}else{
-				//response(204, "No update");
+				response(204, "No update");
 			}
 		}else{
 			response(400, "Bad Request");
