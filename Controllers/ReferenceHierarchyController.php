@@ -11,12 +11,14 @@ class ReferenceHierarchyController implements Controller{
 	private SpecificationModel $sm;
 	private RefHaveSpecModel $rhsm;
 	private ProductModel $pm;
+	private TypeModel $tm;
 
 	public function __construct(){
 		$this->rm = new ReferenceModel();
 		$this->sm = new SpecificationModel();
 		$this->rhsm = new RefHaveSpecModel();
 		$this->pm = new ProductModel();
+		$this->tm = new TypeModel();
 	}
 
 	#[NoReturn] public function ref($args, bool $detail = false){
@@ -178,6 +180,15 @@ class ReferenceHierarchyController implements Controller{
 	#[NoReturn] public function type_brand_model_reference(array $args){
 		if(!is_numeric($args['uri_args'][0])){
 			response(400, "Bad Request");
+		}
+		if($this->tm->select($args['uri_args'][0]) === false){
+			response(404, "Type Not Found");
+		}
+		if($this->sm->selectBrand($args['uri_args'][1]) === false){
+			response(404, "Brand Not Found");
+		}
+		if($this->sm->selectModel($args['uri_args'][2]) === false){
+			response(404, "Model not Found");
 		}
 		$references = $this->rm->selectByTypeBrandModel($args['uri_args'][0], $args['uri_args'][1], $args['uri_args'][2]);
 		if($references === false){
