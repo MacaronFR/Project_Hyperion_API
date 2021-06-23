@@ -201,24 +201,24 @@ class ProfileController implements Controller{
 	/**
 	 * @inheritDoc
 	 */
-	public function delete(array $args){
-		if(checkToken($args['uri_args'][0], 3)){
-			$user = $this->um->select($args['uri_args'][1]);
-			if($user){
-				$this->um->delete($args['uri_args'][1]);
-				response(204, "User Deleted");
-			}
-
-		}else{
-			if(checkToken($args['uri_args'][0], 1))
-				$user = $this->um->select($args['uri_args'][0]);
-			if($user){
-				$token = $this->tm->update(-1, $args['uri_args'][0]);
-				if($token){
-					response(204, "USER Deleted");
-				}
-			}
+	#[NoReturn] public function delete(array $args){
+		if(!is_numeric($args['uri_args'][1])){
+			response(400, "Bad Request");
 		}
-
+		$token = $this->tm->selectByToken($args['uri_args'][0]);
+		if($token === false){
+			response(403, "Forbidden");
+		}
+		$user = $this->um->select($args['uri_args'][1]);
+		if($user === false){
+			response(404, "User Not Found");
+		}
+		if($user['type'] >= $token['scope']){
+			response(401, "Unauthorized");
+		}
+		if($this->um->delete($user['id'])){
+			response(204, "User deleted");
+		}
+		response(500, "Internal Server Error");
 	}
 }
