@@ -256,7 +256,7 @@ class OfferController implements Controller{
 		response(201, "Created", ['offer' => $offer_id]);
 	}
 
-	private function foundInSpecList($array, $value){
+	private function foundInSpecList($array, $value): bool{
 		for($i = 0; $i < count($array); ++$i){
 			if($array[$i][0] === $value){
 				return true;
@@ -271,6 +271,8 @@ class OfferController implements Controller{
 	#[NoReturn] public function put(array $args){
 		if($args['additional'][0] === "counter"){
 			$this->counterOffer($args);
+		}elseif($args['additional'][0] === "send"){
+			$this->sendCounter($args);
 		}
 	}
 
@@ -300,6 +302,59 @@ class OfferController implements Controller{
 			response(200, "Offer Updated");
 		}
 		response(500, "Internal Server Error");
+	}
+
+	private function sendCounter(array $args){
+		if(!is_numeric($args['uri_args'][1])){
+			response(400, "Bad Request");
+		}
+		$token = $this->tom->selectByToken($args['uri_args'][0]);
+		if($token === false || $token['scope'] >= 3){
+			response(401, "Unauthorized");
+		}
+		$offer = $this->om->select($args['uri_args'][1]);
+		if($offer === false){
+			response(404, "Offer Not Found");
+		}
+		if($offer['expert'] !== $token['user']){
+			response(403, "Forbidden");
+		}
+		$product = $this->pm->select($offer['id'], "offer");
+		if($product === false){
+			response(500, "Internal Server Error");
+		}
+		$spec = $this->pm->selectWithDetail($product['id']);
+		if($spec === false){
+			response(501, "Internal Server Error");
+		}
+		$spec = $spec['spec'];
+		$ref = $this->rm->select($product['ref']);
+		if($ref === false){
+			response(502, "Internal Server Error");
+		}
+		$bonus = 0.;
+		foreach($spec as $n => $v){
+			if($n !== "brand" && $n !== "model"){
+				$spec_id = $this->sm->selectIdentical(['name' => $n, 'value' => $v]);
+				if($spec_id === false){
+					response(503, "Internal Server Error");
+				}
+				$rhs = $this->rhsm->selectBySpecRef($spec_id['id'], $ref['id']);
+				if($rhs === false){
+					response(504, "Internal Server Error");
+				}
+				$bonus += (double)$rhs['value'];
+			}
+		}
+		$state = $this->stm->select($product['state']);
+		if($state === false){
+			response(505, "Internal Server Error");
+		}
+		$price = ($ref['buying'] + $bonus) * (100 - $state['penality']) / 100;
+		if($this->om->update($offer['id'], ['status' => 4, 'counter_offer' => $price])){
+			response(200, "Counter Offer Send");
+		}
+		response(506, "Internal Server Error");
 	}
 
 	/**

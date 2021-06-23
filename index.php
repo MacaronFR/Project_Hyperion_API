@@ -150,6 +150,7 @@ $rt->get("/offer/*/*", OfferController::class, ['id']);
 // /offer/{token}
 $rt->post("/offer/*", OfferController::class);
 
+$rt->put("/offer/counter/send/*/*", OfferController::class, ['send']);
 $rt->put("/offer/counter/accept/*/*", OfferController::class, ['counter', 'accept']);
 $rt->put("/offer/counter/refuse/*/*", OfferController::class, ['counter', 'refuse']);
 
