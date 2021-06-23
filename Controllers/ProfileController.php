@@ -49,7 +49,23 @@ class ProfileController implements Controller{
 				response(401, "Invalid Credentials");
 			}
 		}else{
-			response(400, "Bad request");
+			if(!checkToken($args['uri_args'][0], 3)){
+				response(401, "Unauthorized");
+			}
+			if(!is_numeric($args['uri_args'][1])){
+				response(400, "Bad request");
+			}
+			$user = $this->um->select($args['uri_args'][1]);
+			if($user === false){
+				response(404, "User Not Found");
+			}
+			if($user['addr'] !== null){
+				$user['addr'] = $this->am->select($user['addr']);
+				if($user['addr'] === false){
+					response(500, "Internal Server Error");
+				}
+			}
+			response(200, "User", $user);
 		}
 	}
 
