@@ -213,7 +213,7 @@ class ProfileController implements Controller{
 		if($user === false){
 			response(404, "User Not Found");
 		}
-		if($user['type'] >= $token['scope']){
+		if((int)$user['type'] <= (int)$token['scope']){
 			response(401, "Unauthorized");
 		}
 		if($this->um->delete($user['id'])){
