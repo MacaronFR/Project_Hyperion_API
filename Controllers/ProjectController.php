@@ -70,11 +70,11 @@ class ProjectController implements Controller{
 				response(400, "Bad Request");
 			}
 			if(count($args['uri_args']) > 1){
-				$order = match($args['uri_args'][2]){@
+				$order = match($args['uri_args'][2] ?? ""){
 					'DESC' => 'DESC',
 					default => 'ASC'
 				};
-				$sort = match ($args['uri_args'][3]){
+				$sort = match ($args['uri_args'][3] ?? ""){
 					'contribution' => 'contribution',
 					'name' => 'name',
 					'RNA' => 'RNA',
