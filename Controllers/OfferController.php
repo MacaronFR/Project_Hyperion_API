@@ -416,7 +416,6 @@ class OfferController implements Controller{
 		if(empty($new_ref)){
 			response(404, "Product Not Found");
 		}
-		var_dump($new_ref['spec']);
 		if(isset($new_val['spec'])){
 			foreach($new_val['spec'] as $n => $v){
 				if(!$this->foundInSpecList($new_ref['spec'][$n], $v)){
@@ -462,14 +461,13 @@ class OfferController implements Controller{
 							response(506, "Internal Server Error");
 						}
 						$psm_id = $this->psm->selectBySpecProd($old_spec['id'], $data['product']['id']);
-						if($psm_id === false){
-							response(507, "Internal Server Error");
-						}
-						if(!$this->psm->delete($psm_id['id'])){
-							response(508, "Internal Server Error");
-						}
-						if(!$this->psm->insert(['product' => $data['product']['id'], 'spec' => $v])){
-							response(509, "Internal Server Error");
+						if($psm_id !== false){
+							if(!$this->psm->delete($psm_id['id'])){
+								response(508, "Internal Server Error");
+							}
+							if(!$this->psm->insert(['product' => $data['product']['id'], 'spec' => $v])){
+								response(509, "Internal Server Error");
+							}
 						}
 					}
 				}
