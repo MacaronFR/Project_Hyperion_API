@@ -36,7 +36,7 @@ class RefHaveSpecModel extends Model{
 		return $this->prepared_query($sql, ['id' => $id_ref] ,fetch: false);
 	}
 
-	public function selectBySpecRef(int $spec, int $ref){
+	public function selectBySpecRef(int $spec, int $ref): array|false{
 		$sql = "SELECT $this->id_name as id, value as value FROM $this->table_name WHERE id_spec=:spec AND id_product=:product";
 		return $this->prepared_query($sql, ['spec' => $spec, 'product' => $ref], unique: true);
 	}

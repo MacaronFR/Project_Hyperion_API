@@ -100,6 +100,7 @@ class OfferController implements Controller{
 		response(200, "Under Construction");
 		//TODO all offer for user or admin
 	}
+
 	/**
 	 * @inheritDoc
 	 */
@@ -273,6 +274,8 @@ class OfferController implements Controller{
 			$this->counterOffer($args);
 		}elseif($args['additional'][0] === "send"){
 			$this->sendCounter($args);
+		}elseif($args['additional'][0] === "set"){
+			$this->setOffer($args);
 		}
 	}
 
@@ -294,7 +297,7 @@ class OfferController implements Controller{
 		if((int)$offer['status'] !== 4){
 			response(400, "Bad Request");
 		}
-		$val = match($args['additional'][1]){
+		$val = match ($args['additional'][1]) {
 			"accept" => 6,
 			"refuse" => 5
 		};
@@ -304,7 +307,7 @@ class OfferController implements Controller{
 		response(500, "Internal Server Error");
 	}
 
-	private function sendCounter(array $args){
+	private function putRetrieveData(array $args): array{
 		if(!is_numeric($args['uri_args'][1])){
 			response(400, "Bad Request");
 		}
@@ -314,6 +317,9 @@ class OfferController implements Controller{
 		}
 		$offer = $this->om->select($args['uri_args'][1]);
 		if($offer === false){
+			response(404, "Offer Not Found");
+		}
+		if((int)$offer['status'] !== 3){
 			response(404, "Offer Not Found");
 		}
 		if($offer['expert'] !== $token['user']){
@@ -332,29 +338,144 @@ class OfferController implements Controller{
 		if($ref === false){
 			response(502, "Internal Server Error");
 		}
+		return ['spec' => $spec, 'product' => $product, 'offer' => $offer, 'ref' => $ref];
+	}
+
+	#[NoReturn] private function sendCounter(array $args){
+		$data = $this->putRetrieveData($args);
 		$bonus = 0.;
-		foreach($spec as $n => $v){
+		foreach($data['spec'] as $n => $v){
 			if($n !== "brand" && $n !== "model"){
 				$spec_id = $this->sm->selectIdentical(['name' => $n, 'value' => $v]);
 				if($spec_id === false){
 					response(503, "Internal Server Error");
 				}
-				$rhs = $this->rhsm->selectBySpecRef($spec_id['id'], $ref['id']);
+				$rhs = $this->rhsm->selectBySpecRef($spec_id['id'], $data['ref']['id']);
 				if($rhs === false){
 					response(504, "Internal Server Error");
 				}
 				$bonus += (double)$rhs['value'];
 			}
 		}
-		$state = $this->stm->select($product['state']);
+		$state = $this->stm->select($data['product']['state']);
 		if($state === false){
 			response(505, "Internal Server Error");
 		}
-		$price = ($ref['buying'] + $bonus) * (100 - $state['penality']) / 100;
-		if($this->om->update($offer['id'], ['status' => 4, 'counter_offer' => $price])){
+		$price = ($data['ref']['buying'] + $bonus) * (100 - $state['penality']) / 100;
+		if($this->om->update($data['offer']['id'], ['status' => 4, 'counter_offer' => $price])){
 			response(200, "Counter Offer Send");
 		}
 		response(506, "Internal Server Error");
+	}
+
+	private function setOffer(array $args){
+		$data = $this->putRetrieveData($args);
+		$old_val = [
+			'type' => (int)$data['ref']['type'],
+			'brand' => $data['spec']['brand'],
+			'model' => $data['spec']['model'],
+			'state' => (int)$data['product']['state'],
+			'spec' => $data['spec']
+		];
+		unset($old_val['spec']['brand'], $old_val['spec']['model']);
+		$new_val = array_intersect_key($args['put_args'], $old_val);
+		if(isset($new_val['spec'])){
+			$new_val['spec'] = array_intersect_key($new_val['spec'], $old_val['spec']);
+		}
+		if(isset($new_val['type'])){
+			$type = $this->tm->select($new_val['type']);
+			if($type === false){
+				response(404, "Type not Found");
+			}
+		}
+		if(isset($new_val['brand'])){
+			$brand = $this->sm->selectIdentical(['name' => 'brand', 'value' => $new_val['brand']]);
+			if($brand === false){
+				response(404, "Brand not Found");
+			}
+		}
+		if(isset($new_val['model'])){
+			$model = $this->sm->selectIdentical(['name' => 'model', 'value' => $new_val['model']]);
+			if($model === false){
+				response(404, "Model not Found");
+			}
+		}
+		if(isset($new_val['state'])){
+			if((int)$new_val['state'] < 1 || (int)$new_val['state'] > 5){
+				response(400, "Bad Request");
+			}
+		}
+		$new_ref = $this->rm->selectByTypeBrandModel(
+			$new_val['type'] ?? $old_val['type'],
+			$new_val['brand'] ?? $old_val['brand'],
+			$new_val['model'] ?? $old_val['model']
+		);
+		if($new_ref === false){
+			response(500, "Internal Server Error");
+		}
+		if(empty($new_ref)){
+			response(404, "Product Not Found");
+		}
+		var_dump($new_ref['spec']);
+		if(isset($new_val['spec'])){
+			foreach($new_val['spec'] as $n => $v){
+				if(!$this->foundInSpecList($new_ref['spec'][$n], $v)){
+					response(400, "Bad Request");
+				}
+				$spec_id = $this->sm->selectIdentical(['name' => $n, 'value' => $v]);
+				if($spec_id === false){
+					response(501, "Internal Server Error");
+				}
+				$new_val['spec'][$n] = $spec_id['id'];
+			}
+		}
+		if($data['product']['ref'] !== $new_ref['id']){
+			if(!$this->pm->update($data['product']['id'], ['ref' => $new_ref['id']])){
+				response(502, "Internal Server Error");
+			}
+			$old_spec = $this->psm->selectAllByProduct($data['product']['id']);
+			if($old_spec === false){
+				response(503, "Internal Server Error");
+			}
+			foreach($new_ref['spec'] as $n => $a){
+				if(count($a) > 1){
+					if(!isset($new_val['spec'][$n])){
+						response(400, "Bad Request");
+					}
+					if(!$this->psm->insert(['product' => $data['product']['id'], 'spec' => $new_val['spec'][$n]])){
+						response(504, "Internal Server Error");
+					}
+				}
+			}
+
+			foreach($old_spec as $o){
+				if(!$this->psm->delete($o['id'])){
+					response(505, "Internal Server Error");
+				}
+			}
+		}else{
+			if(isset($new_val['spec'])){
+				foreach($new_val['spec'] as $n => $v){
+					if($old_val['spec'][$n] !== $v){
+						$old_spec = $this->sm->selectIdentical(['name' => $n, 'value' => $old_val['spec'][$n]]);
+						if($old_spec === false){
+							response(506, "Internal Server Error");
+						}
+						$psm_id = $this->psm->selectBySpecProd($old_spec['id'], $data['product']['id']);
+						if($psm_id === false){
+							response(507, "Internal Server Error");
+						}
+						if(!$this->psm->delete($psm_id['id'])){
+							response(508, "Internal Server Error");
+						}
+						if(!$this->psm->insert(['product' => $data['product']['id'], 'spec' => $v])){
+							response(509, "Internal Server Error");
+						}
+					}
+				}
+			}
+		}
+		response(200, "Offer Updated");
 	}
 
 	/**

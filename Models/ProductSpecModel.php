@@ -25,4 +25,9 @@ class ProductSpecModel extends Model {
 		}
     	return $this->prepared_query($sql, ['id' => $id_prod]);
 	}
+
+	public function selectBySpecProd(int $spec, int $product): array|false{
+		$sql = "SELECT $this->id_name as id FROM $this->table_name WHERE id_spec=:spec AND id_product=:product";
+		return $this->prepared_query($sql, ['spec' => $spec, 'product' => $product], unique: true);
+	}
 }

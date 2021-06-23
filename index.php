@@ -153,6 +153,7 @@ $rt->post("/offer/*", OfferController::class);
 $rt->put("/offer/counter/send/*/*", OfferController::class, ['send']);
 $rt->put("/offer/counter/accept/*/*", OfferController::class, ['counter', 'accept']);
 $rt->put("/offer/counter/refuse/*/*", OfferController::class, ['counter', 'refuse']);
+$rt->put("/offer/set/*/*", OfferController::class, ['set']);
 
 // PROJECT
 $rt->get("/project/nologo/popular{/*}",ProjectController::class, ['popular', 'nologo']);
