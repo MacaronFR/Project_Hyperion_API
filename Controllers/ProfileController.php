@@ -155,7 +155,7 @@ class ProfileController implements Controller{
 		if(!isset($args['additional']) && (int)$token_info['scope'] !== 0 && $token_info['user'] !== $args['uri_args'][1] && $token_info['scope'] >= $user_info['type']){
 			response(403, "Forbidden");
 		}
-		if(isset($args['put_args']['type']) && (int)$args['put_args']['type'] > $token_info['scope']){
+		if(isset($args['put_args']['type']) && (int)$args['put_args']['type'] < $token_info['scope']){
 			response(403, "Forbidden");
 		}
 		if(isset($args['additional'])){
