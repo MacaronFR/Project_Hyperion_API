@@ -150,6 +150,9 @@ $rt->get("/offer/*/*", OfferController::class, ['id']);
 // /offer/{token}
 $rt->post("/offer/*", OfferController::class);
 
+$rt->put("/offer/counter/accept/*/*", OfferController::class, ['counter', 'accept']);
+$rt->put("/offer/counter/refuse/*/*", OfferController::class, ['counter', 'refuse']);
+
 // PROJECT
 $rt->get("/project/nologo/popular{/*}",ProjectController::class, ['popular', 'nologo']);
 $rt->get("/project/nologo/latest{/*}",ProjectController::class, ['latest', 'nologo']);

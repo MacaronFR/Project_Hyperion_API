@@ -268,8 +268,38 @@ class OfferController implements Controller{
 	/**
 	 * @inheritDoc
 	 */
-	public function put(array $args){
-		// TODO: Implement put() method.
+	#[NoReturn] public function put(array $args){
+		if($args['additional'][0] === "counter"){
+			$this->counterOffer($args);
+		}
+	}
+
+	#[NoReturn] private function counterOffer(array $args){
+		if(!is_numeric($args['uri_args'][1])){
+			response(400, "Bad Request");
+		}
+		$token = $this->tom->selectByToken($args['uri_args'][0]);
+		if($token === false){
+			response(403, "Forbidden");
+		}
+		$offer = $this->om->select($args['uri_args'][1]);
+		if($offer === false){
+			response(404, "Offer Not Found");
+		}
+		if($token['user'] !== $offer['user']){
+			response(401, "Unauthorized");
+		}
+		if((int)$offer['status'] !== 4){
+			response(400, "Bad Request");
+		}
+		$val = match($args['additional'][1]){
+			"accept" => 6,
+			"refuse" => 5
+		};
+		if($this->om->update($offer['id'], ['status' => $val])){
+			response(200, "Offer Updated");
+		}
+		response(500, "Internal Server Error");
 	}
 
 	/**
