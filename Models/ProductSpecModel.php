@@ -18,7 +18,7 @@ class ProductSpecModel extends Model {
     	foreach($this->column as $param => $column){
     		$sql .= "$column as $param, ";
 		}
-    	$sql .= "$this->id_name as id FROM $this->table_name WHERE $this->id_name=:id";
+    	$sql .= "$this->id_name as id FROM $this->table_name WHERE " . $this->column['product'] . "=:id";
     	if($limit){
     		$start = $iteration * $this->max_row;
     		$sql .= " LIMIT $start, $this->max_row";

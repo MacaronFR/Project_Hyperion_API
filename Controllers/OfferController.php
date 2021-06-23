@@ -418,6 +418,9 @@ class OfferController implements Controller{
 		}
 		if(isset($new_val['spec'])){
 			foreach($new_val['spec'] as $n => $v){
+				if(!isset($new_ref['spec'][$n])){
+					response(400, "Bad Request");
+				}
 				if(!$this->foundInSpecList($new_ref['spec'][$n], $v)){
 					response(400, "Bad Request");
 				}
@@ -446,7 +449,6 @@ class OfferController implements Controller{
 					}
 				}
 			}
-
 			foreach($old_spec as $o){
 				if(!$this->psm->delete($o['id'])){
 					response(505, "Internal Server Error");
