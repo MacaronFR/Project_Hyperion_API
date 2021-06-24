@@ -300,10 +300,20 @@ class OfferController implements Controller{
 			"accept" => 6,
 			"refuse" => 5
 		};
-		if($this->om->update($offer['id'], ['status' => $val])){
-			response(200, "Offer Updated");
+		if(!$this->om->update($offer['id'], ['status' => $val])){
+			response(500, "Internal Server Error");
 		}
-		response(500, "Internal Server Error");
+		if($val === 6){
+			$prod = $this->pm->select($offer['id'], "offer");
+			if($prod === false){
+				response(501, "Internal Server Error");
+			}
+			if($this->pm->update($prod['id'], ['status' => 2])){
+				response(200, "Offer Updated");
+			}
+			response(502, "Internal Server Error");
+		}
+		response(200, "Offer Updated");
 	}
 
 	private function putRetrieveData(array $args): array{
