@@ -7,6 +7,7 @@
 
 namespace Hyperion\API;
 
+use DateTime;
 use FPDF;
 
 require("fpdf/fpdf.php");
@@ -58,7 +59,7 @@ $pdf->Cell(75,6, utf8_decode($id_invoice),0,1,'',1);
 $pdf->SetFont('Helvetica','B',9);
 $pdf->Cell(40,6, 'Date de la commande:',0,0,'L',1);
 $pdf->SetFont('Helvetica','',9);
-$pdf->Cell(75,6, '19.06.2021',0,1,'',1);
+$pdf->Cell(75,6, utf8_decode((new DateTime())->format("d/m/Y")),0,1,'',1);
 
 
 
