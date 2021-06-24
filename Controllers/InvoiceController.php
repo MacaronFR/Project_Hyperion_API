@@ -111,6 +111,11 @@ class InvoiceController implements Controller{
 		if(empty($invoice)){
 			response(204, "No content");
 		}
+		$total = $this->im->selectAllByUserInvoiceTotal($user['id']);
+		if($total === false){
+			response(501, "Internal Server Error");
+		}
+		$invoice['total'] = $invoice['totalNotFiltered'] = $total;
 		response(200, " All of your Invoices are belong to us ", $invoice); // c'est un easter egg
 	}
 

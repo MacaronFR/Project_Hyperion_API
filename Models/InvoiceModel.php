@@ -40,4 +40,21 @@ class InvoiceModel extends Model{
 		}
 		return $this->prepared_query($sql, ['id' => $user_id]);
 	}
+
+	public function selectAllByUserInvoiceTotal(int $user_id): int|false{
+		return $this->selectAllByUserTotal($user_id, "id_cart");
+	}
+
+	public function selectAllByUserCreditTotal(int $user_id): int|false{
+		return $this->selectAllByUserTotal($user_id, "id_offer");
+	}
+
+	private function selectAllByUserTotal(int $user_id, string $column): int|false{
+		$sql = "SELECT COUNT($this->id_name) as count FROM $this->table_name WHERE id_user=:id AND $column IS NOT NULL ";
+		$total = $this->prepared_query($sql, ['id' => $user_id], unique: true);
+		if($total === false){
+			return false;
+		}
+		return $total['count'];
+	}
 }

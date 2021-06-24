@@ -51,6 +51,11 @@ class CreditController implements Controller{
 		if(empty($invoice)){
 			response(204, "No content");
 		}
+		$total = $this->im->selectAllByUserCreditTotal($user['id']);
+		if($total === false){
+			response(501, "Internal Server Error");
+		}
+		$invoice['total'] = $invoice['totalNotFiltered'] = $total;
 		response(200, "Credits", $invoice);
 	}
 
