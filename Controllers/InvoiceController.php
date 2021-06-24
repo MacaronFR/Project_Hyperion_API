@@ -72,6 +72,9 @@ class InvoiceController implements Controller{
 		if($invoice === false){
 			response(404, "Invoice Not Found");
 		}
+		if($invoice['cart'] === null){
+			response(400, "Bad Request");
+		}
 		if(!checkToken($args['uri_args'][0], 3)){
 			$user = getUser($this->tm, $args['uri_args'][0], $this->um);
 			if($user['id'] !== $invoice['user']){
