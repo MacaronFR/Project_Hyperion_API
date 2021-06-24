@@ -441,13 +441,18 @@ class OfferController implements Controller{
 				$new_val['spec'][$n] = $spec_id['id'];
 			}
 		}
+		if(isset($new_val['state'])){
+			if(!$this->pm->update($data['product']['id'], ['state' => $new_val['state']])){
+				response(502, "Internal Server Error");
+			}
+		}
 		if($data['product']['ref'] !== $new_ref['id']){
 			if(!$this->pm->update($data['product']['id'], ['ref' => $new_ref['id']])){
-				response(502, "Internal Server Error");
+				response(503, "Internal Server Error");
 			}
 			$old_spec = $this->psm->selectAllByProduct($data['product']['id']);
 			if($old_spec === false){
-				response(503, "Internal Server Error");
+				response(504, "Internal Server Error");
 			}
 			foreach($new_ref['spec'] as $n => $a){
 				if(count($a) > 1){
@@ -455,13 +460,13 @@ class OfferController implements Controller{
 						response(400, "Bad Request");
 					}
 					if(!$this->psm->insert(['product' => $data['product']['id'], 'spec' => $new_val['spec'][$n]])){
-						response(504, "Internal Server Error");
+						response(505, "Internal Server Error");
 					}
 				}
 			}
 			foreach($old_spec as $o){
 				if(!$this->psm->delete($o['id'])){
-					response(505, "Internal Server Error");
+					response(506, "Internal Server Error");
 				}
 			}
 		}else{
@@ -470,7 +475,7 @@ class OfferController implements Controller{
 					if($old_val['spec'][$n] !== $v){
 						$old_spec = $this->sm->selectIdentical(['name' => $n, 'value' => $old_val['spec'][$n]]);
 						if($old_spec === false){
-							response(506, "Internal Server Error");
+							response(507, "Internal Server Error");
 						}
 						$psm_id = $this->psm->selectBySpecProd($old_spec['id'], $data['product']['id']);
 						if($psm_id !== false){
