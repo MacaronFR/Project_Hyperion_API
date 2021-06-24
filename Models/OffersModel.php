@@ -293,7 +293,7 @@ class OffersModel extends Model{
 		foreach($this->column as $item){
 			$sql .= "$item LIKE :search OR ";
 		}
-		$sql .= "$this->id_name LIKE :search ) AND $this->id_name<>0 AND (status=1 OR status=2) ";
+		$sql .= "$this->id_name LIKE :search ) AND $this->id_name<>0 AND status=1 ";
 		$sql .= "ORDER BY $sort $order ";
 		$sql .= "LIMIT $start, $this->max_row;";
 		$search = "%$search%";
@@ -314,7 +314,7 @@ class OffersModel extends Model{
 		foreach($this->column as $item){
 			$sql .= "$item LIKE :search OR ";
 		}
-		$sql .= "$this->id_name LIKE :search ) AND $this->id_name<>0 AND (status=1 OR status=2) ";
+		$sql .= "$this->id_name LIKE :search ) AND $this->id_name<>0 AND status=1 ";
 		$sql .= "ORDER BY $sort $order ";
 		$search = "%" . $search . "%";
 		$total = $this->prepared_query($sql, ["search" => $search], unique: true);
@@ -324,7 +324,7 @@ class OffersModel extends Model{
 		return $total['count'];
 	}
 	public function selectTotalReception(): int|false{
-		$sql = "SELECT COUNT(id_offer) as count FROM OFFERS WHERE (status=1 OR status=2)";
+		$sql = "SELECT COUNT(id_offer) as count FROM OFFERS WHERE status=1";
 		$res = $this->prepared_query($sql, [], unique: true);
 		return $res['count'] ?? false;
 	}
