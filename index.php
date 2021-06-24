@@ -10,7 +10,7 @@ use Hyperion\API\{CartController,
 	OfferController,
 	PendingOfferController,
 	ProjectController,
-	ReceptionOfferController,
+	CreditController,
 	ShopProductController,
 	TypeController,
 	TerminatedOfferController,
@@ -173,11 +173,13 @@ $rt->post("/project/*",ProjectController::class);
 $rt->post("/project/contribute/*", ContributeController::class, ['contribute']);
 
 //
-$rt->get("/invoice/me/*",InvoiceController::class, ['me']);
+$rt->get("/invoice/me/*{/*}",InvoiceController::class, ['me']);
 $rt->get("/invoice/all/*",InvoiceController::class, ['all']);
 $rt->get("/invoice/*/*", InvoiceController::class, ['one']);
 $rt->get("/invoice/cart/*/*", InvoiceController::class, ['cart']);
 $rt->put("/invoice/confirm/*", InvoiceController::class);
+
+$rt->get("/credit/me/*{/*}",CreditController::class, ['me']);
 
 //Shop
 $rt->get("/shop{/*}", ShopController::class, ['main']);

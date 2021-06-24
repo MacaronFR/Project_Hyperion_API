@@ -97,12 +97,21 @@ class InvoiceController implements Controller{
 
 	#[NoReturn] private function getUserInvoice(array $args){
 		$user = getUser($this->tm, $args['uri_args'][0], $this->um);
-		$invoice = $this->im->select($user['id_user'], "user");
+		if(isset($args['uri_args'][1])){
+			if(!is_numeric($args['uri_args'][1])){
+				response(400, "Bad Request");
+			}
+			$invoice = $this->im->selectAllByUserInvoice($user['id'], $args['uri_args'][1]);
+		}else{
+			$invoice = $this->im->selectAllByUserInvoice($user['id'], limit: false);
+		}
 		if($invoice === false){
-			response(404, "Not Found");
+			response(500, "Internal Server Error");
+		}
+		if(empty($invoice)){
+			response(204, "No content");
 		}
 		response(200, " All of your Invoices are belong to us ", $invoice); // c'est un easter egg
-
 	}
 
 	/**
