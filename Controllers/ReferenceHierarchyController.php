@@ -275,16 +275,16 @@ class ReferenceHierarchyController implements Controller{
 		}
 		foreach($specs as $spec){
 			foreach($spec['value'] as $val){
-				$spec_id = $this->sm->selectIdentical(["name" => $spec['name'], "value" => $val]);
+				$spec_id = $this->sm->selectIdentical(["name" => $spec['name'], "value" => $val['value']]);
 				if($spec_id === false){
-					$spec_id = $this->sm->insert(["name" => $spec['name'], "value" => $val]);
+					$spec_id = $this->sm->insert(["name" => $spec['name'], "value" => $val['value']]);
 					if($spec_id === false){
 						response(500, "Internal Server Error");
 					}
 				}else{
 					$spec_id = $spec_id['id'];
 				}
-				if($this->rhsm->insert(['product' => $new_ref, 'spec' => $spec_id]) === false){
+				if($this->rhsm->insert(['product' => $new_ref, 'spec' => $spec_id, 'bonus' => $val['bonus']]) === false){
 					response(500, "Internal Server Error");
 				}
 			}
