@@ -30,9 +30,14 @@ function getUser(TokenModel $tm, string $token, UserModel $um): array | false{
 	$user = $um->select($token['user']);
 	if(!$user){
 		response(404,"Not Found");
-	}else{
-		return $user;
 	}
+	if($user['addr'] !== null){
+		$user['addr'] = (new \Hyperion\API\AddressModel())->select($user['addr']);
+		if($user['addr'] === false){
+			response(500, "Internal Server Error");
+		}
+	}
+	return $user;
 }
 
 function parse_body(): array| false{
