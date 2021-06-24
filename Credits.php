@@ -1,8 +1,7 @@
 <?php
 /**
- * @var array $tab
+ * @var int $id_cart
  * @var array $user
- * @var int $id_invoice
  */
 
 namespace Hyperion\API;
@@ -10,6 +9,26 @@ namespace Hyperion\API;
 use FPDF;
 
 require("fpdf/fpdf.php");
+
+$picm = new ProductInCartModel();
+$pm = new ProductModel();
+
+$products_id = $picm->selectByCart($id_cart);
+$products = [];
+$tab = [[
+	'userName' => $user['name'],
+	'firstname' => $user['fname'],
+	'address' => $user['addr']['address'],
+	'zip' => $user['addr']['zip'],
+	'city' => $user['addr']['city']
+]];
+foreach($products_id as $pid){
+	$p = $pm->select($pid['product']);
+	$p['spec'] = $pm->selectWithDetail($pid['product'])['spec'];
+	$tab[] = ['description' => $p['spec']['brand'] . " " . $p['spec']['model'], 'tva' => 20, 'selling_price' => $p['sell_p']];
+}
+
+
 
 class InvoicePDF extends FPDF
 {
@@ -20,7 +39,7 @@ class InvoicePDF extends FPDF
 		$this->SetFont('Helvetica','',20);
 		$this->setFillColor(230,230,230);
 		$this->SetX(70);
-		$this->Cell(80,10,'Facture',0,0,'C',1);
+		$this->Cell(80,10,'AVOIR',0,0,'C',1);
 		$this->Ln(18);
 	}
 
@@ -51,9 +70,9 @@ $pdf->Cell(112,6,'TVA: FR12637848934987',0,1,'R',0);
 $pdf->Ln(10);
 
 $pdf->SetFont('Helvetica','B',9);
-$pdf->Cell(40,6, 'Numero de facture:',0,0,'L',1);
+$pdf->Cell(40,6, 'Numero de la commande:',0,0,'L',1);
 $pdf->SetFont('Helvetica','',9);
-$pdf->Cell(75,6, utf8_decode($id_invoice),0,1,'',1);
+$pdf->Cell(75,6, '1',0,1,'',1);
 
 $pdf->SetFont('Helvetica','B',9);
 $pdf->Cell(40,6, 'Date de la commande:',0,0,'L',1);

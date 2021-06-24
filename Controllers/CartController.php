@@ -173,9 +173,7 @@ class CartController implements Controller{
 		if(!$this->cm->update($cart['id'], ['status' => 1])){
 			response(500, "Internal Server Error");
 		}
-		$file_content = $this->getInvoice($cart['id'], $user);
 		$save_name = md5(time() . "facture.pdf") . "b64";
-		file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/images/invoice/" . $save_name, $file_content);
 		$file_id = $this->fm->insert(['file_name' => "facture.pdf", "file_path" => "images/invoice/" . $save_name, "type" => "application/pdf", "creator" => $user['id']]);
 		$invoice_value = [
 			'total' => $cart['total'],
@@ -187,10 +185,26 @@ class CartController implements Controller{
 		if($invoice_id === false){
 			response(501, "Internal Server Error");
 		}
+		$file_content = $this->getInvoice($cart['id'], $user, $invoice_id);
+		file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/images/invoice/" . $save_name, $file_content);
 		response(200, "Command OK, Invoice generated", ['invoice' => $invoice_id]);
 	}
 
-	private function getInvoice($id_cart, $user): string{
+	private function getInvoice($id_cart, $user, $id_invoice): string{
+		$products_id = $this->picm->selectByCart($id_cart);
+		$products = [];
+		$tab = [[
+			'userName' => $user['name'],
+			'firstname' => $user['fname'],
+			'address' => $user['addr']['address'],
+			'zip' => $user['addr']['zip'],
+			'city' => $user['addr']['city']
+		]];
+		foreach($products_id as $pid){
+			$p = $this->pm->select($pid['product']);
+			$p['spec'] = $this->pm->selectWithDetail($pid['product'])['spec'];
+			$tab[] = ['description' => $p['spec']['brand'] . " " . $p['spec']['model'], 'tva' => 20, 'selling_price' => $p['sell_p']];
+		}
 		include "Invoice.php";
 		return base64_encode($pdf_output);
 	}
