@@ -140,7 +140,6 @@ $rt->get("/product_detail{/*{/search/*{/order/*/sort/*}}}", ProductHierarchyCont
 $rt->delete("/product/*/*", ProductHierarchyController::class);
 // OFFER
 // /offer/{token}/{id} || /offer/{token}[/{page}[/search/*[/order/*/sort/*]]]
-$rt->get("/offer/reception/all/*{/*}", ReceptionOfferController::class, ['all']);
 $rt->get("/offer/pending/all/*{/*}", PendingOfferController::class, ['all']);
 $rt->get("/offer/pending/*/user/*{/*}", PendingOfferController::class, ['user']);
 $rt->get("/offer/pending/*{/*}", PendingOfferController::class);
@@ -195,11 +194,13 @@ $rt->get("/product/picture/*{/*}", PictureController::class);
 
 $rt->get("/state", StateController::class);
 
+$rt->get("/offer/reception/all/*{/*{/search/*{/order/*/sort/*}}}", ExpertOfferController::class, ['reception']);
 $rt->get("/expert/offer/pending/*{/*{/search/*{/order/*/sort/*}}}", ExpertOfferController::class, ['pending']);
 $rt->get("/expert/offer/history/*{/*{/search/*{/order/*/sort/*}}}", ExpertOfferController::class, ['history']);
 $rt->get("/expert/offer/*{/*{/search/*{/order/*/sort/*}}}", ExpertOfferController::class);
 $rt->post("/expert/offer/*/*",ExpertOfferController::class);
 $rt->put("/expert/offer/counter_offer/*",ExpertOfferController::class);
+$rt->put("/offer/reception/*/*", ReceptionOfferController::class);
 
 $rt->post("/cart/*", CartController::class);
 $rt->post("/cart/product/*", CartController::class, ['add_prod']);

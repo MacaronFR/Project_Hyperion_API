@@ -129,6 +129,26 @@ class ExpertOfferController implements Controller{
 		response(200, "Offer Not Started", $offers);
 	}
 
+	private function getReception(array $args){
+		$count = $args['uri_args'][1] ?? 0;
+		$search = $args['uri_args'][2] ?? "";
+		$order = strtoupper($args['uri_args'][3] ?? "ASC");
+		$sort = $args['uri_args'][4] ?? "id";
+		if(!$this->checkParameter($count, $order, $sort)){
+			response(400, "Bad Request");
+		}
+		$offers = $this->om->selectAllFilterReception($search, $order, $sort, $count);
+		$this->getDetail($offers);
+		$total = $this->om->selectTotalFilterReception($search, $order, $sort);
+		$totalNotFiltered = $this->om->selectTotalReception();
+		if($totalNotFiltered === false || $total === false){
+			response(500, 'Internal Server Error');
+		}
+		$offers['total'] = $total;
+		$offers['totalNotFiltered'] = $totalNotFiltered;
+		response(200, "Offer Not Started", $offers);
+	}
+
 	/**
 	 * @param array $args
 	 */
@@ -142,6 +162,8 @@ class ExpertOfferController implements Controller{
 			$this->getActive($args);
 		}elseif($args['additional'][0] === "history"){
 			$this->getHistory($args);
+		}elseif($args['additional'][0] === "reception"){
+			$this->getReception($args);
 		}
 	}
 
