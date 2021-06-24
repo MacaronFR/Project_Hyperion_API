@@ -60,7 +60,7 @@ $rt->put("/category/*/*", CategoryController::class);
 $rt->delete("/category/*/*", CategoryController::class);
 //Type
 $rt->get("/type{/*{/search/*{/order/*/sort/*}}}", TypeController::class);
-$rt->get("/type_cat{/*{/search/*{/order/*/sort/*}}}", TypeController::class, ['cat']);
+$rt->get("/typeCat{/*{/search/*{/order/*/sort/*}}}", TypeController::class, ['cat']);
 // /type/{user_token}/{id_type}
 $rt->put("/type/*/*", TypeController::class);
 // /type/{user_token}/{id_type}
