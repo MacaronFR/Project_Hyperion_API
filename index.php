@@ -199,8 +199,8 @@ $rt->get("/expert/offer/pending/*{/*{/search/*{/order/*/sort/*}}}", ExpertOfferC
 $rt->get("/expert/offer/history/*{/*{/search/*{/order/*/sort/*}}}", ExpertOfferController::class, ['history']);
 $rt->get("/expert/offer/*{/*{/search/*{/order/*/sort/*}}}", ExpertOfferController::class);
 $rt->post("/expert/offer/*/*",ExpertOfferController::class);
-$rt->put("/expert/offer/counter_offer/*",ExpertOfferController::class);
-$rt->put("/offer/reception/*/*", ReceptionOfferController::class);
+$rt->put("/expert/offer/counter_offer/*",ExpertOfferController::class, ['counter']);
+$rt->put("/expert/offer/reception/*/*", ExpertOfferController::class, ['reception']);
 
 $rt->post("/cart/*", CartController::class);
 $rt->post("/cart/product/*", CartController::class, ['add_prod']);

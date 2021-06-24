@@ -195,7 +195,15 @@ class ExpertOfferController implements Controller{
 	/**
 	 * @param array $args
 	 */
-	public function put(array $args){
+	#[NoReturn] public function put(array $args){
+		if($args['additional'][0] === "counter"){
+			$this->putCounter($args);
+		}elseif($args['additional'][0] === "reception"){
+			$this->putReception($args);
+		}
+	}
+
+	#[NoReturn] public function putCounter(array $args){
 		if(checkToken($args['uri_args'],3)){
 			$expert = getUser($this->tkm,$args['uri_args'][0],$this->um);
 			if(!isset($args['post_args']['counter_offer'],$args['post_args']['id'])){
@@ -214,7 +222,6 @@ class ExpertOfferController implements Controller{
 			if($offer['expert'] !== $expert['id']){
 				response(401,"Unauthorized");
 			}
-
 			if($this->om->update($offer['id'],['counter_offer'=>$args['post_args']['counter_offer'],'status'=>4])){
 				response(200,"Offer Updated");
 			}else{
@@ -223,6 +230,23 @@ class ExpertOfferController implements Controller{
 		}else{
 			response(403,"For Bidden");
 		}
+	}
+
+	#[NoReturn] public function putReception(array $args){
+		if(!is_numeric($args['uri_args'][1])){
+			response(400, "Bad Request");
+		}
+		if(!checkToken($args['uri_args'][0], 3)){
+			response(403, "Forbidden");
+		}
+		$offer = $this->om->select($args['uri_args'][1]);
+		if($offer === false){
+			response(404, "Not Found");
+		}
+		if($this->om->update($offer['id'], ['status' => 2])){
+			response(200, "Offer Reception");
+		}
+		response(500, "Internal Server Error");
 	}
 
 	/**

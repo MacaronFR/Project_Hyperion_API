@@ -87,20 +87,7 @@ class ReceptionOfferController implements Controller{
 	 * @inheritDoc
 	 */
 	public function put(array $args){
-		if(!is_numeric($args['uri_args'][1])){
-			response(400, "Bad Request");
-		}
-		$user = getUser(new TokenModel(), $args['uri_args'][0], new UserModel());
-		if((int)$user['status'] > 3){
-			response(403, "Forbidden");
-		}
-		$offer = $this->om->select($args['uri_args'][1]);
-		if($offer === false){
-			response(404, "Not Found");
-		}
-		if($this->om->update($offer['id'], ['status' => 2])){
 
-		}
 	}
 
 	/**
