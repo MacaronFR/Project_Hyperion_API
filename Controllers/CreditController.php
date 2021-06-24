@@ -32,6 +32,8 @@ class CreditController implements Controller{
 	public function get(array $args){
 		if($args['additional'][0] === "me"){
 			$this->getUserCredit($args);
+		}if($args['additional'][0] === "one"){
+			$this->getOne($args);
 		}
 	}
 
@@ -57,6 +59,32 @@ class CreditController implements Controller{
 		}
 		$invoice['total'] = $invoice['totalNotFiltered'] = $total;
 		response(200, "Credits", $invoice);
+	}
+
+	#[NoReturn] private function getOne(array $args){
+		if(!is_numeric($args['uri_args'][1])){
+			response(400, "Bad Request");
+		}
+		$invoice = $this->im->select($args['uri_args'][1]);
+		if($invoice === false){
+			response(404, "Invoice Not Found");
+		}
+		if($invoice['offer'] === null){
+			response(400, "Bad Request");
+		}
+		if(!checkToken($args['uri_args'][0], 3)){
+			$user = getUser($this->tm, $args['uri_args'][0], $this->um);
+			if($user['id'] !== $invoice['user']){
+				response(401, "Unauthorized");
+			}
+		}
+		$file = $this->fm->selectWithB64($invoice['file']);
+		if($file === false){
+			response(500, "Internal Server Error");
+		}
+		unset($file['creator'], $file['file_path']);
+		$invoice['file'] = $file;
+		response(200, "Invoice", $invoice);
 	}
 
 	/**

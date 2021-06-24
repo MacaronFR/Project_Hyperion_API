@@ -180,6 +180,7 @@ $rt->get("/invoice/cart/*/*", InvoiceController::class, ['cart']);
 $rt->put("/invoice/confirm/*", InvoiceController::class);
 
 $rt->get("/credit/me/*{/*}",CreditController::class, ['me']);
+$rt->get("/credit/*/*", CreditController::class, ['one']);
 
 //Shop
 $rt->get("/shop{/*}", ShopController::class, ['main']);
