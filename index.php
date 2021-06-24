@@ -176,6 +176,7 @@ $rt->get("/invoice/me/*",InvoiceController::class, ['me']);
 $rt->get("/invoice/all/*",InvoiceController::class, ['all']);
 $rt->get("/invoice/*/*", InvoiceController::class, ['one']);
 $rt->get("/invoice/cart/*/*", InvoiceController::class, ['cart']);
+$rt->put("/invoice/confirm/*", InvoiceController::class);
 
 //Shop
 $rt->get("/shop{/*}", ShopController::class, ['main']);

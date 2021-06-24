@@ -4,6 +4,7 @@
 namespace Hyperion\API;
 
 
+use DateTime;
 use JetBrains\PhpStorm\NoReturn;
 
 class InvoiceController implements Controller{
@@ -11,12 +12,18 @@ class InvoiceController implements Controller{
 	private UserModel $um;
 	private TokenModel $tm;
 	private FilesModel $fm;
+	private CartModel $cm;
+	private ProductInCartModel $picm;
+	private ProductModel $pm;
 
 	public function __construct(){
 		$this->im = new InvoiceModel();
 		$this->um = new UserModel();
 		$this->tm = new TokenModel();
 		$this->fm = new FilesModel();
+		$this->cm = new CartModel();
+		$this->picm = new ProductInCartModel();
+		$this->pm = new ProductModel();
 	}
 
 	/**
@@ -109,7 +116,37 @@ class InvoiceController implements Controller{
 	 * @inheritDoc
 	 */
 	public function put(array $args){
-		// TODO: Implement put() method.
+		if(!is_numeric($args['uri_args'][0])){
+			response(400, "Bad Request");
+		}
+		$cart = $this->cm->select($args['uri_args'][0]);
+		if($cart === false){
+			response(404, "Cart Not Found");
+		}
+		$products = $this->picm->selectByCart($cart['id']);
+		if($products === false){
+			response(500, "Internal Server Error");
+		}
+		foreach($products as $product){
+			$p = $this->pm->select($product['product']);
+			if($p === false){
+				response(501, "Internal Server Error");
+			}
+			if((int)$p['status'] !== 2){
+				response(404, "Product Not Found");
+			}
+			if(!$this->pm->update($product['product'], ['status' => 3, 'sell_d' => (new DateTime())->format("Y-m-d H:i:s")])){
+				response(502, "Internal Server Error");
+			}
+		}
+		$invoice = $this->im->select($cart['id'], "cart");
+		if($invoice === false){
+			response(503, "Internal Server Error");
+		}
+		if($this->im->update($invoice['id'], ['status' => 1])){
+			response(200, "Invoice updated");
+		}
+		response(504, "Internal Server Error");
 	}
 
 	/**

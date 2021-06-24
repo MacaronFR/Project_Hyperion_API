@@ -14,6 +14,7 @@ class InvoiceModel extends Model{
 		"file" => "id_file",
 		"cart" => "id_cart",
 		"offer" => "id_offer",
-		"user" => "id_user"
+		"user" => "id_user",
+		"status" => "status"
 	];
 }
