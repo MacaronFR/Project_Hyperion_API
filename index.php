@@ -10,6 +10,7 @@ use Hyperion\API\{CartController,
 	OfferController,
 	PendingOfferController,
 	ProjectController,
+	ReceptionOfferController,
 	ShopProductController,
 	TypeController,
 	TerminatedOfferController,
@@ -139,6 +140,7 @@ $rt->get("/product_detail{/*{/search/*{/order/*/sort/*}}}", ProductHierarchyCont
 $rt->delete("/product/*/*", ProductHierarchyController::class);
 // OFFER
 // /offer/{token}/{id} || /offer/{token}[/{page}[/search/*[/order/*/sort/*]]]
+$rt->get("/offer/reception/all/*{/*}", ReceptionOfferController::class, ['all']);
 $rt->get("/offer/pending/all/*{/*}", PendingOfferController::class, ['all']);
 $rt->get("/offer/pending/*/user/*{/*}", PendingOfferController::class, ['user']);
 $rt->get("/offer/pending/*{/*}", PendingOfferController::class);
