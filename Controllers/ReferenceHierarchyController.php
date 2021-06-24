@@ -268,10 +268,10 @@ class ReferenceHierarchyController implements Controller{
 			$model = $model_exist['id'];
 		}
 		if($this->rhsm->insert(["product" => $new_ref , "spec" => $model]) === false){
-			response(500, "Internal Server Error");
+			response(501, "Internal Server Error");
 		}
 		if($this->rhsm->insert(["product" => $new_ref , "spec" => $args['post_args']['brand']]) === false){
-			response(500, "Internal Server Error");
+			response(502, "Internal Server Error");
 		}
 		foreach($specs as $spec){
 			foreach($spec['value'] as $val){
@@ -279,13 +279,13 @@ class ReferenceHierarchyController implements Controller{
 				if($spec_id === false){
 					$spec_id = $this->sm->insert(["name" => $spec['name'], "value" => $val['value']]);
 					if($spec_id === false){
-						response(500, "Internal Server Error");
+						response(503, "Internal Server Error");
 					}
 				}else{
 					$spec_id = $spec_id['id'];
 				}
 				if($this->rhsm->insert(['product' => $new_ref, 'spec' => $spec_id, 'bonus' => $val['bonus']]) === false){
-					response(500, "Internal Server Error");
+					response(504, "Internal Server Error");
 				}
 			}
 		}
