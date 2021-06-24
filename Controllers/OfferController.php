@@ -5,6 +5,7 @@ namespace Hyperion\API;
 
 require_once "autoload.php";
 
+use DateTime;
 use JetBrains\PhpStorm\NoReturn;
 
 class OfferController implements Controller{
@@ -308,7 +309,7 @@ class OfferController implements Controller{
 			if($prod === false){
 				response(501, "Internal Server Error");
 			}
-			if($this->pm->update($prod['id'], ['status' => 2])){
+			if($this->pm->update($prod['id'], ['status' => 2, 'buy_d' => (new DateTime())->format("Y-m-d H:i:s"), "buy_p" => $offer['counter_offer'], "sell_p" => ((double)$offer['counter_offer'] * 1.3)])){
 				response(200, "Offer Updated");
 			}
 			response(502, "Internal Server Error");
