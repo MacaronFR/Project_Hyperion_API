@@ -332,7 +332,9 @@ class OfferController implements Controller{
 			}
 			$prod['spec'] = $this->pm->selectWithDetail($prod['id'])['spec'];
 			$user = (new UserModel())->select($offer['user']);
+			$user['addr'] = (new AddressModel())->select($user['addr']);
 			$file_content = $this->getCredit($prod, $user, $invoice_id);
+			file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/images/invoice/" . $save_name, $file_content);
 			response(200, "Offer Updated");
 		}
 		response(200, "Offer Updated");
