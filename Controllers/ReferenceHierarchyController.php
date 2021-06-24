@@ -284,7 +284,7 @@ class ReferenceHierarchyController implements Controller{
 				}else{
 					$spec_id = $spec_id['id'];
 				}
-				if($this->rhsm->insert(['product' => $new_ref, 'spec' => $spec_id, 'bonus' => $val['bonus']]) === false){
+				if($this->rhsm->insert(['product' => $new_ref, 'spec' => $spec_id, 'value' => $val['bonus']]) === false){
 					response(504, "Internal Server Error");
 				}
 			}
