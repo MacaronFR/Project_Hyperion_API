@@ -176,7 +176,7 @@ class CartController implements Controller{
 		$file_content = $this->getInvoice($cart['id'], $user);
 		$save_name = md5(time() . "facture.pdf") . "b64";
 		file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/images/invoice/" . $save_name, $file_content);
-		$file_id = $this->fm->insert(['filename' => "facture.pdf", "file_path" => "images/invoice/" . $save_name, "type" => "application/pdf", "creator" => $user['id']]);
+		$file_id = $this->fm->insert(['file_name' => "facture.pdf", "file_path" => "images/invoice/" . $save_name, "type" => "application/pdf", "creator" => $user['id']]);
 		$invoice_value = [
 			'total' => $cart['total'],
 			'file' => $file_id,
@@ -185,14 +185,13 @@ class CartController implements Controller{
 		];
 		$invoice_id = $this->im->insert($invoice_value);
 		if($invoice_id === false){
-			response(500, "Internal Server Error");
+			response(501, "Internal Server Error");
 		}
 		response(200, "Command OK, Invoice generated", ['invoice' => $invoice_id]);
 	}
 
 	private function getInvoice($id_cart, $user): string{
 		include "Invoice.php";
-		header("Content-type: application/pdf");
 		return base64_encode($pdf_output);
 	}
 
