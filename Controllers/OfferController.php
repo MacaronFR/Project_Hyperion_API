@@ -241,7 +241,6 @@ class OfferController implements Controller{
 		}
 		foreach($args['post_args']['files'] as $file){
 			$save_name = md5(time() . $file['filename']) . ".b64";
-			var_dump(file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/images/offer/" . $save_name, $file['content']));
 			if(file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/images/offer/" . $save_name, $file['content']) === false){
 				response(509, "Internal Server Error");
 			}

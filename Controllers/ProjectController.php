@@ -4,16 +4,20 @@
 namespace Hyperion\API;
 
 
+use Cassandra\Date;
+use DateTime;
 use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\NoReturn;
 
 class ProjectController implements Controller{
 	private ProjectModel $pm;
 	private FilesModel $fm;
+	private TokenModel $tm;
 
 	public function __construct(){
 		$this->pm = new ProjectModel();
 		$this->fm = new FilesModel();
+		$this->tm = new TokenModel();
 	}
 
 	/**
@@ -151,18 +155,61 @@ class ProjectController implements Controller{
 	 * @inheritDoc
 	 */
 	public function post(array $args){
-		if(!is_numeric($args['post_args']['id'])){
-			response(400,"Bad Request");
-		}else{
-			$project = $this->pm->select($args['post_args']['id']);
-			if($project !== false){
-				response(400,"Project Already exist");
-			}else{
-				if($this->pm->checkProject($args['post_args']['rna']));
-				$this->pm->insert($args['post_args']);
-			}
+		$post_key = ['name' => 0, 'description' => 0, 'start' => 0, 'duration' => 0, 'logo' => 0, 'RNA' => 0];
+		$file_key = ['filename' => 0, 'type' => 0, 'content' => 0];
+		$user_token = $this->tm->selectByToken($args['uri_args'][0]);
+		$values = array_intersect_key($args['post_args'], $post_key);
+		if(count($values) !== 6){
+			response(400, "Bad Request");
 		}
+		$values['logo'] = array_intersect_key($values['logo'], $file_key);
+		if(count($values['logo']) !== 3){
+			response(400, "Bad Request");
+		}
+		if($values['logo']['type'] !== "image/png"){
+			response(400, "Only Png image accepted");
+		}
+		if(!is_png(base64_decode($values['logo']['content']))){
+			response(400, "Bad request");
+		}
+		$start = DateTime::createFromFormat("Y-m-d", $values['start']);
+		if($start === false){
+			response(400, "Invalid date format");
+		}
+		if($start->diff(new DateTime())->invert === 0){
+			response(400, "Start date in past");
+		}
+		if(!$this->checkRNA($values['RNA'])){
+			response(400, "Bad RNA");
+		}
+		$save_name = md5(time() . $values['logo']['filename']) . ".b64";
+		if(file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/images/offer/" . $save_name, $values['logo']['content']) === false){
+			response(500, "Internal Server Error");
+		}
+		$file_id = $this->fm->insert(['file_path' => "images/offer/" . $save_name, "file_name" => $values['logo']['filename'], 'type' => $values['logo']['type'], 'creator' => $user_token['user']]);
+		if($file_id === false){
+			response(510, "Internal Server Error");
+		}
+		$values['logo'] = $file_id;
+		if($this->pm->insert($values)){
+			response(200, "Project Added");
+		}
+		response(501, "Internal Server Error");
 	}
+
+	private function checkRNA(string $RNA): bool{
+		$curl = curl_init();
+		$opt = [
+			CURLOPT_FOLLOWLOCATION => false,
+			CURLOPT_CUSTOMREQUEST => "GET",
+			CURLOPT_URL => "https://entreprise.data.gouv.fr/api/rna/v1/id/$RNA",
+			CURLOPT_RETURNTRANSFER => true
+		];
+		curl_setopt_array($curl, $opt);
+		$res = curl_exec($curl);
+		$http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+		return $http_code === 200;
+}
 
 	/**
 	 * @inheritDoc

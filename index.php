@@ -169,7 +169,7 @@ $rt->get("/project/invalid{/*{/search/*{/order/*/sort/*}}}",ProjectController:: 
 $rt->post("/project/*",ProjectController::class);
 
 // CONTRIBUTION
-$rt->post("/project/contribute/*", ContributeController::class);
+$rt->post("/project/contribute/*", ContributeController::class, ['contribute']);
 
 //
 $rt->get("/invoice/me/*",InvoiceController::class, ['me']);

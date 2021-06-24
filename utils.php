@@ -5,6 +5,7 @@ use Hyperion\API\LogsModel;
 use Hyperion\API\UserModel;
 use JetBrains\PhpStorm\NoReturn;
 use Hyperion\API\TokenModel;
+use JetBrains\PhpStorm\Pure;
 
 $_PUT = [];
 /**
@@ -110,4 +111,8 @@ function replace_file_ext(string $org, string $new_ext): string{
 	array_pop($exp);
 	$exp[] = $new_ext;
 	return join(".", $exp);
+}
+
+#[Pure] function is_png($pict): bool{
+	return (bin2hex($pict[0]) == '89' && $pict[1] == 'P' && $pict[2] == 'N' && $pict[3] == 'G');
 }
