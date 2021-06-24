@@ -14,7 +14,8 @@ class OffersModel extends Model{
 		"status" => "status",
 		"user" => "id_user",
 		"date" => "date_creation",
-		"expert" => "id_expert"
+		"expert" => "id_expert",
+		'credit' => "id_credit"
 	];
 	protected int $max_row = 10;
 

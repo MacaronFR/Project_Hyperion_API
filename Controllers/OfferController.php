@@ -22,6 +22,7 @@ class OfferController implements Controller{
 	private TokenModel $tom;
 	private FilesModel $fm;
 	private ProductPicturesModel $ppm;
+	private InvoiceModel $im;
 	private array $auth_type = ['image/png' => 'png', "image/jpeg" => 'jpg'];
 
 	public function __construct(){
@@ -37,6 +38,7 @@ class OfferController implements Controller{
 		$this->tom = new TokenModel();
 		$this->fm = new  FilesModel();
 		$this->ppm = new ProductPicturesModel();
+		$this->im = new InvoiceModel();
 	}
 
 	#[NoReturn] public function getOfferById(array $args){
@@ -301,7 +303,23 @@ class OfferController implements Controller{
 			"accept" => 6,
 			"refuse" => 5
 		};
-		if(!$this->om->update($offer['id'], ['status' => $val])){
+		if($val === 6){
+			$save_name = md5(time() . "facture.pdf") . "b64";
+			$file_id = $this->fm->insert(['file_name' => "facture.pdf", "file_path" => "images/invoice/" . $save_name, "type" => "application/pdf", "creator" => $offer['user']]);
+			$invoice_value = [
+				'total' => $offer['counter_offer'],
+				'file' => $file_id,
+				'offer' => $offer['id'],
+				'user' => $offer['user']
+			];
+			$invoice_id = $this->im->insert($invoice_value);
+			if($invoice_id === false){
+				response(501, "Internal Server Error");
+			}
+		}else{
+			$invoice_id = null;
+		}
+		if(!$this->om->update($offer['id'], ['status' => $val, 'credit' => $invoice_id])){
 			response(500, "Internal Server Error");
 		}
 		if($val === 6){
@@ -309,12 +327,28 @@ class OfferController implements Controller{
 			if($prod === false){
 				response(501, "Internal Server Error");
 			}
-			if($this->pm->update($prod['id'], ['status' => 2, 'buy_d' => (new DateTime())->format("Y-m-d H:i:s"), "buy_p" => $offer['counter_offer'], "sell_p" => ((double)$offer['counter_offer'] * 1.3)])){
-				response(200, "Offer Updated");
+			if(!$this->pm->update($prod['id'], ['status' => 2, 'buy_d' => (new DateTime())->format("Y-m-d H:i:s"), "buy_p" => $offer['counter_offer'], "sell_p" => ((double)$offer['counter_offer'] * 1.3)])){
+				response(502, "Internal Server Error");
 			}
-			response(502, "Internal Server Error");
+			$prod['spec'] = $this->pm->selectWithDetail($prod['id'])['spec'];
+			$user = (new UserModel())->select($offer['user']);
+			$file_content = $this->getCredit($prod, $user, $invoice_id);
+			response(200, "Offer Updated");
 		}
 		response(200, "Offer Updated");
+	}
+
+	private function getCredit($product, $user, $id_invoice): string{
+		$tab = [[
+			'userName' => $user['name'],
+			'firstname' => $user['fname'],
+			'address' => $user['addr']['address'],
+			'zip' => $user['addr']['zip'],
+			'city' => $user['addr']['city']
+		]];
+		$tab[] = ['description' => $product['spec']['brand'] . " " . $product['spec']['model'], 'tva' => 20, 'selling_price' => $product['sell_p']];
+		include "Credits.php";
+		return base64_encode($pdf_output);
 	}
 
 	private function putRetrieveData(array $args): array{
@@ -441,7 +475,7 @@ class OfferController implements Controller{
 				$new_val['spec'][$n] = $spec_id['id'];
 			}
 		}
-		if(isset($new_val['state'])){
+		if(isset($new_val['state']) && (int)$old_val['state'] !== (int)$new_val['state']){
 			if(!$this->pm->update($data['product']['id'], ['state' => $new_val['state']])){
 				response(502, "Internal Server Error");
 			}
