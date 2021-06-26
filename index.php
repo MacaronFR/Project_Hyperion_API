@@ -174,12 +174,13 @@ $rt->post("/project/contribute/*", ContributeController::class, ['contribute']);
 
 //
 $rt->get("/invoice/me/*{/*}",InvoiceController::class, ['me']);
-$rt->get("/invoice/all/*",InvoiceController::class, ['all']);
+$rt->get("/invoice/all/*{/*‘}",InvoiceController::class, ['all']);
 $rt->get("/invoice/*/*", InvoiceController::class, ['one']);
 $rt->get("/invoice/cart/*/*", InvoiceController::class, ['cart']);
 $rt->put("/invoice/confirm/*", InvoiceController::class);
 
 $rt->get("/credit/me/*{/*}",CreditController::class, ['me']);
+$rt->get("/credit/all/*{/*‘}",CreditController::class, ['all']);
 $rt->get("/credit/*/*", CreditController::class, ['one']);
 
 //Shop

@@ -57,4 +57,43 @@ class InvoiceModel extends Model{
 		}
 		return $total['count'];
 	}
+
+	private function selectAllByColumn(string $column, int $iteration = 0, bool $limit = true): array|false{
+		$sql = "SELECT ";
+		foreach($this->column as $name => $item){
+			$sql .= " $item as $name,";
+		}
+		$sql .= " $this->id_name as id";
+		$sql .= " FROM $this->table_name WHERE $column IS NOT NULL ";
+		if($limit){
+			$start = $iteration * $this->max_row;
+			$sql .= "LIMIT $start, $this->max_row;";
+		}
+		return $this->query($sql);
+	}
+
+	public function selectAllInvoice(int $iteration = 0, bool $limit = true): array|false{
+		return $this->selectAllByColumn("id_cart", $iteration, $limit);
+	}
+
+	public function selectAllCredit(int $iteration = 0, bool $limit = true): array|false{
+		return $this->selectAllByColumn("id_offer", $iteration, $limit);
+	}
+
+	public function selectAllInvoiceTotal(): int|false{
+		return $this->selectAllTotal("id_cart");
+	}
+
+	public function selectAllCreditTotal(): int|false{
+		return $this->selectAllTotal("id_offer");
+	}
+
+	private function selectAllTotal(string $column): int|false{
+		$sql = "SELECT COUNT($this->id_name) as count FROM $this->table_name WHERE $column IS NOT NULL ";
+		$total = $this->query($sql, unique: true);
+		if($total === false){
+			return false;
+		}
+		return $total['count'];
+	}
 }
