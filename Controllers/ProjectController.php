@@ -154,7 +154,7 @@ class ProjectController implements Controller{
 	/**
 	 * @inheritDoc
 	 */
-	public function post(array $args){
+	#[NoReturn] public function post(array $args){
 		$post_key = ['name' => 0, 'description' => 0, 'start' => 0, 'duration' => 0, 'logo' => 0, 'RNA' => 0];
 		$file_key = ['filename' => 0, 'type' => 0, 'content' => 0];
 		$user_token = $this->tm->selectByToken($args['uri_args'][0]);
