@@ -97,7 +97,6 @@ class TerminatedOfferController implements Controller{
 			}
 			$p['type'] = $type['type'];
 			$p['state'] = $product['state'];
-			$p['status'] = $product['status'];
 			$p['brand'] = $spec['spec']['brand'][0][0];
 			$p['model'] = $spec['spec']['model'][0][0];
 		}
