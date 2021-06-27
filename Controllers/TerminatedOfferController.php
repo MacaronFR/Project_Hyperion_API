@@ -36,8 +36,7 @@ class TerminatedOfferController implements Controller{
 				$this->getTerminated($this->om->selectAllTerminatedByUser($token['user'], $args['uri_args'][1]), $total);
 			}
 		}
-		$test = $this->getTerminated($this->om->selectAllTerminatedByUser($token['user'], limit: false), $total);
-		var_dump($test);
+		$this->getTerminated($this->om->selectAllTerminatedByUser($token['user'], limit: false), $total);
 	}
 
 	#[NoReturn] public function getAllTerminated(array $args){
@@ -98,6 +97,7 @@ class TerminatedOfferController implements Controller{
 			}
 			$p['type'] = $type['type'];
 			$p['state'] = $product['state'];
+			$p['status'] = $product['status'];
 			$p['brand'] = $spec['spec']['brand'][0][0];
 			$p['model'] = $spec['spec']['model'][0][0];
 		}
