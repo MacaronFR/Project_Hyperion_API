@@ -160,27 +160,28 @@ class ProjectController implements Controller{
 		$user_token = $this->tm->selectByToken($args['uri_args'][0]);
 		$values = array_intersect_key($args['post_args'], $post_key);
 		if(count($values) !== 6){
-			response(410, "Bad Request");
+			response(400, "Bad Request");
 		}
 		$values['logo'] = array_intersect_key($values['logo'], $file_key);
 		if(count($values['logo']) !== 3){
-			response(420, "Bad Request");
+			response(400, "Bad Request");
 		}
 		if($values['logo']['type'] !== "image/png"){
-			response(430, "Only Png image accepted");
+			response(400, "Only Png image accepted");
 		}
+		var_dump($values['logo']['content']);
 		if(!is_png(base64_decode($values['logo']['content']))){
-			response(440, "Bad request");
+			response(400, "Bad request");
 		}
 		$start = DateTime::createFromFormat("Y-m-d", $values['start']);
 		if($start === false){
-			response(450, "Invalid date format");
+			response(400, "Invalid date format");
 		}
 		if($start->diff(new DateTime())->invert === 0){
-			response(460, "Start date in past");
+			response(400, "Start date in past");
 		}
 		if(!$this->checkRNA($values['RNA'])){
-			response(470, "Bad RNA");
+			response(400, "Bad RNA");
 		}
 		$save_name = md5(time() . $values['logo']['filename']) . ".b64";
 		if(file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/images/offer/" . $save_name, $values['logo']['content']) === false){
@@ -188,13 +189,13 @@ class ProjectController implements Controller{
 		}
 		$file_id = $this->fm->insert(['file_path' => "images/offer/" . $save_name, "file_name" => $values['logo']['filename'], 'type' => $values['logo']['type'], 'creator' => $user_token['user']]);
 		if($file_id === false){
-			response(510, "Internal Server Error");
+			response(501, "Internal Server Error");
 		}
 		$values['logo'] = $file_id;
 		if($this->pm->insert($values)){
 			response(200, "Project Added");
 		}
-		response(501, "Internal Server Error");
+		response(502, "Internal Server Error");
 	}
 
 	private function checkRNA(string $RNA): bool{
