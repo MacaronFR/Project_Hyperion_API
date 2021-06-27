@@ -160,27 +160,27 @@ class ProjectController implements Controller{
 		$user_token = $this->tm->selectByToken($args['uri_args'][0]);
 		$values = array_intersect_key($args['post_args'], $post_key);
 		if(count($values) !== 6){
-			response(400, "Bad Request");
+			response(410, "Bad Request");
 		}
 		$values['logo'] = array_intersect_key($values['logo'], $file_key);
 		if(count($values['logo']) !== 3){
-			response(400, "Bad Request");
+			response(420, "Bad Request");
 		}
 		if($values['logo']['type'] !== "image/png"){
-			response(400, "Only Png image accepted");
+			response(430, "Only Png image accepted");
 		}
 		if(!is_png(base64_decode($values['logo']['content']))){
-			response(400, "Bad request");
+			response(440, "Bad request");
 		}
 		$start = DateTime::createFromFormat("Y-m-d", $values['start']);
 		if($start === false){
-			response(400, "Invalid date format");
+			response(450, "Invalid date format");
 		}
 		if($start->diff(new DateTime())->invert === 0){
-			response(400, "Start date in past");
+			response(460, "Start date in past");
 		}
 		if(!$this->checkRNA($values['RNA'])){
-			response(400, "Bad RNA");
+			response(470, "Bad RNA");
 		}
 		$save_name = md5(time() . $values['logo']['filename']) . ".b64";
 		if(file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/images/offer/" . $save_name, $values['logo']['content']) === false){
