@@ -160,7 +160,7 @@ class InvoiceController implements Controller{
 	/**
 	 * @inheritDoc
 	 */
-	public function put(array $args){
+	#[NoReturn] public function put(array $args){
 		if(!is_numeric($args['uri_args'][0])){
 			response(400, "Bad Request");
 		}
@@ -188,10 +188,18 @@ class InvoiceController implements Controller{
 		if($invoice === false){
 			response(503, "Internal Server Error");
 		}
+		$user = $this->um->select($cart['user']);
+		if($user === false){
+			response(504, "Internal Server Error");
+		}
+		$gc = (int)$user['gc'] + (int)floor($invoice['total'] / 10);
+		if(!$this->um->update($cart['user'], ['gc' => $gc])){
+			response(505, "Internal Server Error");
+		}
 		if($this->im->update($invoice['id'], ['status' => 1])){
 			response(200, "Invoice updated");
 		}
-		response(504, "Internal Server Error");
+		response(506, "Internal Server Error");
 	}
 
 	/**
