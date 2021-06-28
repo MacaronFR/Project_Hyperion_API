@@ -226,6 +226,9 @@ class ProjectController implements Controller{
 		if($project === false){
 			response(404, "Not Found");
 		}
+		if((int)$project['valid'] !== 0){
+			response(404, "Not Found");
+		}
 		if($this->pm->update($project['id'], ['valid' => 1])){
 			response(200, "Project Validated");
 		}
