@@ -37,7 +37,7 @@ class ProjectController implements Controller{
 		}
 	}
 
-	public function getInvalid(array $args){
+	#[NoReturn] public function getInvalid(array $args){
 		if(count($args["uri_args"]) === 0){
 			$invalid = $this->pm->selectAllProject(limit:false,valid: 0);
 		}elseif(count($args['uri_args']) >= 1){
@@ -45,7 +45,7 @@ class ProjectController implements Controller{
 				response(400,"Bad Request");
 			}
 			if(count($args['uri_args']) > 1){
-				$order = match($args['uri_args'][2]){@
+				$order = match($args['uri_args'][2]){
 					'DESC' => 'DESC',
 					default => 'ASC'
 				};
@@ -56,13 +56,13 @@ class ProjectController implements Controller{
 					default => 'id'
 				};
 				$search = $args['uri_args'][1];
-				$projects = $this->pm->selectAllProjectFilter($search, $order, $sort, $args['uri_args'][0],0);
+				$invalid = $this->pm->selectAllProjectFilter($search, $order, $sort, $args['uri_args'][0],0);
 			}else{
-				$projects = $this->pm->selectAllProject($args['uri_args'][0], valid:0);
+				$invalid = $this->pm->selectAllProject($args['uri_args'][0], valid:0);
 			}
 		}
 		$this->processProject($invalid, !(isset($args['additional'][1]) && $args['additional'][1] === 'nologo'));
-		response(200, "Projects", $projects);
+		response(200, "Projects", $invalid);
 		}
 
 
@@ -215,8 +215,21 @@ class ProjectController implements Controller{
 	/**
 	 * @inheritDoc
 	 */
-	public function put(array $args){
-		// TODO: Implement put() method.
+	#[NoReturn] public function put(array $args){
+		if(!is_numeric($args['uri_args'][1])){
+			response(400, "Bad Request");
+		}
+		if(!checkToken($args['uri_args'][0], 3)){
+			response(401, "Unauthorized");
+		}
+		$project = $this->pm->select($args['uri_args'][1]);
+		if($project === false){
+			response(404, "Not Found");
+		}
+		if($this->pm->update($project['id'], ['valid' => 1])){
+			response(200, "Project Validated");
+		}
+		response(500, "Internal Server Error");
 	}
 
 	/**

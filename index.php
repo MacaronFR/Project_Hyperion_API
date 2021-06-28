@@ -160,6 +160,7 @@ $rt->put("/offer/set/*/*", OfferController::class, ['set']);
 $rt->get("/project/nologo/popular{/*}",ProjectController::class, ['popular', 'nologo']);
 $rt->get("/project/nologo/latest{/*}",ProjectController::class, ['latest', 'nologo']);
 $rt->get("/project/nologo{/*{/search/*{/order/*/sort/*}}}",ProjectController:: class, ['all', 'nologo']);
+$rt->get("/project/nologo/invalid{/*{/search/*{/order/*/sort/*}}}",ProjectController:: class, ['invalid', 'nologo']);
 
 $rt->get("/project/logo/*", ProjectController::class, ['logo']);
 
@@ -168,6 +169,7 @@ $rt->get("/project/latest{/*}",ProjectController::class, ['latest']);
 $rt->get("/project{/*{/search/*{/order/*/sort/*}}}",ProjectController:: class, ['all']);
 $rt->get("/project/invalid{/*{/search/*{/order/*/sort/*}}}",ProjectController:: class, ['invalid']);
 $rt->post("/project/*",ProjectController::class);
+$rt->put("/project/valid/*/*", ProjectController::class);
 
 // CONTRIBUTION
 $rt->post("/project/contribute/*", ContributeController::class, ['contribute']);
